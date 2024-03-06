@@ -132,9 +132,6 @@ class _PersonalEditState extends State<PersonalEdit> {
                 yearcontroller.text=dynamicdata[0]["b_year"];
                 status =dynamicdata[0]["marital_status"];
                 spousenativecontroller.text=dynamicdata[0]["native"];
-
-
-
               });
             }
           });
@@ -317,6 +314,8 @@ class _PersonalEditState extends State<PersonalEdit> {
 
   @override
   Widget build(BuildContext context) {
+    fetchData(widget.currentID.toString());
+
     status=="Married"?
     depVisible = true :depVisible = false;
     getDistrict();

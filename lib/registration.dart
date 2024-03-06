@@ -7,7 +7,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
- import 'dart:html' as html;
+// import 'dart:html' as html;
 import 'login.dart';
 
 class Registration extends StatelessWidget {

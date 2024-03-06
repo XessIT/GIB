@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'dart:html' as html;
+//import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'edit_offer.dart';
 import 'package:http/http.dart' as http;
-
 
 class OfferList extends StatelessWidget {
   final String? userId;
@@ -116,7 +115,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
 
   String? imagename;
   String? imagedata;
-  Future<void> getImage() async {
+  /*Future<void> getImage() async {
     final html.FileUploadInputElement input = html.FileUploadInputElement();
     input.click();
     input.onChange.listen((e) {
@@ -133,7 +132,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
       });
       reader.readAsArrayBuffer(file);
     });
-  }
+  }*/
 
   bool showLocalImage = false;
   XFile? pickedImage;
@@ -151,19 +150,20 @@ class _AddOfferPageState extends State<AddOfferPage> {
       });
     }
   }
-  /*pickImageFromGallery() async {
+  pickImageFromCamera() async {
     ImagePicker imagePicker = ImagePicker();
-    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    pickedImage = await imagePicker.pickImage(source: ImageSource.camera);
     showLocalImage = true;
     if (pickedImage != null) {
-      String imageName = pickedImage!.name;
-      print('Image Name: $imageName');
-      List<int> imageBytes = await pickedImage.readAsBytes();
-      imagedata = base64Encode(imageBytes);
-      print('Image Data: $imagedata');
+      List<int> imageBytes = await pickedImage!.readAsBytes();
+      setState(() {
+        imagename = pickedImage!.name;
+        print('Image Name: $imagename');
+        imagedata = base64Encode(imageBytes);
+        print('Image Data: $imagedata');
+      });
     }
-    setState(() {});
-  }*/
+  }
 
   // ends here
   List<Map<String, dynamic>> data=[];
@@ -253,8 +253,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
                 const SizedBox(height: 20,),
                 InkWell(
                   child: CircleAvatar(
-                    backgroundImage: selectedImage != null
-                        ? Image.memory(selectedImage!).image
+                    backgroundImage: pickedImage != null
+                        ? Image.memory(pickedImage! as Uint8List).image
                         : const AssetImage('assets/add_offer.png'),
                     radius:75,
                   ),
@@ -267,8 +267,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             leading: const Icon(Icons.camera_alt),
                             title: const Text("With Camera"),
                             onTap: () async {
-                              pickImageFromGallery();
-                              // pickImageFromCamera();
+                               pickImageFromCamera();
                               Navigator.of(context).pop();
                             },
                           ),
@@ -276,7 +275,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             leading: const Icon(Icons.storage),
                             title: const Text("From Gallery"),
                             onTap: () {
-                              getImage();
+                              pickImageFromGallery();
+                             // getImage();
                               Navigator.of(context).pop();
                             },
                           )
