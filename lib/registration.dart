@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
 // import 'dart:html' as html;
+
 import 'login.dart';
 
 class Registration extends StatelessWidget {
@@ -120,6 +121,7 @@ class _GuestState extends State<Guest> {
   }
 
   List mobileBaseFetchIDdata=[];
+
   Future<void> MobileBaseIdFetched(String mobile) async {
     try {
       print("Mobile :$mobile");
@@ -157,6 +159,7 @@ class _GuestState extends State<Guest> {
   }
 
   List idBaseFetchMobiledata=[];
+
   Future<void> idBaseMobileNoFetched(String memberId) async {
     try {
       print("Mobile :$memberId");
@@ -243,6 +246,8 @@ class _GuestState extends State<Guest> {
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
 
+  String blockStatus ="Block";
+  String adminRights ="Pending";
   Future<void> uploadImage() async {
 
       if(membertype=="Member Type") {
@@ -250,6 +255,9 @@ class _GuestState extends State<Guest> {
           membertype
           = "Guest";
           print("type:$membertype");
+          blockStatus = "UnBlock";
+          adminRights = "Accepted";
+
         });
       }
     try {
@@ -272,8 +280,8 @@ class _GuestState extends State<Guest> {
         "pin":passwordcontroller.text.trim(),
         "referrer_mobile":referrermobilecontroller.text.trim(),
         "OTP":databaseOTP.toString(),
-        "block_status":"Block",
-        "admin_rights":"Pending",
+        "block_status":blockStatus.toString(),
+        "admin_rights":adminRights.toString(),
         "type":type.toString(),
         "district":districtController.text,
         "chapter":chapterController.text,
@@ -329,25 +337,6 @@ class _GuestState extends State<Guest> {
   TextEditingController caption = TextEditingController();
   String? imagename;
   String? imagedata;
-  // Future<void> getImage() async {
-  //   final html.FileUploadInputElement input = html.FileUploadInputElement();
-  //   input.click();
-  //
-  //   input.onChange.listen((e) {
-  //     final html.File file = input.files!.first;
-  //     final reader = html.FileReader();
-  //
-  //     reader.onLoadEnd.listen((e) {
-  //       setState(() {
-  //         selectedImage = reader.result as Uint8List?;
-  //         imagename = file.name;
-  //         imagedata = base64Encode(selectedImage!);
-  //       });
-  //     });
-  //
-  //     reader.readAsArrayBuffer(file);
-  //   });
-  // }
   bool showLocalImage = false;
   XFile? pickedImage;
 
@@ -419,6 +408,10 @@ class _GuestState extends State<Guest> {
 
 
   /// ends here
+
+
+
+
 
 
   @override
@@ -506,7 +499,8 @@ class _GuestState extends State<Guest> {
                                 leading: const Icon(Icons.storage),
                                 title: const Text("From Gallery"),
                                 onTap: () {
-                                  //getImage();
+                                  pickImageFromGallery();
+                                //  getImage();
                                   Navigator.of(context).pop();
                                 },
                               )

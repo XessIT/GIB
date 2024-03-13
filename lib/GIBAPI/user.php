@@ -35,7 +35,7 @@ if (!$conn) {
       if (file_exists($userData['profile_image'])) {
           $image = base64_encode(file_get_contents($userData['profile_image']));
       } else {
-          $image = ''; // or any other default value
+          $image = '';
       }
       $firstName = $userData['first_name'];
       $lastName = $userData['last_name'];

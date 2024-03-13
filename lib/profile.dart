@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gipapp/guest_personal_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
 
@@ -237,7 +238,12 @@ class _PersonalState extends State<Personal> {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
+                    widget.userType != "Guest"?
+
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
+                      currentID:userID.toString(),
+                    )))
+                        : Navigator.push(context, MaterialPageRoute(builder: (context)=> GuestPersonalEdit (
                       currentID:userID.toString(),
                     )));
                   },
@@ -262,8 +268,11 @@ class _PersonalState extends State<Personal> {
 
                     ],
                   ),
+                  if(widget.userType != "Guest")
                   const Divider(),
-                  Row(
+                  if(widget.userType != "Guest")
+
+                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       Padding(
@@ -276,8 +285,12 @@ class _PersonalState extends State<Personal> {
                       )
                     ],
                   ),
-                  const Divider(),
-                  Row(
+                  if(widget.userType != "Guest")
+
+                    const Divider(),
+                  if(widget.userType != "Guest")
+
+                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       Padding(
@@ -290,7 +303,8 @@ class _PersonalState extends State<Personal> {
                       )
                     ],
                   ),
-                  const Divider(),
+
+                    const Divider(),
                   Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -304,8 +318,12 @@ class _PersonalState extends State<Personal> {
                       )
                     ],
                   ),
-                  const Divider(),
-                  Row(
+                  if(widget.userType != "Guest")
+
+                    const Divider(),
+                  if(widget.userType != "Guest")
+
+                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(

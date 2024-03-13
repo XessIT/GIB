@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:gipapp/about_view.dart';
 import 'package:gipapp/profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Offer/offer.dart';
 import 'about.dart';
 import 'add_member.dart';
 import 'attendance.dart';
@@ -422,7 +424,7 @@ class _HomeState extends State<Home> {
                                 backgroundImage: AssetImage("assets/profile.png"),
                                 radius: 25,
                               ),
-                              Text("Elango", style: Theme.of(context).textTheme.titleSmall,)
+                              Text("Arjun", style: Theme.of(context).textTheme.titleSmall,)
                             ],
                           ),const SizedBox(width: 7,),
 
@@ -443,7 +445,7 @@ class _HomeState extends State<Home> {
                                 backgroundImage: AssetImage("assets/profile.jpg"),
                                 radius: 25,
                               ),
-                              Text("Gowtham",style: Theme.of(context).textTheme.titleSmall,)
+                              Text("Sathish",style: Theme.of(context).textTheme.titleSmall,)
                             ],
                           ),                          SizedBox(width: 7,),
 
@@ -1075,12 +1077,10 @@ class _NavDrawerState extends State<NavDrawer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) =>   Profile(
-
                     userType:  widget.userType,
                     userID:widget.userId,
                   )),
                 ),
-
               },
             ),
 
@@ -1208,12 +1208,12 @@ class _NavDrawerState extends State<NavDrawer> {
               title: Text('Offers',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) =>  OffersPage(
-                //     userId: widget.userId,
-                //   )),
-                // )
+                 Navigator.push(
+                   context,
+                   MaterialPageRoute(builder: (context) =>  OffersPage(
+                     userId: widget.userId,
+                   )),
+                 )
               },
             ),
 
@@ -1252,7 +1252,7 @@ class _NavDrawerState extends State<NavDrawer> {
               onTap: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  const AboutGib()),
+                  MaterialPageRoute(builder: (context) =>  AboutTab(userId:widget.userId,userType:widget.userType))
                 )
               },
             ),

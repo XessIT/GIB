@@ -42,12 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                  }
 
     }
-     elseif ($table == "registration") {
+    else if ($table == "registration") {
 
     $id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : "";
     $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
     $member_id = isset($_GET['member_id']) ? mysqli_real_escape_string($conn, $_GET['member_id']) : "";
     $referrer_id = isset($_GET['referrer_id']) ? mysqli_real_escape_string($conn, $_GET['referrer_id']) : "";
+
                  // Fetch data from the registration table
                          if(isset($_GET['referrer_id'])){
 
@@ -55,11 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                         }else if(isset($_GET["mobile"])){
 
-                          $registrationlist = "SELECT * FROM registration where mobile='$mobile'";
+                          $registrationlist = " SELECT * FROM registration where mobile = '$mobile' ";
 
                         }else if(isset($_GET["member_id"])){
 
-                          $registrationlist = "SELECT mobile FROM registration where member_id='$member_id'";
+                          $registrationlist = " SELECT mobile FROM registration where member_id = '$member_id' ";
+
+                        }else if(isset($_GET["id"])){
+
+                          $registrationlist = " SELECT * FROM registration where id = '$id' ";
 
                         }
                          if(isset($_GET['id'])){
