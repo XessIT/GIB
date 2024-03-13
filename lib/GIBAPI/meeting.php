@@ -13,8 +13,19 @@
  $conn = mysqli_connect($servername, $username, $password, $dbname);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-$meeting_type = isset($_GET['meeting_type']) ? mysqli_real_escape_string($conn, $_GET['meeting_type']) : "";
+
+
+   if( isset($_GET['meeting_type'])){
+
+   $meeting_type = isset($_GET['meeting_type']) ? mysqli_real_escape_string($conn, $_GET['meeting_type']) : "";
+
    $meetingname = "SELECT * FROM meeting where meeting_type='$meeting_type'";
+
+   }
+   else{
+
+      $meetingname = "SELECT * FROM meeting";
+   }
                $meetingResult = mysqli_query($conn, $meetingname);
                if ($meetingResult && mysqli_num_rows($meetingResult) > 0) {
                    $meeting = array();

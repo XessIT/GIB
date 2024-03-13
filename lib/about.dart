@@ -1,8 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'home.dart';
-import 'home1.dart';
-
+import 'package:http/http.dart'as http;
 class AboutGib extends StatelessWidget {
   const AboutGib({Key? key}) : super(key: key);
 
@@ -22,6 +23,31 @@ class About extends StatefulWidget {
 }
 
 class _AboutState extends State<About> {
+
+
+
+
+  ///district code
+  List<Map<String, dynamic>> suggesstiondata = [];
+  Future<void> getDistrict() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/district.php');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        setState(() {
+          suggesstiondata = itemGroups.cast<Map<String, dynamic>>();
+          print("district:$suggesstiondata}");
+        });
+      } else {
+        //print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      //  print('Error: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

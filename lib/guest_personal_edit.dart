@@ -7,11 +7,14 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart'as http;
-class PersonalEdit extends StatefulWidget {
+
+import 'login.dart';
+
+class GuestPersonalEdit extends StatefulWidget {
 
   final String? currentID;
 
-  const PersonalEdit({Key? key,
+  const GuestPersonalEdit({Key? key,
     required this.currentID,
 
   }) : super(key: key);
@@ -19,21 +22,18 @@ class PersonalEdit extends StatefulWidget {
 
 
   @override
-  State<PersonalEdit> createState() => _PersonalEditState();
+  State<GuestPersonalEdit> createState() => _GuestPersonalEditState();
 }
 
-class _PersonalEditState extends State<PersonalEdit> {
+class _GuestPersonalEditState extends State<GuestPersonalEdit> {
 
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 
 
   TextEditingController firstnamecontroller = TextEditingController();
   TextEditingController lastnamecontroller = TextEditingController();
-  TextEditingController skovilcontroller = TextEditingController();
-  TextEditingController membercontroller = TextEditingController();
   TextEditingController locationcontroller = TextEditingController();
   TextEditingController bloodcontroller = TextEditingController();
-  TextEditingController kovilcontroller = TextEditingController();
   TextEditingController mobilecontroller = TextEditingController();
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController spousenamecontroller = TextEditingController();
@@ -83,21 +83,17 @@ class _PersonalEditState extends State<PersonalEdit> {
   String koottam = "Koottam";
   String spousekoottam = "Spouse Father Koottam";
   String userID="";
+  bool guestVisibility = false;
 
   String imageURL="";
   List dynamicdata=[];
-  bool guestVisibility = false;
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/regitsration.php?table=registration&id=$userId');
       final response = await http.get(url);
-      print("fetch url:$url");
 
       if (response.statusCode == 200) {
-        print("fetch status code:${response.statusCode}");
-        print("fetch body:${response.body}");
-
         final responseData = json.decode(response.body);
         if (responseData is List<dynamic>) {
           setState(() {
@@ -107,29 +103,9 @@ class _PersonalEditState extends State<PersonalEdit> {
                 firstnamecontroller.text = dynamicdata[0]["first_name"];
                 lastnamecontroller.text= dynamicdata[0]['last_name'];
                 locationcontroller.text=dynamicdata[0]["place"];
-                _dobdate.text=dynamicdata[0]["dob"];
-                districtController.text=dynamicdata[0]["district"];
                 mobilecontroller.text=dynamicdata[0]["mobile"];
-                chapterController.text=dynamicdata[0]["chapter"];
-                kovilcontroller.text=dynamicdata[0]["kovil"];
                 emailcontroller.text=dynamicdata[0]["email"];
-                spousenamecontroller.text=dynamicdata[0]["s_name"];
-                companynamecontroller.text=dynamicdata[0]["company_name"];
-                companyaddresscontroller.text=dynamicdata[0]["company_address"];
-                _waddate.text=dynamicdata[0]["WAD"];
-                spousekovilcontroller.text=dynamicdata[0]["s_father_kovil"];
-                educationcontroller.text=dynamicdata[0]["education"];
-                pastexpcontroller.text=dynamicdata[0]["past_experience"];
-                membertype = dynamicdata[0]["member_type"];
-                koottam = dynamicdata[0]["koottam"];
-                spousekoottam = dynamicdata[0]["s_father_koottam"];
                 blood = dynamicdata[0]["blood_group"];
-                businesskeywordscontroller.text=dynamicdata[0]["business_keywords"];
-                businesstype = dynamicdata[0]["business_type"];
-                websitecontroller.text=dynamicdata[0]["website"];
-                yearcontroller.text=dynamicdata[0]["b_year"];
-                status =dynamicdata[0]["marital_status"];
-                spousenativecontroller.text=dynamicdata[0]["native"];
               });
             }
           });
@@ -147,70 +123,75 @@ class _PersonalEditState extends State<PersonalEdit> {
     }
   }
 
-  Future updatedetails() async {
-    setState(() {
-      if(status == "Married"){
-        spousenamecontroller.text;
-        spousenativecontroller.text;
-        spousekovilcontroller.text;
-        spousekoottam.toString();
-      }
-      else {
-        spousenamecontroller.clear();
-        spousenativecontroller.clear();
-        spousekoottam="Spouse Father Koottam";
-        spousekovilcontroller.clear();
+  Future updatedetails(
+      String fname,
+      String mobile,
+      String lname,
+      String district,
+      String chapter,
+      String place,
+      String dob,
+      String wad,
+      String koottam,
+      String kovil,
+      String blood,
+      String email,
+      String sName,
+      String native,
+      String sKoottam,
+      String sKovil,
+      String education,
+      String pastExperience,
+      String cname,
+      String caddress,
+      String website,
+      String bkey,
+      String btype,
+      String mstatus,
+      String byear,
+      ) async {
 
-      }
-    });
 
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/update_profile.php');
-      print("edit url:$url");
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php');
 
-      final response = await http.post(
+      final response = await http.put(
         url,
         body: {
-          'first_name': firstnamecontroller.text,
-          'mobile': mobilecontroller.text,
-          'last_name': lastnamecontroller.text,
-          'district': districtController.text,
-          'chapter': chapterController.text,
-          'place': locationcontroller.text,
-          'dob': _dobdate.text,
-          'WAD': _waddate.text,
-          'koottam': koottam.toString(),
-          'kovil': kovilcontroller.text,
-          'blood_group': blood.toString(),
-          'email': emailcontroller.text,
-          's_name': spousenamecontroller.text,
-          'native': spousenativecontroller.text,
-          's_father_koottam': spousekoottam.toString(),
-          's_father_kovil':spousekovilcontroller.text,
-          'education': educationcontroller.text,
-          'past_experience': pastexpcontroller.text,
-          "company_name":companynamecontroller.text,
-          "company_address":companyaddresscontroller.text,
-          "website":websitecontroller.text,
-          "business_keywords":businesskeywordscontroller.text,
-          'business_type':businesstype.toString(),
-          'marital_status':status.toString(),
-          "b_year":yearcontroller.text,
+          'first_name': fname,
+          'mobile': mobile,
+          'last_name': lname,
+          'district': district,
+          'chapter': chapter,
+          'place': place,
+          'dob': dob,
+          'WAD': wad,
+          'koottam': koottam,
+          'kovil': kovil,
+          'blood_group': blood,
+          'email': email,
+          's_name': sName,
+          'native': native,
+          's_father_koottam': sKoottam,
+          's_father_kovil': sKovil,
+          'education': education,
+          'past_experience': pastExperience,
+          "company_name":cname,
+          "company_address":caddress,
+          "website":website,
+          "business_keywords":bkey,
+          'business_type':btype,
+          'marital_status':mstatus,
+          "b_year":byear,
           'id': widget.currentID,
         },
       );
 
-      print("edit body:${response.body}");
-
       if (response.statusCode == 200) {
-        print("edit status code:${response.statusCode}");
-        print("edit check body:${response.body}");
-
-
         print('User updated successfully');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PersonalEdit(currentID: widget.currentID,)),
+          MaterialPageRoute(builder: (context) => Login()),
         );
       } else {
         // Error handling, e.g., show an error message
@@ -266,7 +247,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   List district = [];
   Future<void> getDistrict() async {
     try {
-      final url = Uri.parse('http://localhost/GIBAPI/district.php');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=district');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -287,7 +268,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   List<Map<String, dynamic>> suggesstiondataitemName = [];
   Future<void> getitemname(String district) async {
     try {
-      final url = Uri.parse('http://localhost/GIBAPI/chapter.php?district=$district'); // Fix URL
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&district=$district'); // Fix URL
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -310,10 +291,15 @@ class _PersonalEditState extends State<PersonalEdit> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     status=="Married"?
     depVisible = true :depVisible = false;
+    // dynamicdata[0]["member_type"]=="Guest"?
+    // depVisible = false :depVisible = true;
+
     getDistrict();
     Uint8List decodedImage = base64Decode(imageURL);
 
@@ -334,40 +320,40 @@ class _PersonalEditState extends State<PersonalEdit> {
                   style: Theme.of(context).textTheme.displayMedium,),
 
                 const SizedBox(width: 20,),
-                InkWell(
-                  child: CircleAvatar(
-                    backgroundImage:pickedimage==null
-                        ? NetworkImage('http://localhost${Uri.encodeComponent(imageURL)}')
-                        : Image.file(pickedimage!).image,
-                    radius: 50,
-                  ),
-                  onTap: () {
-                    showModalBottomSheet(context: context, builder: (ctx){
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt),
-                            title: const Text("With Camera"),
-                            onTap: () async {
-                              // pickImageFromCamera();
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.storage),
-                            title: const Text("From Gallery"),
-                            onTap: () {
-                              pickImageFromGallery();
-                              //  pickImageFromDevice();
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    });
-                  },
-                ),
+                // InkWell(
+                //   child: CircleAvatar(
+                //     backgroundImage:pickedimage==null
+                //         ? NetworkImage('http://localhost${Uri.encodeComponent(imageURL)}')
+                //         : Image.file(pickedimage!).image,
+                //     radius: 50,
+                //   ),
+                //   onTap: () {
+                //     showModalBottomSheet(context: context, builder: (ctx){
+                //       return Column(
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           ListTile(
+                //             leading: const Icon(Icons.camera_alt),
+                //             title: const Text("With Camera"),
+                //             onTap: () async {
+                //               // pickImageFromCamera();
+                //               Navigator.of(context).pop();
+                //             },
+                //           ),
+                //           ListTile(
+                //             leading: const Icon(Icons.storage),
+                //             title: const Text("From Gallery"),
+                //             onTap: () {
+                //               pickImageFromGallery();
+                //               //  pickImageFromDevice();
+                //               Navigator.of(context).pop();
+                //             },
+                //           )
+                //         ],
+                //       );
+                //     });
+                //   },
+                // ),
                 SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -637,23 +623,6 @@ class _PersonalEditState extends State<PersonalEdit> {
                   ),
                 ),
 
-                SizedBox(
-                  width: 300,
-                  child: TextFormField(
-                    controller: kovilcontroller,
-                    validator: (value){
-                      if (value!.isEmpty) {
-                        return '* Enter your Kovil';
-                      } else if(nameRegExp.hasMatch(value)){
-                        return null;
-                      }
-                      return null;
-                    },
-                    decoration:  const InputDecoration(
-                      labelText: "Kovil",
-                      // hintText: kovil!,
-                    ),),
-                ),
 
                 Container(
                   width: 320,
@@ -686,7 +655,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 240, 0),
                   child: Text('Contact',
-                    style: Theme.of(context).textTheme.headline5,),
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
                 const SizedBox(height: 5,),
                 SizedBox(
@@ -788,7 +757,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
                         child: Text('Dependents',
-                          style: Theme.of(context).textTheme.headline5,),
+                          style: Theme.of(context).textTheme.headlineSmall,),
                       ),
                       const SizedBox(height: 5,),
                       SizedBox(
@@ -894,7 +863,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
                   child: Text('Education',
-                    style: Theme.of(context).textTheme.headline5,),
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
                 SizedBox(
                   width: 300,
@@ -1111,7 +1080,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
                   child: Text('Experience',
-                    style: Theme.of(context).textTheme.headline5,),
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
                 SizedBox(
                   width: 300,
@@ -1178,9 +1147,47 @@ class _PersonalEditState extends State<PersonalEdit> {
                         onPressed: () async {
 
                           if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              if(status == "Married"){
+                                spousenamecontroller.text;
+                                spousenativecontroller.text;
+                                spousekovilcontroller.text;
+                                spousekoottam.toString();
+                              }
+                              else {
+                                spousenamecontroller.clear();
+                                spousenativecontroller.clear();
+                                spousekoottam="Spouse Father Koottam";
+                                spousekovilcontroller.clear();
 
-                          await updatedetails();
-                            print("${firstnamecontroller.text}${mobilecontroller.text}");
+                              }
+                            });
+                            // updatedetails(
+                            //     firstnamecontroller.text,
+                            //     mobilecontroller.text,
+                            //     lastnamecontroller.text,
+                            //     districtController.text,
+                            //     chapterController.text,
+                            //     locationcontroller.text,
+                            //     _dobdate.text,
+                            //     _waddate.text,
+                            //     koottam.toString(),
+                            //     blood.toString(),
+                            //     emailcontroller.text,
+                            //     spousenamecontroller.text,
+                            //     spousenativecontroller.text,
+                            //     spousekoottam.toString(),
+                            //     spousekovilcontroller.text,
+                            //     educationcontroller.text,
+                            //     pastexpcontroller.text,
+                            //     companynamecontroller.text,
+                            //     companyaddresscontroller.text,
+                            //     websitecontroller.text,
+                            //     businesskeywordscontroller.text,
+                            //     businesstype.toString(),
+                            //     status.toString(),
+                            //     yearcontroller.text
+                            // );
 
                           }
 

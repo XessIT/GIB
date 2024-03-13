@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" type="FlutterBazelRunConfigurationType" factoryName="Flutter (Bazel)">
+    <option name="target" value="$PROJECT_DIR$/lib/main.dart" />
+    <option name="enableReleaseMode" value="true" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -75,9 +75,19 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
   TextEditingController date = TextEditingController();
   TextEditingController time = TextEditingController();
   TextEditingController mDate = TextEditingController();
+  TextEditingController zoom = TextEditingController();
 
    String? getMeetingDate="";
    int count =0;
+
+
+  ///capital letter starts code
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text.substring(0, 1).toUpperCase() + text.substring(1);
+  }
+
+
 
   Future<void> guestDateStoreDatabase() async {
     DateTime? meetingDate = DateTime.tryParse(widget.meeting_date.toString()) ;
@@ -95,6 +105,7 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
         "location": location.text,
         "koottam":koottam.text,
         "kovil":kovil.text,
+        "zoom_meet":zoom.text,
         "gender":gender.toString(),
         "mobile":mobile.text,
         "meeting_id":widget.meetingId.toString(),
@@ -104,15 +115,13 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
         "user_mobile":widget.usermobile,
         "meeting_date": getMeetingDate,
       }));
-
       print("guestSlip -${widget.userId}");
 
       if (res.statusCode == 200) {
         print("V uri$uri");
         print("V Response Status: ${res.statusCode}");
         print("V Response Body: ${res.body}");
-        var response = jsonDecode(res.body);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> Home(userType: widget.userType, userId:widget.userId)));
+        // Navigator.push(context, MaterialPageRoute(builder: (context)=> Home(userType: widget.userType, userId:widget.userId)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Guest Added Successfully")));
       } else {
         print("Failed to Guest Add. Server returned status code: ${res.statusCode}");
@@ -183,7 +192,7 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                               child: Column(
                                 children:   [
                                   const SizedBox(height: 10, ),
-                                   Text('Register as a Guest ${widget.meeting_date}',
+                                   Text('Register as a Guest ${widget.meeting_date}${widget.guestCount}',
                                     style: Theme.of(context).textTheme.displayMedium,),
                                   const SizedBox(height: 10, ),
                                   Padding(
@@ -203,9 +212,18 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                           return null;
                                         }
                                       },
+                                      onChanged: (value) {
+                                        String capitalizedValue = capitalizeFirstLetter(value);
+                                        guestName.value = guestName.value.copyWith(
+                                          text: capitalizedValue,
+                                          // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                        );
+                                      },
                                       decoration: const InputDecoration(
                                           labelText: "Guest Name"
                                       ),
+                                      // inputFormatters: [AlphabetInputFormatter(),
+                                      // ],
                                     ),
                                   ),
                                   //TextFormField Company name starts
@@ -220,6 +238,14 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                           return null;
                                         }
                                       },
+                                      onChanged: (value) {
+                                        String capitalizedValue = capitalizeFirstLetter(value);
+                                        companyName.value = companyName.value.copyWith(
+                                          text: capitalizedValue,
+                                          // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                        );
+                                      },
+
                                       decoration: const InputDecoration(
                                           labelText: "Company Name"
                                       ),
@@ -236,6 +262,13 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                         }else{
                                           return null;
                                         }
+                                      },
+                                      onChanged: (value) {
+                                        String capitalizedValue = capitalizeFirstLetter(value);
+                                        location.value = location.value.copyWith(
+                                          text: capitalizedValue,
+                                          // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                        );
                                       },
                                       decoration: const InputDecoration(
                                         labelText: "Location",
@@ -257,6 +290,13 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                           return null;
                                         }
                                       },
+                                      onChanged: (value) {
+                                        String capitalizedValue = capitalizeFirstLetter(value);
+                                        koottam.value = koottam.value.copyWith(
+                                          text: capitalizedValue,
+                                          // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                        );
+                                      },
                                       decoration: const InputDecoration(
                                         labelText: "Koottam",
                                       ),
@@ -273,6 +313,13 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                         }else{
                                           return null;
                                         }
+                                      },
+                                      onChanged: (value) {
+                                        String capitalizedValue = capitalizeFirstLetter(value);
+                                        kovil.value = kovil.value.copyWith(
+                                          text: capitalizedValue,
+                                          // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                        );
                                       },
                                       decoration: const InputDecoration(
                                         labelText: "Kovil",
@@ -442,7 +489,6 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                                 String scheduleformattedTime = DateFormat(
                                                     'hh:mm a').format(
                                                     scheduleparsedTime);
-                                                //if 'ok = Timeofday
                                                 setState(() {
                                                   time.text =
                                                       scheduleformattedTime;
@@ -455,9 +501,38 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                         ),
                                       ),
                                       //location_on Icon starts
-                                      const Icon(Icons.location_on,
-                                        color: Colors.green,),
-                                      const Text('Zoom meet'),
+                                        SizedBox(
+                                        width: 50,
+                                        child: TextFormField(
+                                          controller: zoom,
+                                          validator: (value){
+                                            if(value!.isEmpty){
+                                              return "*Enter the Field";
+                                            }else{
+                                              return null;
+                                            }
+                                          },
+                                          onChanged: (value) {
+                                            String capitalizedValue = capitalizeFirstLetter(value);
+                                            zoom.value = zoom.value.copyWith(
+                                              text: capitalizedValue,
+                                              // selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                                            );
+                                          },
+                                          decoration: const InputDecoration(
+                                            labelText: "Zoom Meet",
+                                            prefix: Icon(Icons.location_on_outlined,color: Colors.green,)
+                                          ),
+                                        ),
+                                      ),
+                              //Text Gender starts
+                            /*  const SizedBox(height: 10,),
+                              const Padding(
+                                padding: EdgeInsets.only(right: 235),
+                                child: Text('Gender',
+                                  style: TextStyle(
+                                    fontSize: 18,),),
+                              ),*/
                                     ],
                                   ),
                                   const SizedBox(height: 20,),
@@ -475,6 +550,7 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
 
                                               guestDateStoreDatabase();
                                               count++;
+                                              print("count value -- $count");
 
                                               if (count < int.parse(widget.guestCount.toString())) {
                                                 setState(() {
@@ -486,13 +562,16 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
                                                   kovil.clear();
                                                   koottam.clear();
                                                   mobile.clear();
+                                                  zoom.clear();
                                                   gender= "Male";
                                                 });
 
-                                            }else{
+                                            }
+
+                                              if(int.parse(widget.guestCount.toString()) ==count)
                                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>Home(userType: widget.userType, userId: widget.userId)));
 
-                                            }
+
                                             }
                                           },
                                           child: const Text('Submit',
@@ -566,3 +645,16 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
 }
 
 
+
+class AlphabetInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    // Filter out non-alphabetic characters
+    String filteredText = newValue.text.replaceAll(RegExp(r'[^a-zA-Z]'), '');
+
+    return newValue.copyWith(text: filteredText);
+  }
+}

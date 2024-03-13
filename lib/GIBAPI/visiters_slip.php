@@ -47,10 +47,11 @@
    $time = mysqli_real_escape_string($conn, $data->time);
    $user_id = mysqli_real_escape_string($conn, $data->user_id);
    $meeting_date = mysqli_real_escape_string($conn,$data->meeting_date);
+   $zoom_meet = mysqli_real_escape_string($conn,$data->zoom_meet);
 
 
-                  $insertUserQuery = "INSERT INTO `visitors_slip`(`guest_name`, `company_name`, `location`, `koottam`, `kovil`, `gender`, `mobile`, `meeting_id`, `date`, `time`, `user_id`,`meeting_date`)
-                  VALUES ('$guest_name','$company_name','$location','$koottam','$kovil','$gender','$mobile','$meeting_id','$date','$time','$user_id','$meeting_date')";
+                  $insertUserQuery = "INSERT INTO `visitors_slip`(`guest_name`, `company_name`, `location`, `koottam`, `kovil`, `gender`, `mobile`, `meeting_id`, `date`, `time`, `user_id`,`meeting_date`,`zoom_meet`)
+                  VALUES ('$guest_name','$company_name','$location','$koottam','$kovil','$gender','$mobile','$meeting_id','$date','$time','$user_id','$meeting_date','$zoom_meet')";
                   $insertUserResult = mysqli_query($conn, $insertUserQuery);
 
 

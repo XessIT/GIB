@@ -9,24 +9,16 @@ import 'login.dart';
 class GuestHome extends StatelessWidget {
   final String? userType;
   final String? userId;
-
-
    GuestHome({
      Key? key,
-
      required this. userType,
      required this. userId,
-
-
-
-
    }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
       body: GuestHomePage(
-
         userType: userType,
         userId: userId,
         ),
