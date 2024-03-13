@@ -35,6 +35,7 @@ class Members extends StatefulWidget {
 class _MembersState extends State<Members> {
   String name = "";     // search bar
   String type = "Member";
+  String MemberType = "Non-Executive";
   final fieldText = TextEditingController();
   void clearText() {
     fieldText.clear();
@@ -46,7 +47,7 @@ class _MembersState extends State<Members> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type!=${MemberType}');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");

@@ -14,7 +14,7 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['member_type'])) {
         $member_type = mysqli_real_escape_string($conn, $_GET['member_type']);
-        $userlist = "SELECT * FROM registration where member_type='$member_type'";
+        $userlist = "SELECT * FROM registration where member_type!='Non-Executive'";
         $userResult = mysqli_query($conn, $userlist);
         if ($userResult && mysqli_num_rows($userResult) > 0) {
             $user = array();
