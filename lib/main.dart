@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gipapp/sample_login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Non_exe_pages/non_exe_home.dart';
 import 'guest_home.dart';
@@ -91,7 +92,6 @@ void main() {
                       userType: userType ,
                       userID: id,
                     ); // Pass firstName to Homepage
-
                 //   return NonExecutiveHome();
                   case "Guest":
                     return GuestHomePage(
@@ -157,8 +157,6 @@ Future<Map<String, dynamic>> isLoggedIn() async {
   String? WAD = prefs.getString('WAD');
   String? image = prefs.getString('profile_image');
   String? id = prefs.getString('id');
-
-
   return {
     'isLoggedIn': isLoggedIn,
     'userType': userType,

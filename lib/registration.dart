@@ -7,7 +7,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
-import 'dart:html' as html;
+// import 'dart:html' as html;
+
 import 'login.dart';
 
 class Registration extends StatelessWidget {
@@ -336,25 +337,6 @@ class _GuestState extends State<Guest> {
   TextEditingController caption = TextEditingController();
   String? imagename;
   String? imagedata;
-  Future<void> getImage() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement();
-    input.click();
-
-    input.onChange.listen((e) {
-      final html.File file = input.files!.first;
-      final reader = html.FileReader();
-
-      reader.onLoadEnd.listen((e) {
-        setState(() {
-          selectedImage = reader.result as Uint8List?;
-          imagename = file.name;
-          imagedata = base64Encode(selectedImage!);
-        });
-      });
-
-      reader.readAsArrayBuffer(file);
-    });
-  }
   bool showLocalImage = false;
   XFile? pickedImage;
 
@@ -517,7 +499,8 @@ class _GuestState extends State<Guest> {
                                 leading: const Icon(Icons.storage),
                                 title: const Text("From Gallery"),
                                 onTap: () {
-                                  getImage();
+                                  pickImageFromGallery();
+                                //  getImage();
                                   Navigator.of(context).pop();
                                 },
                               )

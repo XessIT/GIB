@@ -312,6 +312,8 @@ class _PersonalEditState extends State<PersonalEdit> {
 
   @override
   Widget build(BuildContext context) {
+    fetchData(widget.currentID.toString());
+
     status=="Married"?
     depVisible = true :depVisible = false;
     getDistrict();

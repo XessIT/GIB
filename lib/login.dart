@@ -262,45 +262,41 @@ class _LoginSubClassState extends State<LoginSubClass> {
 
         //  Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
           // Navigate based on user type
-          if (memberType != null) {
-            switch (memberType) {
-              case "Executive":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Homepage(
+          switch (memberType) {
+            case "Executive":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Homepage(
 
-                    userType: userType,
-                    userID: userId,
-                  )),
+                  userType: userType,
+                  userID: userId,
+                )),
 
-                );
-                break;
-              case "Non-Executive":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NonExecutiveHome(
+              );
+              break;
+            case "Non-Executive":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NonExecutiveHome(
 
-                    userType: userType,
-                    userID:userId,
-                  )),
+                  userType: userType,
+                  userID:userId,
+                )),
 
-                );
-                break;
-              case "Guest":
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GuestHomePage(
+              );
+              break;
+            case "Guest":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GuestHomePage(
 
-                    userType: userType,
-                    userId: userId,
-                   )),
-                );
-                break;
-              default:
-                print("Unknown member_type: $memberType");
-            }
-          } else {
-            print("Member type is null");
+                  userType: userType,
+                  userId: userId,
+                 )),
+              );
+              break;
+            default:
+              print("Unknown member_type: $memberType");
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -321,11 +317,6 @@ class _LoginSubClassState extends State<LoginSubClass> {
       print("Error during sign in: $e");
     }
   }
-
-
-
-
-
 
 
   @override
@@ -394,7 +385,7 @@ class _LoginSubClassState extends State<LoginSubClass> {
                         if (value!.isEmpty) {
                           return "* Enter M-Pin";
                         } else if (value.length < 6) {
-                          return "M-Pin should be atleast 6 characters";
+                          return "M-Pin should be at least 6 characters";
                         } else {
                           return null;
                         }
@@ -424,9 +415,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
 
 
                   const SizedBox(height: 20,),
-                  Row(
+                  const Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
+                    children: [
 
 
 
