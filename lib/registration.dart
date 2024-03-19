@@ -7,8 +7,6 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
-// import 'dart:html' as html;
-
 import 'login.dart';
 
 class Registration extends StatelessWidget {
@@ -140,12 +138,20 @@ class _GuestState extends State<Guest> {
             mobileBaseFetchIDdata = responseData.cast<Map<String, dynamic>>();
             if (mobileBaseFetchIDdata.isNotEmpty) {
               setState(() {
+
                 referreridcotroller.text = mobileBaseFetchIDdata[0]["member_id"];
                 print("referrer ID--${referreridcotroller.text}" );
+
               });
             }
           });
         } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("This mobile number is not member. Enter the member mobile number."),
+            ),
+          );
+      //    referreridcotroller.clear();
           print('Invalid response data format');
         }
       } else {
@@ -196,38 +202,6 @@ class _GuestState extends State<Guest> {
   }
 
 
-  ///for otp check and store  not complete
-  Future<void> saveInformationToDatabase1() async {
-    try {
-      // otpExpiration = DateTime.now().add(Duration(minutes: 1));
-
-      var response = await http.post(
-        Uri.parse("http://localhost/GIB/lib/GIBAPI/OTP.php"),
-        body: jsonEncode({
-          "mobile": mobilecontroller.text.trim(),
-          "OTP Expire":"12345",
-          "Date":"234567",
-          "email":emailcontroller.text.trim(),
-          "OTP":generateOTP(),
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        // print("OTP response: ${response.body}");
-        //print("OTP response: ${response.statusCode} ${response.body}");
-        //print("OTP successful");
-        // Navigator.push(context, MaterialPageRoute(builder: (context)=>const Home()));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("OTP store successful")));
-
-      }
-      else {
-        //  print("Error: ${response.statusCode}");
-      }
-    } catch (e) {
-      //  print("Error during signup: $e");
-      // Handle error as needed
-    }
-  }
   /// random numbers generate code
   String? databaseOTP;
   DateTime? otpExpiration;
@@ -252,8 +226,7 @@ class _GuestState extends State<Guest> {
 
       if(membertype=="Member Type") {
         setState(() {
-          membertype
-          = "Guest";
+          membertype = "Guest";
           print("type:$membertype");
           blockStatus = "UnBlock";
           adminRights = "Accepted";
@@ -486,9 +459,9 @@ class _GuestState extends State<Guest> {
                     InkWell(
                       child:  CircleAvatar(
                         radius: 60,
-                        backgroundImage: selectedImage != null
+                        /*backgroundImage: selectedImage != null
                             ? Image.memory(selectedImage!).image
-                            : const AssetImage('assets/img.png'),
+                            : const AssetImage('assets/img.png'),*/
                       ),
                       onTap: () {
                         showModalBottomSheet(context: context, builder: (ctx) {
@@ -499,7 +472,7 @@ class _GuestState extends State<Guest> {
                                 leading: const Icon(Icons.storage),
                                 title: const Text("From Gallery"),
                                 onTap: () {
-                                  pickImageFromGallery();
+                                 // pickImageFromGallery();
                                 //  getImage();
                                   Navigator.of(context).pop();
                                 },
@@ -1920,6 +1893,10 @@ class _GuestState extends State<Guest> {
                               },
                               onChanged: (value){
                                 idBaseMobileNoFetched(referreridcotroller.text);
+                               if( value.isEmpty){
+                                 referrermobilecontroller.clear();
+                               }
+
 
                               },
                               decoration: const InputDecoration(
@@ -1927,11 +1904,6 @@ class _GuestState extends State<Guest> {
                                 hintText: "Referrer Executive GiB Member ID",
                                 suffixIcon: Icon(Icons.phone_android),
                               ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                                // LengthLimitingTextInputFormatter(10)
-                              ],
                             ),
                           ),
                           // Executive GiB Member ID textfield ends here
@@ -1964,6 +1936,8 @@ class _GuestState extends State<Guest> {
                                   ),
                                   onChanged: (value){
                                     setState(() {
+                                      if(value.length==10)
+                                        referreridcotroller.clear();
                                       MobileBaseIdFetched(referrermobilecontroller.text);
 
                                     });
@@ -1980,6 +1954,7 @@ class _GuestState extends State<Guest> {
                           ),
 
                           const SizedBox(height: 15,),
+/*
                           SizedBox(
                             width: 300,
                             child: TextFormField(
@@ -2103,6 +2078,7 @@ class _GuestState extends State<Guest> {
                               ],
                             ),
                           ),
+*/
                           /*
                           Visibility(
                             visible: otpcodevisible,
@@ -2149,6 +2125,7 @@ class _GuestState extends State<Guest> {
                             color: Colors.green[800],
 
                             onPressed: () {
+
                               /*      if (type == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -2184,6 +2161,10 @@ class _GuestState extends State<Guest> {
                             onPressed: () {
                               //   signUp();
                               uploadImage();
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const Login()));
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please wait for Admin Approval")));
+
+
                             },
                             child: const Text('save',
                               style: TextStyle(color: Colors.white),)),

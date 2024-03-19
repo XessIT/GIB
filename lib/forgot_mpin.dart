@@ -1,315 +1,7 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:http/http.dart'as http;
-// import 'login.dart';
-// import 'new_mpin.dart';
-//
-// class ForgotMPin extends StatelessWidget {
-//   const ForgotMPin({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Scaffold(
-//       body: Forgot(),
-//     );
-//   }
-// }
-//
-// class Forgot extends StatefulWidget {
-//   const Forgot({Key? key}) : super(key: key);
-//
-//   @override
-//   State<Forgot> createState() => _ForgotState();
-// }
-//
-// class _ForgotState extends State<Forgot> {
-//
-//   final _formKey = GlobalKey<FormState>();
-//
-//   FirebaseAuth auth = FirebaseAuth.instance;
-//   String verificationIDRecieved = "";
-//
-//   bool otpcodevisible = false;
-//   TextEditingController phoneController = TextEditingController();
-//   TextEditingController otpCodeController = TextEditingController();
-//
-//   final TextEditingController mobileController = TextEditingController();
-//   final TextEditingController newpasswordcontroller = TextEditingController();
-//   final FirebaseAuth _auth = FirebaseAuth.instance;final regex = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-//   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-//   String? userId;
-//   String passwords ="";
-//   String mobile ="";
-//
-//   Future _getDataFromDatabasae() async {
-//     await  FirebaseFirestore.instance
-//         .collection("Register")
-//         .where("Mobile",isEqualTo: mobileController.text.trim())
-//         .get()
-//         .then((snapshot) async {
-//       if (snapshot.docs.isNotEmpty) {
-//         final data = snapshot.docs.first.data();
-//         setState(() {
-//
-//           // passwords=data["Password"];
-//
-//         });
-//       }
-//     });
-//
-//   }
-//   Future<void> updatePassword(String email, String password) async {
-//     try {
-//       final User? user = (await _auth.signInWithEmailAndPassword(
-//         email: email,
-//         password: password,
-//       )).user;
-//
-//       final newPassword = newpasswordcontroller.text;
-//
-//       if (!regex.hasMatch(newPassword)) {
-//         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-//             content: Text("Password must contain at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character")));
-//         return;
-//       }
-//
-//       await user!.updatePassword(newPassword);
-//
-//       print("Password updated successfully");
-//     } catch (e) {
-//       print("Error updating password: $e");
-//     }
-//   }
-//
-//   @override
-//   void initState() {
-//     _getDataFromDatabasae();
-//     // TODO: implement initState
-//     super.initState();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false,
-//         title: const Center(child: Text('Forgot M-Pin')),
-//         centerTitle: true,
-//         actions: [
-//           IconButton(
-//               onPressed: () {
-//                 Navigator.pop(context);
-//               },
-//               icon: const Icon(Icons.cancel))
-//         ],
-//       ),
-//
-//       body: SingleChildScrollView(
-//         child: Center(
-//           child: Form(
-//             key: _formKey,
-//             child: Column(
-//               children: [
-//
-//                 const SizedBox(height: 30,),
-//                 Image.asset('assets/forgot-password.jpg',width: 300,),
-//                 const SizedBox(height: 20,),
-//                 Padding(
-//                   padding: const EdgeInsets.fromLTRB(0, 0, 220, 0),
-//                   child: Text('Forgot\n'
-//                       'Password?',
-//                       style: Theme.of(context).textTheme.headline4),
-//                 ),
-//                 const SizedBox(height: 20,),
-//                 Text("Don't worry! it happens. Please enter the\n"
-//                     "Mobile number associated with your account",
-//                   style: Theme.of(context).textTheme.bodyText2,),
-//                 const SizedBox(height: 30,),
-//                 TextFormField(
-//                   controller: mobileController,
-//                   decoration: const InputDecoration(
-//                     hintText: "Mobile Number",
-//                   ),
-//                   validator: (value) {
-//                     if (value!.isEmpty) {
-//                       return "* Enter your Mobile Number";
-//                     } else if (value.length < 10) {
-//                       return "Mobile Number should be 10 digits";
-//                     } else {
-//                       return null;
-//                     }
-//                   },
-//
-//                   keyboardType: TextInputType.number,
-//                   inputFormatters: <TextInputFormatter>[
-//                     FilteringTextInputFormatter.digitsOnly,
-//                     LengthLimitingTextInputFormatter(10)
-//                   ],
-//                 ),
-//                 SizedBox(height: 20,),
-//                 Container(
-//                   child: OutlinedButton(onPressed: () async {
-//                     var collection = FirebaseFirestore.instance.collection('Register');
-//                     var querySnapshot = await collection.where("Mobile",isEqualTo: mobileController.text).get();
-//                     for (var queryDocumentSnapshot in querySnapshot.docs) {
-//                       Map<String, dynamic> data = queryDocumentSnapshot.data();
-//                       var name = data['Name'];
-//                       var password = data['Password'];
-//                       var mobiles= data["Mobile"];
-//                       setState(() {
-//                         passwords=password;
-//                         mobile = mobiles;
-//
-//                       });
-//                     }
-//                     if(mobile != mobileController.text) {
-//                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Mobile Number Not Registered")));
-//                     }
-//
-//                     if(mobile == mobileController.text)
-//                       if (_formkey.currentState!.validate()) {
-//                         showDialog(
-//                             context: context,
-//                             builder: (BuildContext context) {
-//                               return AlertDialog(
-//                                 backgroundColor: Colors.grey[800],
-//                                 title: Text(
-//                                   "Confirm",
-//                                   style: TextStyle(color: Colors.white),
-//                                 ),
-//                                 content: Text(
-//                                   "Do you want to send Password to your Mobile Number?",
-//                                   style: TextStyle(color: Colors.white),
-//                                 ),
-//                                 actions: <Widget>[
-//                                   TextButton(
-//                                       child: Text('Yes'),
-//                                       onPressed: () async {
-//
-//                                         if (_formkey.currentState!
-//                                             .validate()) {
-//                                           String password = passwords;
-//                                           String apikey =
-//                                               "3fd55fb2b77b0a2980b2efe4a4ab8110";
-//                                           String route = "2";
-//                                           String senderid = "GoRubn";
-//                                           String number =
-//                                           mobileController.text.trim();
-//                                           String sms =
-//                                               "Welcome to GoRurban-Logistics made easier. Thanks for being our valuable customer. Your Password Is $password Regards GoRurban";
-//                                           String templateid =
-//                                               "1207163827477260339";
-//                                           final encodedSms =
-//                                           Uri.encodeComponent(sms);
-//                                           final url = Uri.parse(
-//                                               'http://sms.xesstechlink.com/api/smsapi?key=$apikey&route=$route&sender=$senderid&number=$number&sms=$encodedSms&templateid=$templateid');
-//                                           try {
-//                                             final response =
-//                                             await http.get(url);
-//                                             if (response.statusCode ==
-//                                                 200) {
-//                                               print(
-//                                                   'SMS sent successfully');
-//                                             } else {
-//                                               // Request failed, handle the error here
-//                                               print('Failed to send SMS');
-//                                             }
-//                                           } catch (error) {
-//                                             // An error occurred, handle the exception here
-//                                             print(
-//                                                 'Error sending SMS: $error');
-//                                           }
-//
-//                                           Navigator.push(
-//                                               context,
-//                                               MaterialPageRoute(
-//                                                   builder: (context) =>
-//                                                       LoginSubClass()));
-//                                           ScaffoldMessenger.of(context)
-//                                               .showSnackBar(SnackBar(
-//                                               content: Text(
-//                                                   "Your Password Sent to Your Registered Mobile Number Successfully")));
-//                                         }
-//                                       }),
-//                                   TextButton(
-//                                     child: Text('No'),
-//                                     onPressed: () {
-//                                       Navigator.pop(context);
-//                                     },
-//                                   ),
-//                                 ],
-//                               );
-//                             });
-//                       }
-//                   }, child: Text("Send Password")),
-//                 ),
-//                 const SizedBox(height: 20,),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   void verifyCode() async {
-//     final String username = phoneController.text.trim();
-//     //  String retVal ="error";
-//     //  OurUser _user = OurUser();
-//     PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationIDRecieved, smsCode: otpCodeController.text);
-//     /* try {
-//       UserCredential _authResult = await auth.signInWithCredential(credential);
-//       if(_authResult.additionalUserInfo.isNewUser) {
-//         currentUser.uid = _authResult.user?.uid;
-//       }
-//     }*/
-//     await auth.signInWithCredential(credential).then((value) async {
-//       // QuerySnapshot snap = await FirebaseFirestore.instance.collection("users")
-//       //   .where("username", isEqualTo: username).get();
-//       Navigator.push(
-//         context, MaterialPageRoute(builder: (context) => const NewMpin()),
-//       );
-//       print("You are logged in Successfully");
-//     });
-//   }
-//   void verifyNumber() {
-//     auth.verifyPhoneNumber(phoneNumber: phoneController.text.toString(),
-//         verificationCompleted: (PhoneAuthCredential credential) async {
-//           await auth.signInWithCredential(credential).then((value) {
-//             print("You are logged in Successfully");
-//           });
-//         },
-//         verificationFailed: (FirebaseAuthException exception){
-//           print(exception.message);
-//           /* if(e.code == 'invalid-phone-number'){
-//         print('Invalid phone number');
-//       }*/
-//         },
-//         codeSent: (String verificationID, int? resendToken) async{
-//           verificationIDRecieved = verificationID;
-//           otpcodevisible = true;
-//           setState(() {  });
-//         },
-//         codeAutoRetrievalTimeout: (String verificationID){
-//         });
-//   }
-//
-//   Future<void> resend() async{
-//     PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
-//         verificationId: verificationIDRecieved,
-//         smsCode: otpCodeController.text.toString());
-//     auth.signInWithCredential(phoneAuthCredential);
-//   }
-//
-// }
-//
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart'as http;
-
 import 'login.dart';
 
 
@@ -323,12 +15,47 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   final TextEditingController newpasswordcontroller = TextEditingController();
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   String? userId;
-
-
   String passwords ="";
   String mobile ="";
   String names ="";
   String membersid ="";
+  String? userName ="Anitha";
+  bool isRegistered =false;
+
+
+  List<Map<String,dynamic>> data =[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&mobile=${mobileController.text}');
+      print(url);
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("ResponseData: $responseData");
+
+        final List<dynamic> itemGroups = responseData;
+        setState(() {
+          isRegistered = responseData.isNotEmpty;
+          data = itemGroups.cast<Map<String, dynamic>>();
+          userName = data[0]["first_name"];
+          membersid ="  ${data[0]["member_id"]}";
+          passwords = "  ${data[0]["password"]}";
+          print(data);
+        });
+        print('Data: $data');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
 
   @override
   void initState() {
@@ -345,7 +72,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
          Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginSubClass()));
 
         },),
-        title: Text("Reset M-Pin"),
+        title: Text("Reset M-Pin",style: Theme.of(context).textTheme.bodySmall,),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: WillPopScope(
         onWillPop: ()async{
@@ -353,150 +81,96 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
           SystemNavigator.pop();
           return true;
         },
-        child: Form(
-          key: _formkey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 30,),
-                Image.asset('assets/forgot-password.jpg',width: 300,),
-                const SizedBox(height: 20,),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 220, 0),
-                  child: Text('Forgot\n'
-                      'M-Pin?',
-                      style: Theme.of(context).textTheme.headline4),
-                ),
-                const SizedBox(height: 20,),
-                Text("Don't worry! it happens. Please enter the\n"
-                    "Mobile number associated with your account",
-                  style: Theme.of(context).textTheme.bodyText2,),
-                Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(width: 300,
-                          child: TextFormField(
-                            controller: mobileController,
-                            decoration: const InputDecoration(
-                              prefixText: "+91 ",
-                              hintText: "Mobile Number",
+        child: Center(
+          child: Form(
+            key: _formkey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 30,),
+                  Image.asset('assets/forgot-password.jpg',width: 300,),
+                  const SizedBox(height: 20,),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 220, 0),
+                    child: Text('Forgot\n'
+                        'M-Pin?',
+                        style: Theme.of(context).textTheme.headline4),
+                  ),
+                  const SizedBox(height: 20,),
+                  Text("Don't worry! it happens. Please enter the\n"
+                      "Mobile number associated with your account",
+                    style: Theme.of(context).textTheme.bodyText2,),
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(width: 300,
+                            child: TextFormField(
+                              controller: mobileController,
+                              decoration: const InputDecoration(
+                                prefixText: "+91 ",
+                                hintText: "Mobile Number",
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "* Enter your Mobile Number";
+                                } else if (value.length < 10) {
+                                  return "Mobile Number should be 10 digits";
+                                } else {
+                                  return null;
+                                }
+                              },
+                              onChanged: (value){
+                                getData();
+                              },
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10)
+                              ],
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "* Enter your Mobile Number";
-                              } else if (value.length < 10) {
-                                return "Mobile Number should be 10 digits";
-                              } else {
-                                return null;
-                              }
-                            },
-
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10)
-                            ],
                           ),
-                        ),
-                        SizedBox(height: 20,),
-                        Container(
-                          child: OutlinedButton(onPressed: () async {
+                          SizedBox(height: 20,),
+                          Container(
+                            child: OutlinedButton(onPressed: () async {
+                              String welcomeText ="$userName, Welcome To GIB,";
 
-
-
-                            /*if(mobile != mobileController.text) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Mobile Number Not Registered")));
-                            }
-                            if(mobile == mobileController.text)*/
-                              if (_formkey.currentState!.validate()) {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor: Colors.grey[800],
-                                        title: Text(
-                                          "Confirm",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        content: Text(
-                                          "Do you want to send M-Pin to your Mobile Number?"
-                                              ,
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                              child: Text('Yes'),
-                                              onPressed: () async {
-                                                if (_formkey.currentState!
-                                                    .validate()) {
-                                                  String name1 = names;
-                                                  String memberids = membersid;
-                                                  String password = passwords;
-                                                  String apikey =
-                                                      "3fd55fb2b77b0a2980b2efe4a4ab8110";
-                                                  String route = "2";
-                                                  String senderid = "GoRubn";
-                                                  String number =
-                                                  mobileController.text.trim();
-                                                  String sms =
-                                                  //"Hi {#var#} Login ID{#var#} and M-Pin is{#var#} Thank You GiBERODE";
-                                                  //"Hi$name1 Login ID$memberids and M-Pin is$password Thank You GiBERODE";
-                                                 "Welcome to GoRurban-Logistics made easier. Thanks for being our valuable customer. Your Password Is $password Regards GoRurban";
-                                                  String templateid =
-                                                      "1207163827477260339";
-                                                  final encodedSms =
-                                                  Uri.encodeComponent(sms);
-                                                  final url = Uri.parse(
-                                                      'http://sms.xesstechlink.com/api/smsapi?key=$apikey&route=$route&sender=$senderid&number=$number&sms=$encodedSms&templateid=$templateid');
-                                                  try {
-                                                    final response =
-                                                    await http.get(url);
-                                                    if (response.statusCode ==
-                                                        200) {
-                                                      print(
-                                                          'SMS sent successfully');
-                                                    } else {
-                                                      // Request failed, handle the error here
-                                                      print('Failed to send SMS');
-                                                    }
-                                                  } catch (error) {
-                                                    // An error occurred, handle the exception here
-                                                    print(
-                                                        'Error sending SMS: $error');
-                                                  }
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              LoginSubClass()));
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(SnackBar(
-                                                      content: Text(
-                                                          "Your M-Pin Sent to Your Registered Mobile Number Successfully")));
-                                                }
-                                              }),
-                                          TextButton(
-                                            child: Text('No'),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    });
+                              if(_formkey.currentState!.validate()) {
+                               if(isRegistered){
+                                  String apikey = "5YCbYiCLPF-G5q9CdsjexCtIzxCJHsk4mHJAp5CoCCgPljMAM8Eb-kH8VEZuUdo7";
+                                String senderid = "GIBERD";
+                                String number = mobileController.text.trim();
+                                String sms = "Hi $welcomeText Login ID$membersid and M-Pin is$passwords Thank You GiBERODE";
+                                String templateid = "1207161941538955931";
+                                final encodedSms = Uri.encodeComponent(sms);
+                                final url = Uri.parse("https://obligr.io/api_v2/message/send?api_key=$apikey&dlt_template_id=$templateid&sender_id=$senderid&mobile_no=$number&message=$encodedSms&unicode=0");
+                                try {
+                                  print(url);
+                                  final response = await http.get(url);
+                                  if (response.statusCode == 200) {
+                                    print('SMS sent successfully');
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Try Again Later...")));
+                                    print('Failed to send SMS');
+                                  }
+                                } catch (error) {
+                                  print('Error sending SMS: $error');
+                                }}
+                               else{
+                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mobile Number is Not Registered")));
+                               }
                               }
-                          }, child: Text("Send M-Pin")),
-                        ),
-                        const SizedBox(height: 20,),
-
-                      ],
+                            }, child: const Text("Send M-Pin",style: TextStyle(color: Colors.white),)),
+                          ),
+                          const SizedBox(height: 20,),
+                        ],
+                      ),
                     ),
                   ),
-                ),
 
-              ],
+                ],
+              ),
             ),
           ),
         ),

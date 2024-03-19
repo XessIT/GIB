@@ -403,10 +403,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Type")));
                           }
-                          else if(pickedImage == null){
+                          /*else if(pickedImage == null){
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Image")));
-                          }
+                          }*/
                           else if (_formKey.currentState!.validate()) {
                             offers();
                             Navigator.push(context,

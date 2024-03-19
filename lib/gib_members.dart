@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'gib_members_filter.dart';
 import 'home.dart';
-import 'home1.dart';
 
 class GibMembers extends StatelessWidget {
   final String userType;
@@ -31,9 +31,10 @@ class Members extends StatefulWidget {
   @override
   State<Members> createState() => _MembersState();
 }
-
 class _MembersState extends State<Members> {
-  String name = "";     // search bar
+  String name = "";
+  String? chapter = "";
+  String? district = "";
   String type = "Member";
   final fieldText = TextEditingController();
   void clearText() {
@@ -42,22 +43,64 @@ class _MembersState extends State<Members> {
   bool isVisible = false;
   bool titleVisible = true;
   String documentid = "";
+  TextEditingController districtController = TextEditingController();
+  TextEditingController chapterController = TextEditingController();
+  List<Map<String,dynamic>>userdata=[];
+  Future<void> fetchData() async {
+    try {
+      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      final response = await http.get(url);
+      //  print("fetch url:$url");
+
+      if (response.statusCode == 200) {
+        // print("fetch status code:${response.statusCode}");
+        // print("fetch body:${response.body}");
+
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                chapter = userdata[0]["chapter"]??"";
+                district = userdata[0]["district"]??"";
+                print("chapter $districtController.text");
+                print("district $chapterController.text");
+
+
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
   List<Map<String, dynamic>> data=[];
-  Future<void> getData() async {
+  Future<void> getData(String districts,String chapters) async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}');
-      print(url);
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}&district=$districts&chapter=$chapters&id=${widget.userId}');
+      print("gib members url =$url");
       final response = await http.get(url);
-      print("ResponseStatus: ${response.statusCode}");
-      print("Response: ${response.body}");
+      print("gib members ResponseStatus: ${response.statusCode}");
+      print("gib members Response: ${response.body}");
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        print("ResponseData: $responseData");
+        print("gib members ResponseData: $responseData");
         final List<dynamic> itemGroups = responseData;
         setState(() {});
-         data = itemGroups.cast<Map<String, dynamic>>();
-         print('Data: $data');
+        data = itemGroups.cast<Map<String, dynamic>>();
+        print('gib members Data: $data');
       } else {
         print('Error: ${response.statusCode}');
       }
@@ -68,9 +111,90 @@ class _MembersState extends State<Members> {
     }
 
   }
+
+
+  List<Map<String, dynamic>> districtAndChapterData=[];
+  Future<void> districtAndChapterDatas(String districts,String chapters) async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}&district=$districts&chapter=$chapters&id=${widget.userId}');
+      print("gib members url =$url");
+      final response = await http.get(url);
+      print("gib members ResponseStatus: ${response.statusCode}");
+      print("gib members Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("gib members ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        data = itemGroups.cast<Map<String, dynamic>>();
+        print('gib members Data: $data');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
+
+
+  ///district code
+  List<Map<String, dynamic>> suggesstiondistrictdata = [];
+  Future<void> getDistrict() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/district.php');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        setState(() {
+          suggesstiondistrictdata = itemGroups.cast<Map<String, dynamic>>();
+        });
+      } else {
+        //print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      //  print('Error: $error');
+    }
+  }
+  /// chapter code
+  List<Map<String, dynamic>> suggesstionchapterdata = [];
+  Future<void> getchapter(String district) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/chapter.php?district=$district');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> units = responseData;
+        setState(() {
+          suggesstionchapterdata = units.cast<Map<String, dynamic>>();
+        });
+        print('Sorted chapter Names: $suggesstionchapterdata');
+        setState(() {
+          setState(() {
+          });
+         // chapterController.clear();
+        });
+      } else {
+        print('chapter Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print(' chapter Error: $error');
+    }
+  }
   @override
   void initState() {
-    getData();
+    getDistrict();
+    fetchData().then((_) {
+      if (chapter!.isNotEmpty&& district!.isNotEmpty)  {
+        getData(district! ,chapter!);
+      }
+    }).catchError((error) {
+      print("Error in fetchData: $error");
+    });
     // TODO: implement initState
     super.initState();
   }
@@ -102,7 +226,7 @@ class _MembersState extends State<Members> {
                 ),
                 child: Center(
                   child: TextField(
-                    onChanged: (val){         //search bar
+                    onChanged: (val){
                       setState(() {
                         name = val ;
                       });
@@ -135,314 +259,227 @@ class _MembersState extends State<Members> {
           ),
         ],
       ),
-      body: ListView.builder(
-               itemCount: data.length,
-               itemBuilder: (context, i) {
-
-               //  if(documentid != thisitem["Uid"]) {
-                   if (name.isEmpty) {
-                     return Center(
-                       child: Column(
-                         children: [
-                           const SizedBox(height: 5,),
-                           InkWell(
-                             onTap: () {
-                               /*Navigator.push(context, MaterialPageRoute(
-                                   builder: (context) =>
-                                       Details(thisitem['id'])));*/
-                             },
-                             child: Container(
-                               width: 350,
-                               height: 80,
-                               padding: const EdgeInsets.all(5.0),
-                               decoration: const BoxDecoration(
-                                 border: Border(
-                                   bottom: BorderSide(
-                                       color: Colors.green, width: 1),
-                                 ),
-                                 // borderRadius: BorderRadius.circular(10.0)
-                               ),
-                               child: ListTile(
-                                 leading:
-                                 SizedBox(
-                                   height: 80,
-                                   child: CircleAvatar(
-                                     /*backgroundImage: Image
-                                         .network("${thisitem['Image']}")
-                                         .image,*/
-                                     //  radius: 50,
-                                   ),
-                                 ),
-                                 /* SizedBox(
-                                 height: 80.0,
-                                 width: 80.0, // fixed width and height
-                                 child: Image.network('${thisitem['Image']}', fit: BoxFit.cover,),
-                               ),*/
-                                 /* const CircleAvatar(
-                                           backgroundImage: AssetImage(
-                                             'assets/profile.jpg',),
-                                          // radius: 40,
-                                         ),*/
-                                 title: Text('${data[i]['first_name']} ${data[i]['last_name']}'),
-                                 subtitle: Text(
-                                     '${data[i]['company_name']}'),
-                                 // subtitle: Text(documentSnapshot['Company Name']),
-                                 trailing: IconButton(
-                                     onPressed: () async {
-                                       final call = Uri.parse(
-                                           "tel://${data[i]['mobile']}");
-                                       if (await canLaunchUrl(call)) {
-                                         launchUrl(call);
-                                       } else {
-                                         throw 'Could not launch $call';
-                                       }
-                                     },
-                                     icon: const Icon(
-                                       Icons.call, color: Colors.green,)),
-                               ),
-                             ),
-                           ),
-
-                         ],
-                       ),
-                     );
-                   }
-
-
-                   /*    return Visibility(
-                     visible: (documentid.isNotEmpty) ? false : true ,
-                     child: Center(
-                       child: Column(
-                         children: [
-                           const SizedBox(height: 5,),
-                           InkWell(
-                             onTap: () {
-                               Navigator.push(context, MaterialPageRoute(
-                                   builder: (context) => Details(thisitem['id'])));
-                             },
-                             child: Container(
-                               width: 350,
-                               height: 80,
-                               padding: const EdgeInsets.all(5.0),
-                               decoration: const BoxDecoration(
-                                 border: Border(
-                                   bottom: BorderSide(color: Colors.green, width: 1),
-                                 ),
-                                 // borderRadius: BorderRadius.circular(10.0)
-                               ),
-                               child: ListTile(
-                                 leading:
-                                 SizedBox(
-                                   height: 80,
-                                   child: CircleAvatar(
-                                     backgroundImage: Image.network("${thisitem['Image']}").image,
-                                     //  radius: 50,
-                                   ),
-                                 ),
-                                 /* SizedBox(
-                                 height: 80.0,
-                                 width: 80.0, // fixed width and height
-                                 child: Image.network('${thisitem['Image']}', fit: BoxFit.cover,),
-                               ),*/
-                                 /* const CircleAvatar(
-                                           backgroundImage: AssetImage(
-                                             'assets/profile.jpg',),
-                                          // radius: 40,
-                                         ),*/
-                                 title: Text('${thisitem['First Name']}'),
-                                 subtitle: Text('${thisitem['Company Name']}'),
-                                 // subtitle: Text(documentSnapshot['Company Name']),
-                                 trailing: IconButton(
-                                     onPressed: () async {
-                                       final call = Uri.parse("tel://${thisitem['Mobile']}");
-                                       if (await canLaunchUrl(call)) {
-                                         launchUrl(call);
-                                       } else {
-                                         throw 'Could not launch $call';
-                                       }
-                                     },
-                                     icon: const Icon(
-                                       Icons.call, color: Colors.green,)),
-                               ),
-                             ),
-                           ),
-                         ],
-                       ),
-                     ),
-                   );*/
-
-
-                   if (data[i]['first_name']
-                       .toString()
-                       .toLowerCase().startsWith(name.toLowerCase()) ||
-                       data[i]['company_name']
-                           .toString()
-                           .toLowerCase().startsWith(name.toLowerCase())) {
-                     return
-                       Center(
-                         child: InkWell(
-                           onTap: () {
-                             /*Navigator.push(context, MaterialPageRoute(
-                                 builder: (context) =>
-                                     Details(thisitem['id'])));*/
-                           },
-                           child: Container(
-                             width: 350,
-                             height: 80,
-                             padding: const EdgeInsets.all(5.0),
-                             decoration: const BoxDecoration(
-                               border: Border(
-                                 bottom: BorderSide(
-                                     color: Colors.green, width: 1),
-                               ),
-                               // borderRadius: BorderRadius.circular(10.0)
-                             ),
-                             child: ListTile(
-                               leading: SizedBox(
-                                 height: 80.0,
-                                 width: 80.0, // fixed width and height
-                                 /*child: Image.network(
-                                   '${thisitem['Image']}',
-                                   fit: BoxFit.cover,),*/
-                               ),
-                               /* const CircleAvatar(
-                                         backgroundImage: AssetImage(
-                                           'assets/profile.jpg',),
-                                        // radius: 40,
-                                       ),*/
-                               title: Text('${data[i]['first_name']}'),
-                               subtitle: Text(
-                                   '${data[i]['company_name']}'),
-                               // subtitle: Text(documentSnapshot['Company Name']),
-                               trailing: IconButton(
-                                   onPressed: () async {
-                                     final call = Uri.parse(
-                                         "tel://${data[i]['mobile']}");
-                                     if (await canLaunchUrl(call)) {
-                                       launchUrl(call);
-                                     } else {
-                                       throw 'Could not launch $call';
-                                     }
-                                   },
-                                   /* onPressed: () {
-                                   launch("tel://${thisitem['Mobile']}");
-                                 },*/
-                                   icon: const Icon(
-                                     Icons.call, color: Colors.green,)),
-                             ),
-                           ),
-                         ),
-                       );
-                   }
-                // }
-                 return Container();
-               }
-                )
-      /* body: StreamBuilder<QuerySnapshot>(
-    stream: FirebaseFirestore.instance.collection("Register").snapshots(),
-   /* (name != "") ?
-          FirebaseFirestore.instance.collection('Register')
-              //.where("Type", isEqualTo: type)
-              .orderBy('First Name')
-              .startAt([name])
-              .endAt(['$name\uf8ff'])
-          .snapshots()
-          : FirebaseFirestore.instance.collection("Register")
-        .where("Type", isEqualTo: type).snapshots(), */  //search bar
-      builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-        if (streamSnapshot.hasData) {
-          QuerySnapshot<Object?>? querySnapshot = streamSnapshot.data;
-          List<QueryDocumentSnapshot> documents = querySnapshot!.docs;
-
-          List<Map> items = documents.map((e) => {
-            "id": e.id,
-            "First Name": e['First Name'],
-            "Company Name": e['Company Name'],
-            "Mobile": e['Mobile']
-          }).toList();
-          return ListView.builder(
-              itemCount: items.length,
-              // itemCount: streamSnapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                var data = streamSnapshot.data!.docs[index].data();
-                Map thisitem = items[index];
-                // final DocumentSnapshot documentSnapshot = streamSnapshot.data!.docs[index];
-                return Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20,),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => Details(thisitem['id'])));
-                        },
-                        child: Container(
-                          width: 350,
-                          height: 80,
-                          padding: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.green, width: 1),
-                              borderRadius: BorderRadius.circular(10.0)
-                          ),
-                           child: ListTile(
-                                leading: SizedBox(
-                                    height: 80.0,
-                                    width: 80.0, // fixed width and height
-                                    child: Image.network('${thisitem['Image']}', fit: BoxFit.cover,),
-                                ),
-                               /* const CircleAvatar(
-                                  backgroundImage: AssetImage(
-                                    'assets/profile.jpg',),
-                                 // radius: 40,
-                                ),*/
-                                title: Text('${thisitem['First Name']}'),
-                                subtitle: Text('${thisitem['Company Name']}'),
-                               // subtitle: Text(documentSnapshot['Company Name']),
-                                trailing: IconButton(
-                                    onPressed: () {
-                                      launch("tel://${thisitem['Mobile']}");
-                                    },
-                                    icon: const Icon(
-                                      Icons.call, color: Colors.green,)),
-                              )
-                         /* child: Row(
-                           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage: AssetImage('assets/profile.jpg'),
-                                radius: 40,
-                              ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text('${thisitem['First Name']}\n'
-                                    '${thisitem['Company Name']}',
-                                  style: Theme.of(context).textTheme.bodyText1,),
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: IconButton(
-                                    onPressed: () {
-                                      launch("tel://'${thisitem['Mobile']}'");
-                                    },
-                                    icon: const Icon(Icons.call,color: Colors.green,)),
-                              )
-                            ],
-                          ),*/
-                        ),
-                      ),
-                      // const SizedBox(height: 5,)
-                    ],
+        /*
+          Row(
+            children: [
+              SizedBox(
+                width: 305,
+                height: 50,
+                child: TypeAheadFormField<String>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: districtController,
+                    decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        labelText: "District"
+                    ),
                   ),
-                );
-              }
-          );
-        }
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    ),*/
+                  suggestionsCallback: (pattern) async {
+                    return suggesstiondistrictdata
+                        .where((item) =>
+                        (item['district']?.toString().toLowerCase() ?? '')
+                            .startsWith(pattern.toLowerCase()))
+                        .map((item) => item['district'].toString())
+                        .toList();
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      title: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) async {
+                    setState(() {
+                      districtController.text = suggestion;
+                      setState(() {
+                        getchapter(districtController.text.trim());
+
+                      });
+                    });
+                    //   print('Selected Item Group: $suggestion');
+                  },
+                ),
+              ),
+              // Chapter drop down button starts
+
+              // DOB textfield starts here
+              const SizedBox(height: 15,),
+              SizedBox(
+                width: 305,
+                height: 50,
+                child: TypeAheadFormField<String>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: chapterController,
+                    decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        labelText: "Chapter"
+                    ),
+                  ),
+                  suggestionsCallback: (pattern) async {
+                    return suggesstionchapterdata
+                        .where((item) =>
+                        (item['chapter']?.toString().toLowerCase() ?? '')
+                            .startsWith(pattern.toLowerCase()))
+                        .map((item) => item['chapter'].toString())
+                        .toList();
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      title: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) async {
+                    setState(() {
+                      chapterController.text = suggestion;
+                        // district ="";
+                        // chapter ="";
+                        districtAndChapterDatas(districtController.text.trim(), chapterController.text.trim());
+
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+*/
+
+        body: SingleChildScrollView(
+          child: Container(height: 1000,width: 500,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                   children: [
+                     IconButton(onPressed: (){
+                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GIBmembersFilter(userType:widget.userType,userId:widget.userId)));
+                     }, icon: Icon(Icons.filter_alt,color: Colors.green.shade900,))
+                   ],
+                ),
+                Container(
+                  height: 500,
+                  child: ListView.builder(
+                           itemCount: data.length,
+                           itemBuilder: (context, i) {
+                              if (data[i]['first_name']
+                                   .toString()
+                                   .toLowerCase().startsWith(name.toLowerCase()) ||
+                                   data[i]['company_name']
+                                       .toString()
+                                       .toLowerCase().startsWith(name.toLowerCase())) {
+                                 return
+                                   SingleChildScrollView(
+                                     child: Center(
+                                       child: InkWell(
+                                         onTap: () {
+                                         },
+                                         child: Container(
+                                           width: 300,
+                                           height: 100,
+                                           padding: const EdgeInsets.all(10.0),
+                                           decoration: BoxDecoration(
+                                               border: Border.all(
+                                                   color: Colors.green, width: 1),
+                                               borderRadius: BorderRadius.circular(10.0)
+                                           ),
+                                          /* width: 350,
+                                           height: 80,
+                                           padding: const EdgeInsets.all(5.0),
+                                           decoration: const BoxDecoration(
+                                             border: Border(
+                                               bottom: BorderSide(
+                                                   color: Colors.green, width: 1),
+                                             ),
+                                             // borderRadius: BorderRadius.circular(10.0)
+                                           ),*/
+                                           child: ListTile(
+                                             leading: SizedBox(
+                                               height: 80.0,
+                                               width: 80.0,),
+                                             title: Text('${data[i]['first_name']}'),
+                                             subtitle: Text(
+                                                 '${data[i]['company_name']}'),
+                                             trailing: IconButton(
+                                                 onPressed: () async {
+                                                   final call = Uri.parse(
+                                                       "tel://${data[i]['mobile']}");
+                                                   if (await canLaunchUrl(call)) {
+                                                     launchUrl(call);
+                                                   } else {
+                                                     throw 'Could not launch $call';
+                                                   }
+                                                 },
+                                                 icon: const Icon(
+                                                   Icons.call, color: Colors.green,)),
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+                                   );
+                               }
+                             return Container();
+                           }
+                            ),
+                ),
+                Container(
+                  height: 500,
+                  child: ListView.builder(
+                      itemCount: districtAndChapterData.length,
+                      itemBuilder: (context, i) {
+            
+            
+                        if (districtAndChapterData[i]['first_name']
+                            .toString()
+                            .toLowerCase().startsWith(name.toLowerCase()) ||
+                            districtAndChapterData[i]['company_name']
+                                .toString()
+                                .toLowerCase().startsWith(name.toLowerCase())) {
+                          return
+                            Center(
+                              child: InkWell(
+                                onTap: () {
+                                },
+                                child: Container(
+                                  width: 350,
+                                  height: 80,
+                                  padding: const EdgeInsets.all(5.0),
+                                  decoration: const BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          color: Colors.green, width: 1),
+                                    ),
+                                    // borderRadius: BorderRadius.circular(10.0)
+                                  ),
+                                  child: ListTile(
+                                    leading: SizedBox(
+                                      height: 80.0,
+                                      width: 80.0,),
+                                    title: Text('${districtAndChapterData[i]['first_name']}'),
+                                    subtitle: Text(
+                                        '${districtAndChapterData[i]['company_name']}'),
+                                    trailing: IconButton(
+                                        onPressed: () async {
+                                          final call = Uri.parse(
+                                              "tel://${districtAndChapterData[i]['mobile']}");
+                                          if (await canLaunchUrl(call)) {
+                                            launchUrl(call);
+                                          } else {
+                                            throw 'Could not launch $call';
+                                          }
+                                        },
+                                        icon: const Icon(
+                                          Icons.call, color: Colors.green,)),
+                                  ),
+                                ),
+                              ),
+                            );
+                        }
+                        return Container();
+                      }
+                  ),),
+              ],
+            ),
+          ),
+        )
     );
   }
 }

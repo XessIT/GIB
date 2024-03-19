@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
 
@@ -187,13 +188,30 @@ class _GuestState extends State<Guest> {
     if (text.isEmpty) return text;
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
+  XFile? pickedImage;
+  bool showLocalImage = false;
+
+  pickImageFromGallery() async {
+    ImagePicker imagePicker = ImagePicker();
+    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    showLocalImage = true;
+    if (pickedImage != null) {
+      List<int> imageBytes = await pickedImage!.readAsBytes();
+      setState(() {
+        imagename = pickedImage!.name;
+        print('Image Name: $imagename');
+        imagedata = base64Encode(imageBytes);
+        print('Image Data: $imagedata');
+      });
+    }
+  }
+
 
   Future<void> uploadImage() async {
     try {
-      // String uri = "http://localhost/GIB/lib/GIBAPI/save_image.php";
-      String uri = "http://localhost/GIB/lib/GIBAPI/registration.php";
-      var res = await http.post(Uri.parse(uri), body: {
-        // "caption":caption.text,
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php');
+    //  String uri = "http://localhost/GIB/lib/GIBAPI/registration.php";
+      final res = await http.post(url, body: jsonEncode({
         "imagedata": imagedata,
         "imagename": imagename,
         "mobile": mobilecontroller.text.trim(),
@@ -231,7 +249,7 @@ class _GuestState extends State<Guest> {
         "website":websitecontroller.text.trim(),
         "b_year":yearcontroller.text.trim(),
         "referrer_id":referrerId.toString(),
-      });
+      }));
 
       if (res.statusCode == 200) {
         var response = jsonDecode(res.body);
@@ -354,7 +372,7 @@ class _GuestState extends State<Guest> {
 
                 referrermobilecontroller.text=dynamicdata[0]["mobile"];
                 referreridcotroller.text = dynamicdata[0]["referrer_id"];
-                print("referrer Details Fetch : ${referrermobilecontroller.text},${ referreridcotroller.text}");
+            //    print("referrer Details Fetch : ${referrermobilecontroller.text},${ referreridcotroller.text}");
 
               });
             }
@@ -390,7 +408,7 @@ class _GuestState extends State<Guest> {
         title:  Center(child: Text('ADD MEMBER',style: Theme.of(context).textTheme.bodySmall,)),
         centerTitle: true,
         iconTheme:  IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
+          color: Colors.white,
         ),
       ),
       // Appbar ends
@@ -401,11 +419,8 @@ class _GuestState extends State<Guest> {
         child: SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.symmetric(
-
-              ),borderRadius: BorderRadius.circular(2),
+              border: Border.symmetric(),borderRadius: BorderRadius.circular(2),
               color: Colors.white,
-
             ),
             child: Center(
               child: Form(
@@ -417,8 +432,8 @@ class _GuestState extends State<Guest> {
                     InkWell(
                       child:  CircleAvatar(
                         radius: 60,
-                        backgroundImage: selectedImage != null
-                            ? Image.memory(selectedImage!).image
+                        backgroundImage: pickedImage != null
+                            ? Image.memory(pickedImage! as Uint8List).image
                             : const AssetImage('assets/img.png'),
                       ),
                       onTap: () {
@@ -430,7 +445,7 @@ class _GuestState extends State<Guest> {
                                 leading: const Icon(Icons.storage),
                                 title: const Text("From Gallery"),
                                 onTap: () {
-                                  //getImage();
+                                  pickImageFromGallery();
                                   Navigator.of(context).pop();
                                 },
                               )
@@ -458,14 +473,14 @@ class _GuestState extends State<Guest> {
                           String capitalizedValue = capitalizeFirstLetter(value);
                           firstnamecontroller.value = firstnamecontroller.value.copyWith(
                             text: capitalizedValue,
-                            selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                           // selection: TextSelection.collapsed(offset: capitalizedValue.length),
                           );
                         },
                         decoration: const InputDecoration(
                           labelText: "First Name",
                           suffixIcon: Icon(Icons.account_circle),
                         ),
-                        inputFormatters: [AlphabetInputFormatter(),
+                        inputFormatters: [//AlphabetInputFormatter(),
                           LengthLimitingTextInputFormatter(20),
                         ],
                       ),
@@ -1835,7 +1850,9 @@ class _GuestState extends State<Guest> {
 
                           // Executive GiB Member ID textfield starts here
                           const SizedBox(height: 15,),
-                          SizedBox(
+                          /// referrer Id auto fetched code starts here...
+
+                          /*   SizedBox(
                             width: 300,
                             child: TextFormField(
                               controller: referreridcotroller,
@@ -1858,10 +1875,12 @@ class _GuestState extends State<Guest> {
                                 // LengthLimitingTextInputFormatter(10)
                               ],
                             ),
-                          ),
-                          // Executive GiB Member ID textfield ends here
+                          ),*/
+                          /// referrer Id auto fetched code ends here...
 
-                          const SizedBox(height: 15,),
+                          // Executive GiB Member ID textfield ends here
+/// referrer Mobile No auto fetched code starts here...
+                      /*    const SizedBox(height: 15,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -1896,8 +1915,10 @@ class _GuestState extends State<Guest> {
                               ),
                             ],
                           ),
+*/
+                          /// referrer Mobile No auto fetched code ends here...
 
-                          const SizedBox(height: 15,),
+                          /* const SizedBox(height: 15,),
                           SizedBox(
                             width: 300,
                             child: TextFormField(
@@ -2020,7 +2041,7 @@ class _GuestState extends State<Guest> {
                                 LengthLimitingTextInputFormatter(7)
                               ],
                             ),
-                          ),
+                          ),*/
                           /*
                           Visibility(
                             visible: otpcodevisible,

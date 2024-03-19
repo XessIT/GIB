@@ -3,21 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:gipapp/guest_personal_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
-
 import 'Non_exe_pages/non_exe_home.dart';
 import 'package:http/http.dart'as http;
-
-import 'edit_profile.dart';
+import 'personal_edit.dart';
 import 'guest_home.dart';
 import 'home.dart';
 
 class Profile extends StatelessWidget {
-
   final String userType;
-  String? userID;
+  final String? userID;
    Profile({
     Key? key,
-
     required this.userType,
     required this. userID,
   }) : super(key: key);
@@ -27,9 +23,7 @@ class Profile extends StatelessWidget {
 
     return  Scaffold(
       body: View(
-
         userType : userType,
-
       userID:userID),
     );
   }
@@ -39,16 +33,16 @@ class View extends StatefulWidget {
 
   final String userType;
 
-  String? userID;
+ final String? userID;
 
 
-      View({
-    Key? key,
+      const View({
+    super.key,
 
     required this.userType,
 
     required this. userID,
-  }) : super(key: key);
+  });
 
   @override
   State<View> createState() => _ViewState();
@@ -121,8 +115,8 @@ class _ViewState extends State<View> {
 class Personal extends StatefulWidget {
 
 
-   String userType;
-   String? userID;
+ final String userType;
+  final String? userID;
 
    Personal({
     Key? key,
