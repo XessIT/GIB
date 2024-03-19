@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    print("UserId: ${widget.userId}");
+   // print("UserId: ${widget.userId}");
     // TODO: implement initState
     super.initState();
     //notificationsServices.initialiseNotifications();
@@ -130,15 +130,15 @@ class _HomeState extends State<Home> {
           });
         } else {
           // Handle invalid response data (not a List)
-          print('Invalid response Meeting data format');
+       //   print('Invalid response Meeting data format');
         }
       } else {
         // Handle non-200 status code
-        print('Meeting Error: ${response.statusCode}');
+      //  print('Meeting Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
-      print('Meeting Error: $error');
+    //  print('Meeting Error: $error');
     }
   }
 
@@ -177,7 +177,7 @@ class _HomeState extends State<Home> {
         }
       } else {
         // Handle non-200 status code
-        print('Error: ${response.statusCode}');
+      //  print('Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
@@ -201,9 +201,9 @@ class _HomeState extends State<Home> {
       }));
 
       if (res.statusCode == 200) {
-        print("Register uri$uri");
-        print("Register Response Status: ${res.statusCode}");
-        print("Register Response Body: ${res.body}");
+      //  print("Register uri$uri");
+       // print("Register Response Status: ${res.statusCode}");
+        //print("Register Response Body: ${res.body}");
         var response = jsonDecode(res.body);
         Navigator.push(context, MaterialPageRoute(builder: (context)=> Home(userType: widget.userId, userId: widget.userType)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registration Successfully")));
@@ -211,7 +211,7 @@ class _HomeState extends State<Home> {
         print("Failed to upload image. Server returned status code: ${res.statusCode}");
       }
     } catch (e) {
-      print("Error uploading image: $e");
+    //  print("Error uploading image: $e");
     }
   }
 
@@ -244,11 +244,11 @@ class _HomeState extends State<Home> {
         }
       } else {
         // Handle non-200 status code
-        print('Error: ${response.statusCode}');
+      //  print('Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
-      print('Error: $error');
+     // print('Error: $error');
     }
   }
 
@@ -1077,8 +1077,8 @@ class _NavDrawerState extends State<NavDrawer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) =>   Profile(
-                    userType:  widget.userType,
-                    userID:widget.userId,
+                    userType: widget.userType,
+                    userID: widget.userId,
                   )),
                 ),
               },

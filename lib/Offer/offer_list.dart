@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:convert'; // for base64Encode
 //import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class OfferList extends StatelessWidget {
   final String? userId;
-  const OfferList({Key? key, required this.userId}) : super(key: key);
+  const OfferList({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class OfferList extends StatelessWidget {
 }
 class OfferListPage extends StatefulWidget {
   final String? userId;
-  const OfferListPage({Key? key, required this.userId}) : super(key: key);
+  const OfferListPage({super.key, required this.userId});
 
   @override
   State<OfferListPage> createState() => _OfferListPageState();
@@ -113,8 +113,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
   String message = "";
   TextEditingController caption = TextEditingController();
 
-  String? imagename;
-  String? imagedata;
+  /*String? imagename;
+  String? imagedata;*/
   /*Future<void> getImage() async {
     final html.FileUploadInputElement input = html.FileUploadInputElement();
     input.click();
@@ -136,6 +136,9 @@ class _AddOfferPageState extends State<AddOfferPage> {
 
   bool showLocalImage = false;
   XFile? pickedImage;
+  late String imageName;
+  late String imageData;
+
   pickImageFromGallery() async {
     ImagePicker imagePicker = ImagePicker();
     pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -143,10 +146,11 @@ class _AddOfferPageState extends State<AddOfferPage> {
     if (pickedImage != null) {
       List<int> imageBytes = await pickedImage!.readAsBytes();
       setState(() {
-        imagename = pickedImage!.name;
-        print('Image Name: $imagename');
-        imagedata = base64Encode(imageBytes);
-        print('Image Data: $imagedata');
+        imageName = pickedImage!.name;
+        print('Image Name: $imageName');
+        imageData = base64Encode(imageBytes); // Convert bytes to base64
+        print('Base64 Image Data: $imageData');
+        // You can use imageName and imageData in your application as needed
       });
     }
   }
@@ -157,10 +161,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
     if (pickedImage != null) {
       List<int> imageBytes = await pickedImage!.readAsBytes();
       setState(() {
-        imagename = pickedImage!.name;
-        print('Image Name: $imagename');
-        imagedata = base64Encode(imageBytes);
-        print('Image Data: $imagedata');
+        imageName = pickedImage!.name;
+        print('Image Name: $imageName');
+        imageData = base64Encode(imageBytes);
+        print('Image Data: $imageData');
       });
     }
   }
@@ -210,8 +214,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
       final response = await http.post(
         url,
         body: jsonEncode({
-          "imagename": imagename,
-          "imagedata": imagedata,
+          "imagename": imageName,
+          "imagedata": imageData,
           "name": namecontroller.text,
           "discount": discountcontroller.text,
           "validity": formattedDate,
@@ -226,7 +230,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
       );
       print(url);
       //  print("imagedata: $imagedata");
-      print("imagename: $imagename");
+      print("imagename: $imageName");
       print("ResponseStatus: ${response.statusCode}");
 
       if (response.statusCode == 200) {

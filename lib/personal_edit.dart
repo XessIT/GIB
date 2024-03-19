@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:gipapp/profile.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -10,9 +11,49 @@ import 'package:http/http.dart'as http;
 class PersonalEdit extends StatefulWidget {
 
   final String? currentID;
+  final String? currentFname;
+  final String? currentLname;
+  final String? currentLocation;
+  final String? currentDistrict;
+  final String? currentDob;
+  final String? currentChapter;
+  final String? currentMobile;
+  final String? currentEmail;
+  final String? currentKovil;
+  final String? currentKoottam;
+  final String? currentBloodgroup;
+  final String? currentMaritalStatus;
+  final String? currentSpouseName;
+  final String? currentWad;
+  final String? currentSpouseNative;
+  final String? currentSpouseKovil;
+  final String? currentSpouseKoottam;
+  final String? currentSpouseBloodGroup;
+  final String? currentEducation;
+  final String? currentPastExperience;
 
   const PersonalEdit({Key? key,
     required this.currentID,
+    required this.currentFname,
+    required this.currentLname,
+    required this.currentLocation,
+    required this.currentDistrict,
+    required this.currentDob,
+    required this.currentChapter,
+    required this.currentMobile,
+    required this.currentEmail,
+    required this.currentKovil,
+    required this.currentKoottam,
+    required this.currentBloodgroup,
+    required this.currentMaritalStatus,
+    required this.currentSpouseName,
+    required this.currentWad,
+    required this.currentSpouseNative,
+    required this.currentSpouseKovil,
+    required this.currentSpouseKoottam,
+    required this.currentSpouseBloodGroup,
+    required this.currentEducation,
+    required this.currentPastExperience,
 
   }) : super(key: key);
 
@@ -25,8 +66,6 @@ class PersonalEdit extends StatefulWidget {
 class _PersonalEditState extends State<PersonalEdit> {
 
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
-
-
   TextEditingController firstnamecontroller = TextEditingController();
   TextEditingController lastnamecontroller = TextEditingController();
   TextEditingController skovilcontroller = TextEditingController();
@@ -45,12 +84,11 @@ class _PersonalEditState extends State<PersonalEdit> {
   TextEditingController chapterController = TextEditingController();
   String businesstype = "Business Type";
   String? status;
-
-  TextEditingController businesskeywordscontroller = TextEditingController();
+  /*TextEditingController businesskeywordscontroller = TextEditingController();
   TextEditingController websitecontroller = TextEditingController();
   TextEditingController yearcontroller = TextEditingController();
   TextEditingController companynamecontroller = TextEditingController();
-  TextEditingController companyaddresscontroller = TextEditingController();
+  TextEditingController companyaddresscontroller = TextEditingController();*/
 
 
 
@@ -64,12 +102,26 @@ class _PersonalEditState extends State<PersonalEdit> {
   bool depVisible=false;
   @override
   void initState() {
-    setState(() {
-      userID = widget.currentID.toString();
-      fetchData(widget.currentID.toString());
-
-    });
-
+    firstnamecontroller = TextEditingController(text: widget.currentFname);
+    lastnamecontroller = TextEditingController(text: widget.currentLname);
+    locationcontroller = TextEditingController(text: widget.currentLocation);
+    _dobdate = TextEditingController(text: widget.currentDob);
+    districtController = TextEditingController(text: widget.currentDistrict);
+    chapterController = TextEditingController(text: widget.currentChapter);
+    mobilecontroller = TextEditingController(text: widget.currentMobile);
+    emailcontroller = TextEditingController(text: widget.currentEmail);
+    kovilcontroller = TextEditingController(text: widget.currentKovil);
+    koottam = widget.currentKoottam!;
+    blood = widget.currentBloodgroup!;
+    status = widget.currentMaritalStatus!;
+    spousenamecontroller = TextEditingController(text: widget.currentSpouseName);
+    spousenativecontroller = TextEditingController(text: widget.currentSpouseNative);
+    spousekovilcontroller = TextEditingController(text: widget.currentSpouseKovil);
+    spousekoottam = widget.currentSpouseKoottam!;
+    spouseblood = widget.currentSpouseBloodGroup!;
+    _waddate = TextEditingController(text: widget.currentWad);
+    educationcontroller = TextEditingController(text: widget.currentEducation);
+    pastexpcontroller = TextEditingController(text: widget.currentPastExperience);
     super.initState();
   }
 
@@ -79,6 +131,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   String? selectedDistrict;
   String? selectedChapter;
   String blood = "Blood Group";
+  String spouseblood = "Blood Group";
   String membertype = "Member Type";
   String koottam = "Koottam";
   String spousekoottam = "Spouse Father Koottam";
@@ -88,89 +141,21 @@ class _PersonalEditState extends State<PersonalEdit> {
   List dynamicdata=[];
   bool guestVisibility = false;
 
-  Future<void> fetchData(String userId) async {
-    try {
-      final url = Uri.parse('localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
-      final response = await http.get(url);
-      print("fetch url:$url");
-
-      if (response.statusCode == 200) {
-        print("fetch status code:${response.statusCode}");
-        print("fetch body:${response.body}");
-
-        final responseData = json.decode(response.body);
-        if (responseData is List<dynamic>) {
-          setState(() {
-            dynamicdata = responseData.cast<Map<String, dynamic>>();
-            if (dynamicdata.isNotEmpty) {
-              setState(() {
-                firstnamecontroller.text = dynamicdata[0]["first_name"];
-                lastnamecontroller.text= dynamicdata[0]['last_name'];
-                locationcontroller.text=dynamicdata[0]["place"];
-                _dobdate.text=dynamicdata[0]["dob"];
-                districtController.text=dynamicdata[0]["district"];
-                mobilecontroller.text=dynamicdata[0]["mobile"];
-                chapterController.text=dynamicdata[0]["chapter"];
-                kovilcontroller.text=dynamicdata[0]["kovil"];
-                emailcontroller.text=dynamicdata[0]["email"];
-                spousenamecontroller.text=dynamicdata[0]["s_name"];
-                companynamecontroller.text=dynamicdata[0]["company_name"];
-                companyaddresscontroller.text=dynamicdata[0]["company_address"];
-                _waddate.text=dynamicdata[0]["WAD"];
-                spousekovilcontroller.text=dynamicdata[0]["s_father_kovil"];
-                educationcontroller.text=dynamicdata[0]["education"];
-                pastexpcontroller.text=dynamicdata[0]["past_experience"];
-                membertype = dynamicdata[0]["member_type"];
-                koottam = dynamicdata[0]["koottam"];
-                spousekoottam = dynamicdata[0]["s_father_koottam"];
-                blood = dynamicdata[0]["blood_group"];
-                businesskeywordscontroller.text=dynamicdata[0]["business_keywords"];
-                businesstype = dynamicdata[0]["business_type"];
-                websitecontroller.text=dynamicdata[0]["website"];
-                yearcontroller.text=dynamicdata[0]["b_year"];
-                status =dynamicdata[0]["marital_status"];
-                spousenativecontroller.text=dynamicdata[0]["native"];
-              });
-            }
-          });
-        } else {
-          // Handle invalid response data (not a List)
-          print('Invalid response data format');
-        }
-      } else {
-        // Handle non-200 status code
-        print('Error: ${response.statusCode}');
-      }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
-    }
-  }
-
-  Future updatedetails() async {
+  Future<void> Edit() async {
     setState(() {
-      if(status == "Married"){
-        spousenamecontroller.text;
-        spousenativecontroller.text;
-        spousekovilcontroller.text;
-        spousekoottam.toString();
-      }
-      else {
+      if (status != "Married") {
         spousenamecontroller.clear();
         spousenativecontroller.clear();
-        spousekoottam="Spouse Father Koottam";
+        spousekoottam = "Spouse Father Koottam";
         spousekovilcontroller.clear();
-
       }
     });
-
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/update_profile.php');
-      print("edit url:$url");
-
-      final response = await http.post(
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/personal_edit.php');
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      final response = await http.put(
         url,
-        body: {
+        body: jsonEncode({
           'first_name': firstnamecontroller.text,
           'mobile': mobilecontroller.text,
           'last_name': lastnamecontroller.text,
@@ -186,42 +171,31 @@ class _PersonalEditState extends State<PersonalEdit> {
           's_name': spousenamecontroller.text,
           'native': spousenativecontroller.text,
           's_father_koottam': spousekoottam.toString(),
-          's_father_kovil':spousekovilcontroller.text,
+          's_father_kovil': spousekovilcontroller.text,
           'education': educationcontroller.text,
           'past_experience': pastexpcontroller.text,
-          "company_name":companynamecontroller.text,
-          "company_address":companyaddresscontroller.text,
-          "website":websitecontroller.text,
-          "business_keywords":businesskeywordscontroller.text,
-          'business_type':businesstype.toString(),
-          'marital_status':status.toString(),
-          "b_year":yearcontroller.text,
+          'marital_status': status.toString(),
           'id': widget.currentID,
-        },
+        }),
       );
-
-      print("edit body:${response.body}");
-
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
       if (response.statusCode == 200) {
-        print("edit status code:${response.statusCode}");
-        print("edit check body:${response.body}");
-
-
-        print('User updated successfully');
+        print("Offers response: ${response.body}");
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PersonalEdit(currentID: widget.currentID,)),
+          MaterialPageRoute(builder: (context) => Profile(userID: widget.currentID, userType: '',)),
         );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Profile Successfully Updated")));
       } else {
-        // Error handling, e.g., show an error message
-        print('Error: ${response.statusCode}');
+        print("Error: ${response.statusCode}");
       }
     } catch (e) {
-      // Handle network or server errors
-      print('Error making HTTP request: $e');
+      print("Error during signup: $e");
+      // Handle error as needed
     }
   }
-
 
   String category = 'Business';
   var categorylist = ['Business','Service'];
@@ -312,7 +286,7 @@ class _PersonalEditState extends State<PersonalEdit> {
 
   @override
   Widget build(BuildContext context) {
-    fetchData(widget.currentID.toString());
+//    fetchData(widget.currentID.toString());
 
     status=="Married"?
     depVisible = true :depVisible = false;
@@ -323,6 +297,9 @@ class _PersonalEditState extends State<PersonalEdit> {
       appBar: AppBar(
         title: const Center(child: Text('Edit Profile')),
         centerTitle: true,
+        iconTheme:  const IconThemeData(
+          color: Colors.white, // Set the color for the drawer icon
+        ),
       ),
 
       body: SingleChildScrollView(
@@ -407,7 +384,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                     ),),
                 ),
 
-                SizedBox(
+                /*SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: companynamecontroller,
@@ -435,7 +412,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                       LengthLimitingTextInputFormatter(20),
                     ],
                   ),
-                ),
+                ),*/
 
                 SizedBox(
                   width: 305,
@@ -602,7 +579,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                   width: 320,
                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 4),
                   child: DropdownButtonFormField<String>(
-                    value: koottam,
+                    value: koottam.isNotEmpty ? koottam : null,
                     hint: Text("Koottam"),
                     icon: const Icon(Icons.arrow_drop_down),
                     isExpanded: true,
@@ -661,7 +638,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                   width: 320,
                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 4),
                   child: DropdownButtonFormField<String>(
-                    value: blood,
+                    value: blood.isNotEmpty ? blood : null,
                     hint: Text("Blood Group"),
                     icon: const Icon(Icons.arrow_drop_down),
                     isExpanded: true,
@@ -810,6 +787,96 @@ class _PersonalEditState extends State<PersonalEdit> {
                             // hintText: spousename!,
                           ),),
                       ),
+                      SizedBox(
+                        width: 300,
+                        child: TextFormField(
+                          readOnly: true,
+                          controller: _waddate,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return '* Enter your Wedding Anniversary Date';
+                            } else if (nameRegExp.hasMatch(value)) {
+                              return null;
+                            }
+                            return null;
+                          },
+                          onTap: () async {
+                            DateTime currentDate = DateTime.now();
+                            DateTime firstSelectableYear = DateTime(1900);
+                            DateTime lastSelectableYear = DateTime(currentDate.year, 12, 31);
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: firstSelectableYear,
+                              firstDate: firstSelectableYear,
+                              lastDate: lastSelectableYear,
+                              initialDatePickerMode: DatePickerMode.year,
+                            );
+
+                            if (pickedDate != null) {
+                              setState(() {
+                                _waddate.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                              });
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "WAD",
+                            hintText: "Wedding Aniversery Date",
+                            suffixIcon:Icon(Icons.calendar_today_outlined),
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 300,
+                        child: DropdownButtonFormField<String>(
+                          value: spouseblood.isNotEmpty ? spouseblood : null,
+                          hint: const Text("Blood Group",style: TextStyle(color: Colors.black),),
+                          icon: const Icon(Icons.arrow_drop_down),
+                          isExpanded: true,
+                          items: <String>[
+                            "Blood Group",
+                            "A+",
+                            "A-",
+                            "A1+",
+                            "A1-",
+                            "A2+",
+                            "A2-",
+                            "A1B+",
+                            "A1B-",
+                            "A2B+",
+                            "A2B-",
+                            "AB+",
+                            "AB-",
+                            "B+",
+                            "B-",
+                            "O+",
+                            "O-",
+                            "BBG",
+                            "INRA"
+                          ]
+                              .map<DropdownMenuItem<String>>((
+                              String value) {
+                            return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value));
+                          }
+                          ).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              spouseblood = newValue!;
+                            });
+                          },
+                          validator: (value) {
+                            if (spouseblood == 'Blood Group') {
+                              return '* Select Blood Group';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
 
                       SizedBox(
                         width: 300,
@@ -833,7 +900,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                         width: 320,
                         padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 4),
                         child: DropdownButtonFormField<String>(
-                          value: spousekoottam,
+                          value: spousekoottam.isNotEmpty ? spousekoottam : null,
                           hint: const Text("Koottam"),
                           icon: const Icon(Icons.arrow_drop_down),
                           isExpanded: true,
@@ -918,17 +985,17 @@ class _PersonalEditState extends State<PersonalEdit> {
                 ),
 
 
-                Padding(
+                /*Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 170, 0),
                   child: Text('Business Details',
                     style: Theme
                         .of(context)
                         .textTheme
                         .headlineSmall,),
-                ),
+                ),*/
 
                 const SizedBox(height: 15,),
-                SizedBox(
+               /* SizedBox(
                   width: 300,
                   child: DropdownButtonFormField<String>(
                     value: businesstype,
@@ -940,7 +1007,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                       "Whole Sale",
                       "Ditributor",
                       "Service",
-                      "Retail"
+                      "Retail",
+                      "Teacher"
                     ]
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -960,10 +1028,10 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                   ),
-                ),
+                ),*/
                 // Company Address textfield starts
                 const SizedBox(height: 15,),
-                SizedBox(
+               /* SizedBox(
                   width: 300,
                   child: TextFormField(
                     minLines: 1,
@@ -991,11 +1059,11 @@ class _PersonalEditState extends State<PersonalEdit> {
                       suffixIcon: Icon(Icons.business),
                     ),
                   ),
-                ),
+                ),*/
                 // Company Address textfield ends
 
                 const SizedBox(height: 15,),
-                SizedBox(
+                /*SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: businesskeywordscontroller,
@@ -1023,11 +1091,11 @@ class _PersonalEditState extends State<PersonalEdit> {
                       LengthLimitingTextInputFormatter(30),
                     ],
                   ),
-                ),
+                ),*/
 
                 // Website  textfield starts
                 const SizedBox(height: 15,),
-                SizedBox(
+                /*SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: websitecontroller,
@@ -1051,12 +1119,12 @@ class _PersonalEditState extends State<PersonalEdit> {
                       LengthLimitingTextInputFormatter(30),
                     ],
                   ),
-                ),
+                ),*/
                 // Website textfield ends
 
                 // Year of business established textfield starts
                 const SizedBox(height: 15,),
-                SizedBox(
+                /*SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: yearcontroller,
@@ -1071,7 +1139,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                       }
                       return null;
                     },
-                    /*onTap: () async {
+                    *//*onTap: () async {
                                 DateTime currentDate = DateTime.now();
                                 DateTime firstSelectableYear = DateTime(1900);
                                 DateTime lastSelectableYear = DateTime(currentDate.year, 12, 31);
@@ -1089,7 +1157,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                                   });
                                 }
 
-                              },*/
+                              },*//*
 
                     decoration: const InputDecoration(
                       labelText: "business established year",
@@ -1104,7 +1172,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                     ],
 
                   ),
-                ),
+                ),*/
 
                 const SizedBox(height: 5,),
 
@@ -1177,11 +1245,11 @@ class _PersonalEditState extends State<PersonalEdit> {
                         minWidth: 130,
                         height: 50,
                         color: Colors.green[800],
-                        onPressed: () async {
+                        onPressed: ()  {
 
                           if (_formKey.currentState!.validate()) {
-
-                          await updatedetails();
+                           Edit();
+                          // updatedetails();
                             print("${firstnamecontroller.text}${mobilecontroller.text}");
 
                           }

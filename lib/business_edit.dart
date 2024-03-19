@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gipapp/profile.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:http/http.dart'as http;
 
 class BusinessEditPage extends StatefulWidget {
   final String? currentbusinesstype;
@@ -15,10 +17,9 @@ class BusinessEditPage extends StatefulWidget {
   final String? currentaddress;
   final String? currentwebsite;
   final String? currentybe;
-  final String documentid;
-  final String? currentdimage;
- final String? currentbusinessimage;
-  const BusinessEditPage({Key? key,
+  final String? id;
+  final String? currentbusinessimage;
+  const BusinessEditPage({super.key,
     required this.currentbusinesstype,
     required  this.currentcompanyname,
     // required this.currentservice,
@@ -28,12 +29,10 @@ class BusinessEditPage extends StatefulWidget {
     required  this.currentaddress,
     required   this.currentwebsite,
     required  this.currentybe,
-    required this.documentid,
-    required this.currentdimage,
+    required this.id,
     required this.currentbusinessimage,
 
-  }) :
-        super(key: key);
+  });
 
   @override
   State<BusinessEditPage> createState() => _BusinessEditPageState();
@@ -48,35 +47,14 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
 
   @override
   void  initState() {
-   // _getDataFromDatabase();
-    companynamecontroller = TextEditingController(
-      text: widget.currentcompanyname,
-    );
-      businesskeywordcontroller = TextEditingController(
-    text: widget.currentbusinesskeywords,
-    );
-    // servicecontroller = TextEditingController(
-    // text: widget.currentservice,
-    // );
-    mobilecontroller = TextEditingController(
-      text: widget.currentmobile,
-    );
-    emailcontroller = TextEditingController(
-      text: widget.currentemail,
-    );
-    addresscontroller = TextEditingController(
-      text: widget.currentaddress,
-    );
-    websitecontroller = TextEditingController(
-      text: widget.currentwebsite,
-    );
-    ybecontroller = TextEditingController(
-      text: widget.currentybe,
-    );
+    companynamecontroller = TextEditingController(text: widget.currentcompanyname,);
+    businesskeywordcontroller = TextEditingController(text: widget.currentbusinesskeywords,);
+    mobilecontroller = TextEditingController(text: widget.currentmobile,);
+    emailcontroller = TextEditingController(text: widget.currentemail,);
+    addresscontroller = TextEditingController(text: widget.currentaddress,);
+    websitecontroller = TextEditingController(text: widget.currentwebsite,);
+    ybecontroller = TextEditingController(text: widget.currentybe,);
     businesstype = widget.currentbusinesstype!;
-    image = widget.currentdimage!;
-
-
     // TODO: implement build
     super.initState();
   }
@@ -91,6 +69,40 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   TextEditingController websitecontroller = TextEditingController();
   TextEditingController ybecontroller = TextEditingController();
 
+  Future<void> Edit() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_edit.php');
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      final response = await http.put(
+        url,
+        body: jsonEncode({
+          "company_name": companynamecontroller.text,
+          "mobile": mobilecontroller.text,
+          "email": emailcontroller.text,
+          "company_address": addresscontroller.text,
+          "website": websitecontroller.text,
+          "b_year": ybecontroller.text,
+          "business_keywords": businesskeywordcontroller.text,
+          "business_type": businesstype,
+          "id": widget.id
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        print("Offers response: ${response.body}");
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context)=> Profile(userID: widget.id, userType: '',)),);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Profile Successfully Updated")));
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
 
   Future<File?> CropImage({required File imageFile}) async{
     CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
@@ -133,6 +145,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
     if (text.isEmpty) return text;
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,6 +153,9 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
         title: const Center(child:
         Text('Business Edit Profile'),),
         centerTitle: true,
+        iconTheme:  const IconThemeData(
+          color: Colors.white, // Set the color for the drawer icon
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -188,9 +204,6 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                       });
                     },
                   ),
-
-
-
 
                   const SizedBox(height: 10,),
                   Container(
@@ -417,13 +430,9 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                           height: 50,
                           color: Colors.green[800],
                           onPressed: () async {
-/*
                             if (_formKey.currentState!.validate()) {
-
+                              Edit();
                             }
-*/
-
-                            Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text(

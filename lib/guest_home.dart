@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'change_mpin.dart';
+import 'guest_profile.dart';
 import 'login.dart';
 
 class GuestHome extends StatelessWidget {
@@ -824,9 +825,9 @@ class _NavDrawerState extends State<NavDrawer> {
               onTap: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>   Profile(
+                  MaterialPageRoute(builder: (context) =>   GuestProfile(
 
-                      userType:  widget.userType,
+                     // userType:  widget.userType,
                      userID: widget.userId,
                   )),
                 ),

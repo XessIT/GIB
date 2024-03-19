@@ -1,21 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gipapp/guest_personal_edit.dart';
+import 'package:gipapp/guest_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
 
 import 'Non_exe_pages/non_exe_home.dart';
 import 'package:http/http.dart'as http;
-
-import 'edit_profile.dart';
+import 'personal_edit.dart';
+//import 'edit_profile.dart';
 import 'guest_home.dart';
 import 'home.dart';
 
 class Profile extends StatelessWidget {
 
   final String userType;
-  String? userID;
-   Profile({
+  final String? userID;
+  Profile({
     Key? key,
 
     required this.userType,
@@ -27,26 +27,18 @@ class Profile extends StatelessWidget {
 
     return  Scaffold(
       body: View(
-
-        userType : userType,
-
-      userID:userID),
+          userType : userType,
+          userID:userID),
     );
   }
 }
 
 class View extends StatefulWidget {
-
   final String userType;
-
-  String? userID;
-
-
-      View({
+  final String? userID;
+  View({
     Key? key,
-
     required this.userType,
-
     required this. userID,
   }) : super(key: key);
 
@@ -64,32 +56,31 @@ class _ViewState extends State<View> {
         appBar: AppBar(
           title: const Center(child: Text('My Profile')),
           centerTitle: true,
+          leading: IconButton(onPressed: (){
+            if(widget.userType =="Non-Executive") {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>NonExecutiveHome(
+                userType:widget.userType.toString(),
+                userID: widget.userID.toString(),
+              )));
+            }
+            if(widget.userType =="Executive") {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>Home(
+                userType:widget.userType.toString(),
+                userId: widget.userID.toString(),
+              )));
+            }
+            if(widget.userType =="Guest") {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHomePage(
+                userType:widget.userType.toString(),
+                userId: widget.userID.toString(),
+              )));
+            }
 
-    leading: IconButton(onPressed: (){
-      if(widget.userType =="Non-Executive")
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>NonExecutiveHome(
-    userType:widget.userType.toString(),
-    userID: widget.userID.toString(),
-
-    )));
-     if(widget.userType =="Executive") {
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>Home(
-      userType:widget.userType.toString(),
-      userId: widget.userID.toString(),
-    )));
-     }
-    if(widget.userType =="Guest")
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHomePage(
-      userType:widget.userType.toString(),
-
-      userId: widget.userID.toString(),
-    )));
-
-    },icon: Icon(Icons.arrow_back),
-    ),),
+          },icon: Icon(Icons.arrow_back),
+          ),),
         body: Column(
           children:  [
-            TabBar(
+            const TabBar(
                 isScrollable: true,
                 labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
@@ -104,10 +95,13 @@ class _ViewState extends State<View> {
                   Personal(
                     userType:widget.userType,
                     userID:widget.userID,
-
                   ),
-                  BusinessTabPage(),
-                 // Reward(),
+                  BusinessTabPage(
+                    userType:widget.userType,
+                    userID:widget.userID,
+                  ),
+                  //BusinessTabPage(),
+                   Reward(),
                 ],
               ),
             ),
@@ -120,15 +114,13 @@ class _ViewState extends State<View> {
 
 class Personal extends StatefulWidget {
 
+  final String userType;
+  final String? userID;
 
-   String userType;
-   String? userID;
-
-   Personal({
+  Personal({
     Key? key,
-
     required this.userType,
-     required this. userID,
+    required this. userID,
   }) : super(key: key);
 
 
@@ -222,7 +214,8 @@ class _PersonalState extends State<Personal> {
   @override
   void initState() {
     fetchData(widget.userID.toString());
-    userID=widget.userID;
+    userID = widget.userID;
+ //   print("user Id: $userID");
     // TODO: implement initState
     super.initState();
   }
@@ -233,18 +226,37 @@ class _PersonalState extends State<Personal> {
         child: Center(
           child: Column(
             children: [
-
+              SizedBox(
+                  width: double.infinity,
+                  height: 300,
+                  child: Image.network(profileImage, fit: BoxFit.cover,)
+              ),
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
-                    widget.userType != "Guest"?
-
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
-                      currentID:userID.toString(),
-                    )))
-                        : Navigator.push(context, MaterialPageRoute(builder: (context)=> GuestPersonalEdit (
-                      currentID:userID.toString(),
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
+                      currentID: userID,
+                      currentFname: fname,
+                      currentLname: lname,
+                      currentLocation: location,
+                      currentDob: dob,
+                      currentDistrict: district,
+                      currentChapter: chapter,
+                      currentMobile: mobile,
+                      currentEmail: email,
+                      currentKovil: kovil,
+                      currentKoottam: koottam,
+                      currentBloodgroup: bloodgroup,
+                      currentMaritalStatus: marital_status,
+                      currentSpouseName: spousename,
+                      currentWad: wad,
+                      currentSpouseNative: spousenative,
+                      currentSpouseKovil: spousekovil,
+                      currentSpouseKoottam: spousekoottam,
+                      currentSpouseBloodGroup: spousebloodgroup,
+                      currentEducation: education,
+                      currentPastExperience: pastexperience,
                     )));
                   },
                   icon: Icon(Icons.edit, color: Colors.green[800],),
@@ -255,7 +267,7 @@ class _PersonalState extends State<Personal> {
                 title: const Text('Basic Information'),
                 children: [
                   Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -269,44 +281,44 @@ class _PersonalState extends State<Personal> {
                     ],
                   ),
                   if(widget.userType != "Guest")
+                    const Divider(),
+                  if(widget.userType != "Guest")
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('District'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(district!),
+                        )
+                      ],
+                    ),
+                  if(widget.userType != "Guest")
+
+                    const Divider(),
+                  if(widget.userType != "Guest")
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Chapter'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(chapter!),
+                        )
+                      ],
+                    ),
+
                   const Divider(),
-                  if(widget.userType != "Guest")
-
-                    Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('District'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(district!),
-                      )
-                    ],
-                  ),
-                  if(widget.userType != "Guest")
-
-                    const Divider(),
-                  if(widget.userType != "Guest")
-
-                    Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Chapter'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(chapter!),
-                      )
-                    ],
-                  ),
-
-                    const Divider(),
                   Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -324,50 +336,50 @@ class _PersonalState extends State<Personal> {
                   if(widget.userType != "Guest")
 
                     Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('DOB'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(dob!),
-                      )
-                    ],
-                  ), if(widget.userType != "Guest")
-                  const Divider(),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('DOB'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(dob!),
+                        )
+                      ],
+                    ), if(widget.userType != "Guest")
+                    const Divider(),
                   if(widget.userType != "Guest")
-                  Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Koottam'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(koottam!),
-                      )
-                    ],
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Koottam'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(koottam!),
+                        )
+                      ],
+                    ),
                   if(widget.userType != "Guest")
 
                     const Divider(),
                   if(widget.userType != "Guest")
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Kovil'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(kovil!),
-                      )
-                    ],
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Kovil'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(kovil!),
+                        )
+                      ],
+                    ),
                   const Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -400,98 +412,98 @@ class _PersonalState extends State<Personal> {
               ),
               if(widget.userType != "Guest" && marital_status=="Married")
 
-              ExpansionTile(
-                leading: const Icon(Icons.group),
-                title: const Text('Dependents'),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Spouse Name'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child:spousename == null ? const Text("Nil")
-                            : Text(spousename!),
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('WAD'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(wad!),
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Spouse Blood Group'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(spousebloodgroup!),
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Spouse Native'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child:spousenative == null ? const Text("Nil")
-                            : Text(spousenative!),
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Spouse Father Koottam'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: spousekoottam == null ? const Text("Nil")
-                            : Text(spousekoottam!),
-                      )
+                ExpansionTile(
+                  leading: const Icon(Icons.group),
+                  title: const Text('Dependents'),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Spouse Name'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child:spousename == null ? const Text("Nil")
+                              : Text(spousename!),
+                        )
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('WAD'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(wad!),
+                        )
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Spouse Blood Group'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(spousebloodgroup!),
+                        )
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Spouse Native'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child:spousenative == null ? const Text("Nil")
+                              : Text(spousenative!),
+                        )
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Spouse Father Koottam'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: spousekoottam == null ? const Text("Nil")
+                              : Text(spousekoottam!),
+                        )
 
-                    ],),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Spouse Father Kovil'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: spousekovil== null ? const Text("Nil")
-                            : Text(spousekovil!),
-                      )
+                      ],),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Spouse Father Kovil'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: spousekovil== null ? const Text("Nil")
+                              : Text(spousekovil!),
+                        )
 
-                    ],),
-                ],),
+                      ],),
+                  ],),
 
               ExpansionTile(
                 leading: const Icon(Icons.call),
@@ -527,45 +539,45 @@ class _PersonalState extends State<Personal> {
                 ],
               ),
               if(widget.userType != "Guest")
-              ExpansionTile(
-                leading: const Icon(Icons.cast_for_education),
-                title: const Text('Education Details'),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ExpansionTile(
+                  leading: const Icon(Icons.cast_for_education),
+                  title: const Text('Education Details'),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    children: [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Education'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(education!),)
-                    ],
-                  )
-                ],
-              ),
+                      children: [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Education'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(education!),)
+                      ],
+                    )
+                  ],
+                ),
               if(widget.userType != "Guest")
-              ExpansionTile(
-                leading: const Icon(Icons.man),
-                title: const Text('Past Experience'),
-                children: [
-                  Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      const Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Past Experience'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(pastexperience!),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                ExpansionTile(
+                  leading: const Icon(Icons.man),
+                  title: const Text('Past Experience'),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        const Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Past Experience'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(pastexperience!),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -576,19 +588,20 @@ class _PersonalState extends State<Personal> {
 
 
 class BusinessTabPage extends StatefulWidget {
-  const BusinessTabPage({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userID;
+  const BusinessTabPage({super.key,
+    required this.userType, required this.userID});
 
   @override
   State<BusinessTabPage> createState() => _BusinessTabPageState();
 }
 class _BusinessTabPageState extends State<BusinessTabPage> {
 
-
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         body: Column(
           children: [
@@ -624,10 +637,12 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
             ),
 
             //TABBAR VIEW STARTS
-            const Expanded(
+             Expanded(
               child: TabBarView(children: [
-                BusinessInfo(),
-                // ImageAndVideo(),
+                BusinessInfo(
+                  userType:widget.userType,
+                  userID:widget.userID,),
+                 ImageAndVideo(),
 
               ]),
             )
@@ -639,7 +654,11 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
 }
 
 class BusinessInfo extends StatefulWidget {
-  const BusinessInfo({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userID;
+  const BusinessInfo({super.key,
+    required this.userType,
+    required this.userID});
 
   @override
   State<BusinessInfo> createState() => _BusinessInfoState();
@@ -647,26 +666,52 @@ class BusinessInfo extends StatefulWidget {
 
 class _BusinessInfoState extends State<BusinessInfo> {
 
-
-  String? businesstype="";
-  String? companyname ="";
   String? businessimage = "";
-  String? businesskeywords ="";
-  //String? service="";
-  String? address="";
-  String? mobile="";
-  String? email="";
-  String? website ="";
-  String? ybe="";
-  String documentid="";
 
-    @override
-    void initState() {
-      // TODO: implement initState
-      super.initState();
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData(String userId) async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      print(url);
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("ResponseData: $responseData");
+        if (responseData is List) {
+          // If responseData is a List (multiple records)
+          final List<dynamic> itemGroups = responseData;
+          setState(() {
+            data = itemGroups.cast<Map<String, dynamic>>();
+          });
+          print('Data: $data');
+        } else if (responseData is Map<String, dynamic>) {
+          // If responseData is a Map (single record)
+          setState(() {
+            data = [responseData];
+          });
+          print('Data: $data');
+        }
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
     }
-    @override
-    Widget build(BuildContext context) {
+  }
+
+  @override
+  void initState() {
+    getData(widget.userID.toString());
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -684,15 +729,15 @@ class _BusinessInfoState extends State<BusinessInfo> {
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context)=> BusinessEditPage(
                       currentbusinessimage: businessimage,
-                      currentcompanyname: companyname,
-                      currentmobile: mobile,
-                      currentemail: email,
-                      currentaddress: address,
-                      currentwebsite: website,
-                      currentybe: ybe,
-                      documentid: documentid,
-                      currentbusinesskeywords: businesskeywords,
-                      currentbusinesstype: businesstype, currentdimage: businessimage ,
+                      currentcompanyname: data[0]["company_name"],
+                      currentmobile: data[0]["mobile"],
+                      currentemail: data[0]["email"],
+                      currentaddress: data[0]["company_address"],
+                      currentwebsite: data[0]["website"],
+                      currentybe: data[0]["b_year"],
+                      id: widget.userID.toString(),
+                      currentbusinesskeywords: data[0]["business_keywords"],
+                      currentbusinesstype: data[0]["business_type"],
                     )));
                   },
                   icon: const Icon(Icons.edit),
@@ -712,7 +757,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(108, 0, 0, 0),
-                        child: Text(businesstype!),
+                        child: Text(data.isNotEmpty ? "${data[0]["business_type"]}" : ""),
                       )
                     ],
                   ),
@@ -726,7 +771,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(94, 0, 0, 0),
-                        child: Text(companyname!),
+                        child: Text(data.isNotEmpty ? "${data[0]["company_name"]}" : ""),
                       )
                     ],
                   ),
@@ -743,7 +788,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(73, 0, 0, 0),
-                          child: Text(businesskeywords!,
+                          child: Text(data.isNotEmpty ? "${data[0]["business_keywords"]}" : "",
                             textAlign: TextAlign.justify,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,),
@@ -770,7 +815,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(124, 0, 0, 0),
-                          child: Text(address!,
+                          child: Text(data.isNotEmpty ? "${data[0]["company_address"]}" : "",
                             //  textAlign: TextAlign.justify,
                           ),
                         )
@@ -788,7 +833,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(130, 0, 0, 0),
-                        child: Text(mobile!,
+                        child: Text(data.isNotEmpty ? "${data[0]["mobile"]}" : "",
                           textAlign: TextAlign.justify,
                         ),
                       )
@@ -805,7 +850,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(140, 0, 0, 2),
-                        child: Text(email!,
+                        child: Text(data.isNotEmpty ? "${data[0]["email"]}" : "",
                           textAlign: TextAlign.justify,
                         ),
                       )
@@ -827,7 +872,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(73, 0, 0, 5),
-                        child: Text(website!),
+                        child: Text(data.isNotEmpty ? "${data[0]["website"]}" : ""),
                       )
                     ],
                   ),
@@ -841,7 +886,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(88, 0, 0, 0),
-                        child: Text(ybe!),
+                        child: Text(data.isNotEmpty ?" ${data[0]["b_year"]}" : ""),
                       )
                     ],
                   ),
