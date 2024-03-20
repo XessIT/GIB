@@ -94,7 +94,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   Future<void> fetchData(String userId) async {
     try {
       //http://localhost/GIB/lib/GIBAPI/offers.php?table=registration&id=${widget.userId}
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/regitsration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

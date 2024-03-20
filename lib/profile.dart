@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gipapp/guest_personal_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
 import 'Non_exe_pages/non_exe_home.dart';
@@ -232,14 +231,14 @@ class _PersonalState extends State<Personal> {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
-                    widget.userType != "Guest"?
+                  /* widget.userType != "Guest"?
 
                       Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
                       currentID:userID.toString(),
                     )))
                         : Navigator.push(context, MaterialPageRoute(builder: (context)=> GuestPersonalEdit (
                       currentID:userID.toString(),
-                    )));
+                    )));*/
                   },
                   icon: Icon(Icons.edit, color: Colors.green[800],),
                 ),
@@ -684,9 +683,9 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       currentaddress: address,
                       currentwebsite: website,
                       currentybe: ybe,
-                      documentid: documentid,
+                      // documentid: documentid,
                       currentbusinesskeywords: businesskeywords,
-                      currentbusinesstype: businesstype, currentdimage: businessimage ,
+                      currentbusinesstype: businesstype, id: '',/* currentdimage: businessimage ,*/
                     )));
                   },
                   icon: const Icon(Icons.edit),

@@ -64,9 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                           $registrationlist = " SELECT mobile FROM registration where member_id = '$member_id' ";
 
                         }else if(isset($_GET["id"])){
-
                           $registrationlist = " SELECT * FROM registration where id = '$id' ";
-
                         }
                          else if(isset($_GET['member_type'])){
 

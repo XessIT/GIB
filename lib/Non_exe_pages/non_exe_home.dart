@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart'as http;
 import '../change_mpin.dart';
 import '../gib_members.dart';
+import '../home.dart';
 import '../login.dart';
 import '../profile.dart';
 
@@ -26,8 +29,111 @@ class NonExecutiveHome extends StatefulWidget {
 
 class _NonExecutiveHomeState extends State<NonExecutiveHome> {
 
-  //  final CalendarController _calendarController =  CalendarController();
+  List<Map<String,dynamic>>userdata=[];
+  Future<void> fetchData(String? userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
 
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                // fetchName = userdata[0]["first_name"]??"";
+                // fetchLastName= userdata[0]['last_name']??"";
+                // fetchMemberId=userdata[0]["member_id"]??"";
+                // fetchMemberType = userdata[0]["member_type"]??"";
+                // fetchTeamName = userdata[0]["team_name"]??"";
+                // fetchMobile = userdata[0]["mobile"]??"";
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+
+
+  ///offers fetch
+  List<Map<String,dynamic>>offersdata=[];
+  Future<void> offersfetchData() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final response = await http.get(url);
+      print(url);
+
+      if (response.statusCode == 200) {
+        // print("status code: ${response.statusCode}");
+        // print("status body: ${response.body}");
+
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            offersdata = responseData.cast<Map<String, dynamic>>();
+            //  print("offers data : $offersdata");
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  ///register Meeting data store code
+  String? registerStatus="Register";
+  Future<void> registerDateStoreDatabase(String meetingId,String meetingType, String meetingDate, String meetingPlace) async {
+    try {
+      String uri = "http://localhost/GIB/lib/GIBAPI/register_meeting.php";
+      var res = await http.post(Uri.parse(uri), body: jsonEncode( {
+        "meeting_id": meetingId,
+        "meeting_type": meetingType,
+        "meeting_date": meetingDate,
+        "meeting_place":meetingPlace,
+        "status":registerStatus,
+        "user_id":widget.userID,
+        "user_type":widget.userType,
+      }));
+
+      if (res.statusCode == 200) {
+        //  print("Register uri$uri");
+        // print("Register Response Status: ${res.statusCode}");
+        //print("Register Response Body: ${res.body}");
+        var response = jsonDecode(res.body);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> NonExecutiveHome(userID: widget.userID,userType: widget.userType,)));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registration Successfully")));
+      } else {
+        print("Failed to upload image. Server returned status code: ${res.statusCode}");
+      }
+    } catch (e) {
+      //  print("Error uploading image: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    offersfetchData();
+    fetchData(widget.userID);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
@@ -329,295 +435,525 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                         ),
                       ),
                       Container(
-                        width: 380,
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.white, Colors.white,
+                        width: w,
+                        // height: 900,
+                        decoration:   BoxDecoration(
+                            color: Colors.green.shade900,
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
+                        ),
+                        child: Column(
+                          children: [
+
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                height: 700,
+                                child: Row(
+                                  children: offersdata.map((offer) {
+                                    String companyName = offer['company_name'] ?? '';
+                                    String name = offer['name'] ?? '';
+                                    String offerImage = offer['offer_image'] ?? '';
+                                    // print("image - $offerImage");
+
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: 120,
+                                            height: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
+                                            ),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+
+/*
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Container(
+                        child: Row(
+                          children: [
+                            SizedBox(width: 15,),
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+                            Column(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  decoration: BoxDecoration(
+
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset("assets/img_1.png"),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
+
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+*/
+
+                            /*   const SizedBox(height: 15,),
+                    Container(
+                      width: 390,
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white, Colors.white,
+                          ],
+                        ),
+                        border: Border.all(
+                            color: Colors.white,width: 2),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child:
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                height: 210,
+                                width: 180,
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      color: Colors.black,
+                                    ),),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: IconButton(
+                                          onPressed: (){},
+                                          icon:  const Icon(
+                                            Icons.call_outlined,
+                                            color: Colors.green,)),),
+                                    CircleAvatar(
+                                      radius: 45,
+                                      backgroundColor: Colors.cyan,
+                                      backgroundImage: const
+                                      AssetImage('assets/car.jpg'),
+                                      child: Stack(
+                                        children: const [
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: CircleAvatar(
+                                                radius: 18.5,
+                                                backgroundColor: Colors.green,
+                                                child: Text('10%',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15,),
+                                    const Text('A1 Car Accessories',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
+                                    const SizedBox(height: 15,),
+                                    const Text('product -Ceramic Coating',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
+                                    const SizedBox(width: 1,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text('Validity -',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),),
+                                        Text(DateFormat
+                                          ('dd/MM/yyyy').
+                                        format(DateTime.now(),),
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
+                              Container(
+                                height: 210,
+                                width: 180,
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: IconButton(
+                                          onPressed: (){},
+                                          icon:  const Icon(
+                                            Icons.call_outlined,
+                                            color: Colors.green,)),),
+                                    CircleAvatar(
+                                      radius: 45,
+                                      backgroundColor: Colors.cyan,
+                                      backgroundImage: const AssetImage('assets/ro.jpg'),
+                                      child: Stack(
+                                        children: const [
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundColor: Colors.green,
+                                                child: Text('15%',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15,),
+                                    const Text('Jm Technology',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold), ),
+                                    const SizedBox(height: 15,),
+                                    const Text('Service -Ro System',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
+
+                                    const SizedBox(width: 1,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text('Validity -',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),),
+                                        Text(DateFormat
+                                          ('dd/MM/yyyy').
+                                        format(DateTime.now(),),
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                          border: Border.all(
-                              color: Colors.white,width: 2),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child:
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  height: 210,
-                                  width: 170,
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      right: BorderSide(
-                                        color: Colors.black,
-                                      ),),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: IconButton(
-                                            onPressed: (){},
-                                            icon:  const Icon(
-                                              Icons.call_outlined,
-                                              color: Colors.green,)),),
-                                      CircleAvatar(
-                                        radius: 45,
-                                        backgroundColor: Colors.cyan,
-                                        backgroundImage: const
-                                        AssetImage('assets/car.jpg'),
-                                        child: Stack(
-                                          children: const [
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: CircleAvatar(
-                                                  radius: 18.5,
-                                                  backgroundColor: Colors.green,
-                                                  child: Text('10%',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),)),
-                                            ),
-                                          ],
-                                        ),
+                          const Divider(color: Colors.black,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                height: 210,
+                                width: 180,
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      color: Colors.black,
+                                    ),),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: IconButton(
+                                          onPressed: (){},
+                                          icon:  const Icon(
+                                            Icons.call_outlined,
+                                            color: Colors.green,)),),
+                                    CircleAvatar(
+                                      radius: 45,
+                                      backgroundColor: Colors.cyan,
+                                      backgroundImage: const
+                                      AssetImage('assets/car.jpg'),
+                                      child: Stack(
+                                        children: const [
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundColor: Colors.green,
+                                                child: Text('10%',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),)),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 15,),
-                                      const Text('A1 Car Accessories',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
-                                      const SizedBox(height: 15,),
-                                      const Text('product -Ceramic Coating',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
-                                      const SizedBox(width: 1,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Text('Validity -',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),),
-                                          Text(DateFormat
-                                            ('dd/MM/yyyy').
+                                    ),
+                                    const SizedBox(height: 15,),
+                                    const Text('A1 Car Accessories',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
+                                    const SizedBox(height: 15,),
+                                    const Text('product -Ceramic Coating',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
+                                    const SizedBox(width: 1,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text('Validity -',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy').
                                           format(DateTime.now(),),
-                                            style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
+                              Container(
+                                height: 210,
+                                width: 180,
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: IconButton(
+                                          onPressed: (){},
+                                          icon:  const Icon(Icons.call_outlined,
+                                            color: Colors.green,)),),
+                                    CircleAvatar(
+                                      radius: 45,
+                                      backgroundColor: Colors.cyan,
+                                      backgroundImage: const AssetImage('assets/ro.jpg'),
+                                      child: Stack(
+                                        children: const [
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundColor: Colors.green,
+                                                child: Text('15%',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),)),
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                                Container(
-                                  height: 210,
-                                  width: 170,
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: IconButton(
-                                            onPressed: (){},
-                                            icon:  const Icon(
-                                              Icons.call_outlined,
-                                              color: Colors.green,)),),
-                                      CircleAvatar(
-                                        radius: 45,
-                                        backgroundColor: Colors.cyan,
-                                        backgroundImage: const AssetImage('assets/ro.jpg'),
-                                        child: Stack(
-                                          children: const [
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundColor: Colors.green,
-                                                  child: Text('15%',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 15,),
-                                      const Text('Jm Technology',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold), ),
-                                      const SizedBox(height: 15,),
-                                      const Text('Service -Ro System',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
+                                    ),
+                                    const SizedBox(height: 15,),
+                                    const Text('Jm Technology',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold), ),
+                                    const SizedBox(height: 15,),
+                                    const Text('Service -Ro System',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),),
 
-                                      const SizedBox(width: 1,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Text('Validity -',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),),
-                                          Text(DateFormat
-                                            ('dd/MM/yyyy').
+                                    const SizedBox(width: 1,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text('Validity -',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy').
                                           format(DateTime.now(),),
-                                            style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(color: Colors.black,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  height: 210,
-                                  width: 170,
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      right: BorderSide(
-                                        color: Colors.black,
-                                      ),),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: IconButton(
-                                            onPressed: (){},
-                                            icon:  const Icon(
-                                              Icons.call_outlined,
-                                              color: Colors.green,)),),
-                                      CircleAvatar(
-                                        radius: 45,
-                                        backgroundColor: Colors.cyan,
-                                        backgroundImage: const
-                                        AssetImage('assets/car.jpg'),
-                                        child: Stack(
-                                          children: const [
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundColor: Colors.green,
-                                                  child: Text('10%',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),)),
-                                            ),
-                                          ],
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                      ),
-                                      const SizedBox(height: 15,),
-                                      const Text('A1 Car Accessories',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
-                                      const SizedBox(height: 15,),
-                                      const Text('product -Ceramic Coating',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
-                                      const SizedBox(width: 1,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Text('Validity -',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),),
-                                          Text(
-                                            DateFormat('dd/MM/yyyy').
-                                            format(DateTime.now(),),
-                                            style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                                Container(
-                                  height: 210,
-                                  width: 170,
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: IconButton(
-                                            onPressed: (){},
-                                            icon:  const Icon(Icons.call_outlined,
-                                              color: Colors.green,)),),
-                                      CircleAvatar(
-                                        radius: 45,
-                                        backgroundColor: Colors.cyan,
-                                        backgroundImage: const AssetImage('assets/ro.jpg'),
-                                        child: Stack(
-                                          children: const [
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundColor: Colors.green,
-                                                  child: Text('15%',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 15,),
-                                      const Text('Jm Technology',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold), ),
-                                      const SizedBox(height: 15,),
-                                      const Text('Service -Ro System',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 180,),
+*/
 
-                                      const SizedBox(width: 1,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Text('Validity -',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),),
-                                          Text(
-                                            DateFormat('dd/MM/yyyy').
-                                            format(DateTime.now(),),
-                                            style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+
+
                           ],
                         ),
                       ),
@@ -767,6 +1103,7 @@ class NavDrawer extends StatefulWidget {
 }
 
 class _NavDrawerState extends State<NavDrawer> {
+
   @override
   Widget build(BuildContext context) {
     return Drawer(

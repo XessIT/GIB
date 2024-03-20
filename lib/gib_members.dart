@@ -36,6 +36,7 @@ class _MembersState extends State<Members> {
   String? chapter = "";
   String? district = "";
   String type = "Member";
+  String MemberType = "Non-Executive";
   final fieldText = TextEditingController();
   void clearText() {
     fieldText.clear();
@@ -119,6 +120,12 @@ class _MembersState extends State<Members> {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}&district=$districts&chapter=$chapters&id=${widget.userId}');
       print("gib members url =$url");
+/*
+=======
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type!=${MemberType}');
+      print(url);
+>>>>>>> fd1cdcf31b472149a016a5f7231bd858ca467ea1
+*/
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
       print("gib members Response: ${response.body}");

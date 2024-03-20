@@ -96,9 +96,11 @@ class _HomeState extends State<Home> {
 String? memberType ="Executive";
   @override
   void initState() {
+
     print("UserId: ${widget.userId}");
     offersfetchData();
     wishData(memberType!);
+
     // TODO: implement initState
     super.initState();
   }
@@ -122,22 +124,20 @@ String? memberType ="Executive";
             dynamicdata = responseData.cast<Map<String, dynamic>>();
             if (dynamicdata.isNotEmpty) {
               setState(() {
-              //  print("dynamic data :-- $dynamicdata");
-
               });
             }
           });
         } else {
           // Handle invalid response data (not a List)
-          print('Invalid response Meeting data format');
+       //   print('Invalid response Meeting data format');
         }
       } else {
         // Handle non-200 status code
-        print('Meeting Error: ${response.statusCode}');
+      //  print('Meeting Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
-      print('Meeting Error: $error');
+    //  print('Meeting Error: $error');
     }
   }
 
@@ -193,7 +193,6 @@ String? memberType ="Executive";
                 fetchMemberType = userdata[0]["member_type"]??"";
                 fetchTeamName = userdata[0]["team_name"]??"";
                 fetchMobile = userdata[0]["mobile"]??"";
-
               });
             }
           });
@@ -203,7 +202,7 @@ String? memberType ="Executive";
         }
       } else {
         // Handle non-200 status code
-        print('Error: ${response.statusCode}');
+      //  print('Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
@@ -259,9 +258,9 @@ String? memberType ="Executive";
       }));
 
       if (res.statusCode == 200) {
-        print("Register uri$uri");
-        print("Register Response Status: ${res.statusCode}");
-        print("Register Response Body: ${res.body}");
+      //  print("Register uri$uri");
+       // print("Register Response Status: ${res.statusCode}");
+        //print("Register Response Body: ${res.body}");
         var response = jsonDecode(res.body);
         Navigator.push(context, MaterialPageRoute(builder: (context)=> Home(userType: widget.userId, userId: widget.userType)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registration Successfully")));
@@ -269,7 +268,7 @@ String? memberType ="Executive";
         print("Failed to upload image. Server returned status code: ${res.statusCode}");
       }
     } catch (e) {
-      print("Error uploading image: $e");
+    //  print("Error uploading image: $e");
     }
   }
 
@@ -302,11 +301,11 @@ String? memberType ="Executive";
         }
       } else {
         // Handle non-200 status code
-        print('Error: ${response.statusCode}');
+      //  print('Error: ${response.statusCode}');
       }
     } catch (error) {
       // Handle other errors
-      print('Error: $error');
+     // print('Error: $error');
     }
   }
 
@@ -466,24 +465,91 @@ String? memberType ="Executive";
                           final today = DateTime.now();
                           final userDob = DateTime.parse(formattedDob);
                           if (userDob.month == today.month && userDob.day == today.day) {
-                            return Column(
+                            return Row(
                               children: [
-                                Text(
-                                  "${user['first_name']} ${user['last_name']}",
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                )
+                                Padding(
+                                  padding: const EdgeInsets.all(3.0),
+                                  child: Column(
+                                    children: [
+                                      InkWell(
+                                        onTap:(){
+                                          showDialog<void>(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                title: const Text('Convey Your Wish',style: TextStyle(color: Colors.green),),
+                                                content:  SizedBox(width: 300,
+                                                  child: TextFormField(
+                                                    controller: wishing,
+                                                    validator: (value){
+                                                      if(value!.isEmpty){
+                                                        return "Convey Your wishes";
+                                                      }else{
+                                                        return null;
+                                                      }
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        hintText:"Share Your Hearty Wishes",
+                                                        suffixIcon: IconButton(onPressed: (){
+                                                          wishing.clear();
+                                                        }, icon: const Icon(Icons.cancel_presentation,color: Colors.red,))
+                                                    ) ,
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        child: const Text('Wish',),
+                                                        onPressed:  ()  {
+                                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                              content: Text("Your Wishes Conveyed")));
+                                                        },
+                                                      ),
+                                                      TextButton(
+                                                        child:  const Text('Cancel',),
+                                                        onPressed: () {
+                                                          //notificationsServices.sendNotification("hello", "My First Notification");
+
+                                                          Navigator.pop(context);
+                                                          // Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+                                                        },
+                                                      ),
+
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            }, );
+
+                        },
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage("assets/pro1.jpg"),
+                                          radius: 25,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${user['first_name']} ",
+                                        style: Theme.of(context).textTheme.titleSmall,
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ],
                             );
                           }
                         }
-                        return SizedBox(); // Return an empty SizedBox if it's not the user's birthday
+                        return SizedBox();
                       },
                     ),
                   ),
 
 
+///birthday design starts here
 
-
+/*
                         Row(
                         children: [
                           const SizedBox(width: 20,),
@@ -544,6 +610,7 @@ String? memberType ="Executive";
 
                         ],
                       ),
+*/
                       const SizedBox(height: 8,),
                       Container(
                         //  height: 300,
@@ -1031,8 +1098,8 @@ class _NavDrawerState extends State<NavDrawer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) =>   Profile(
-                    userType:  widget.userType,
-                    userID:widget.userId,
+                    userType: widget.userType,
+                    userID: widget.userId,
                   )),
                 ),
               },
