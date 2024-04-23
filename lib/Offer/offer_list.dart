@@ -1,4 +1,5 @@
 import 'dart:convert'; // for base64Encode
+//import 'dart:typed_data'; // Import this for Uint8List
 //import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,7 +89,7 @@ class AddOfferPage extends StatefulWidget {
 }
 
 class _AddOfferPageState extends State<AddOfferPage> {
-
+  XFile? pickedImage;
   final _formKey = GlobalKey<FormState>();
   DateTime date =DateTime.now();
   final TextEditingController _date = TextEditingController();
@@ -101,15 +102,17 @@ class _AddOfferPageState extends State<AddOfferPage> {
 
   @override
   void initState() {
+/*
     offers();
+*/
     getData();
-    print("USER ID---${widget.userId}");
+   // print("USER ID---${widget.userId}");
     // TODO: implement initState
     super.initState();
   }
 
   //get image from file code starts here
-  Uint8List? selectedImage;
+
   String message = "";
   TextEditingController caption = TextEditingController();
 
@@ -135,36 +138,51 @@ class _AddOfferPageState extends State<AddOfferPage> {
   }*/
 
   bool showLocalImage = false;
-  XFile? pickedImage;
+ /* XFile? pickedImage; */
   late String imageName;
   late String imageData;
-
-  pickImageFromGallery() async {
+ // Uint8List? selectedImage;
+  Future<void> pickImageFromGallery() async {
     ImagePicker imagePicker = ImagePicker();
-    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
+
     if (pickedImage != null) {
-      List<int> imageBytes = await pickedImage!.readAsBytes();
-      setState(() {
-        imageName = pickedImage!.name;
-        print('Image Name: $imageName');
-        imageData = base64Encode(imageBytes); // Convert bytes to base64
-        print('Base64 Image Data: $imageData');
-        // You can use imageName and imageData in your application as needed
-      });
+      // Verify that pickedImage is indeed an XFile
+      print('pickedImage type: ${pickedImage.runtimeType}');
+
+      // Read the image file as bytes
+      try {
+        List<int> imageBytes = await pickedImage!.readAsBytes();
+
+        // Verify that imageBytes contains the raw image data
+        print('imageBytes length: ${imageBytes.length}');
+
+        // Encode the bytes to base64
+        String base64ImageData = base64Encode(imageBytes);
+
+        setState(() {
+          imageName = pickedImage!.name;
+         print('Image Name: $imageName');
+          imageData = base64ImageData;
+         print('Base64 Image Data: $imageData');
+        });
+      } catch (e) {
+        print('Error reading image file: $e');
+      }
     }
   }
   pickImageFromCamera() async {
     ImagePicker imagePicker = ImagePicker();
-    pickedImage = await imagePicker.pickImage(source: ImageSource.camera);
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.camera);
     showLocalImage = true;
     if (pickedImage != null) {
       List<int> imageBytes = await pickedImage!.readAsBytes();
       setState(() {
         imageName = pickedImage!.name;
-        print('Image Name: $imageName');
+     //   print('Image Name: $imageName');
         imageData = base64Encode(imageBytes);
-        print('Image Data: $imageData');
+      //  print('Image Data: $imageData');
       });
     }
   }
@@ -175,10 +193,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
     print('Attempting to make HTTP request...');
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=registration&id=${widget.userId}');
-      print(url);
+   //   print(url);
       final response = await http.get(url);
-      print("ResponseStatus: ${response.statusCode}");
-      print("Response: ${response.body}");
+      // print("ResponseStatus: ${response.statusCode}");
+      // print("Response: ${response.body}");
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print("ResponseData: $responseData");
@@ -205,40 +223,48 @@ class _AddOfferPageState extends State<AddOfferPage> {
       throw e; // rethrow the error if needed
     }
   }
-  Future<void> offers() async {
+  Future<void> offers(String datefetch) async {
     try {
+      print("_date.text before check request: ${_date.text}");
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
-      final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(_date.text);
-      final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
-      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
-      final response = await http.post(
-        url,
-        body: jsonEncode({
-          "imagename": imageName,
-          "imagedata": imageData,
-          "name": namecontroller.text,
-          "discount": discountcontroller.text,
-          "validity": formattedDate,
-          "user_id": data[0]["id"],
-          "offer_type": type,
-          "first_name": data[0]["first_name"],
-          "last_name": data[0]["last_name"],
-          "mobile": data[0]["mobile"],
-          "company_name": data[0]["company_name"],
-          "block_status": "Unblock"
-        }),
-      );
-      print(url);
-      //  print("imagedata: $imagedata");
-      print("imagename: $imageName");
-      print("ResponseStatus: ${response.statusCode}");
+      if (datefetch.isNotEmpty) {
+        final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(datefetch);
+        final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
+        final response = await http.post(
+          url,
+          body: jsonEncode({
+            "imagename": imageName,
+            "imagedata": imageData,
+            "name": namecontroller.text,
+            "discount": discountcontroller.text,
+            "validity": formattedDate,
+            "user_id": data[0]["id"],
+            "offer_type": type,
+            "first_name": data[0]["first_name"],
+            "last_name": data[0]["last_name"],
+            "mobile": data[0]["mobile"],
+            "company_name": data[0]["company_name"],
+            "block_status": "Unblock"
+          }),
+        );
+        print(url);
+        //  print("imagedata: $imagedata");
+        print("imagename: $imageName");
+        print("ResponseStatus: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        print("Offers response: ${response.body}");
+        if (response.statusCode == 200) {
+          print("Offers response: ${response.body}");
 
+        } else {
+          print("Error: ${response.statusCode}");
+        }
       } else {
-        print("Error: ${response.statusCode}");
+        print("date is empty");
+        // Handle the case where _date.text is empty
+        // You can display an error message or take any other appropriate action
       }
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+
     } catch (e) {
       print("Error during signup: $e");
       // Handle error as needed
@@ -375,10 +401,11 @@ class _AddOfferPageState extends State<AddOfferPage> {
                               initialDate: date,
                               firstDate: DateTime(1900),
                               lastDate: DateTime(2100));
-                          if(pickDate==null) return;{
+                          print("Picked date: $pickDate");
+                          if(pickDate != null) {
                             setState(() {
                               _date.text = DateFormat('dd/MM/yyyy').format(pickDate);
-
+                              print("_date.text updated: ${_date.text}");
                             });
                           }
                         }, icon: const Icon(
@@ -407,12 +434,13 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Type")));
                           }
-                          else if(pickedImage == null){
+                          /*else if(pickedImage == null){
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Image")));
-                          }
+                          }*/
                           else if (_formKey.currentState!.validate()) {
-                            offers();
+                            print("_date.text before sending request: ${_date.text}");
+                            offers(_date.text);
                             Navigator.push(context,
                               MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId,)),);
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
