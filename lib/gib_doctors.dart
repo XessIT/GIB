@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gipapp/search_doctor.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart'as http;
 
 class GibDoctors extends StatelessWidget {
   const GibDoctors({Key? key}) : super(key: key);
@@ -24,11 +26,48 @@ class _DoctorsState extends State<Doctors> {
 
   String doctor="Doctor's Wing";
 
+List<Map<String,dynamic>> getDoctor=[];
+  Future<void> getGibDoctors() async {
+    try {
+
+      final url =
+
+      Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&member_type=$doctor');
+
+        print("Doctor Url:$url");
+      final response = await http.get(url);
+
+        print("Response:$response");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+          print("responseData:$responseData");
+          print("statusCode:${response.statusCode}");
+          print("statusCode:${response.body}");
+        setState(() {
+          getDoctor = itemGroups.cast<Map<String, dynamic>>();
+          print("aboutVision:$getDoctor");
+        });
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+@override
+  void initState() {
+    // TODO: implement initState
+  getGibDoctors();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text('GiB Doctors')),
+      appBar: AppBar(centerTitle: true,
+        title: Text('GiB Doctors', style: Theme.of(context).textTheme.bodySmall),
+        iconTheme: IconThemeData(color: Colors.white),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
@@ -43,16 +82,16 @@ class _DoctorsState extends State<Doctors> {
       ),
 
       body: ListView.builder(
-                  itemCount: 10,
+                  itemCount: getDoctor.length,
                   itemBuilder: (context, index) {
-                    Map thisitem = [index] as Map;
+                    Map<String, dynamic> thisitem = getDoctor[index];
                     return Center(
                       child: Column(
                         children: [
                           const SizedBox(height: 20,),
                           InkWell(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>  DoctorsDetailsPage(thisitem['id'])));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) =>  DoctorsDetailsPage(itemId:thisitem['id'])));
                             },
                             child: Container(
                               width: 300,
@@ -67,17 +106,20 @@ class _DoctorsState extends State<Doctors> {
                                 mainAxisAlignment: MainAxisAlignment
                                     .spaceBetween,
                                 children: [
+
                                   CircleAvatar(
-                                    backgroundImage: Image
-                                        .network("${thisitem['Image']}")
-                                        .image,
+                                    backgroundImage: NetworkImage("https://localhost/GIB/GIBAPI/upload/${thisitem['profile_image']}image.png"),
+
+                                    /* backgroundImage: Image
+                                        .network(thisitem['profile_image'])
+                                        .image,*/
                                     //  radius: 50,
                                   ),
-                                  Text('${thisitem["First Name"]}\n'
-                                      '${thisitem["Company Name"]}'),
+                                  Text('${thisitem["first_name"]}\n'
+                                      '${thisitem["company_name"]}'),
                                   IconButton(
                                       onPressed: () {
-                                        launch("tel://'${thisitem['Mobile']}'");
+                                        launch("tel://'${thisitem['mobile']}'");
                                       },
                                       icon: const Icon(
                                         Icons.call, color: Colors.green,))
@@ -95,27 +137,68 @@ class _DoctorsState extends State<Doctors> {
 }
 
 
-class DoctorsDetailsPage extends StatelessWidget {
+class DoctorsDetailsPage extends StatefulWidget {
+  String? itemId="";
 
-  DoctorsDetailsPage(this.itemId , {Key? key}) : super(key: key){
-
+  DoctorsDetailsPage( {Key? key,required this.itemId ,}) : super(key: key){
   }
 
 
-  String itemId;
-  late Map data;
+  @override
+  State<DoctorsDetailsPage> createState() => _DoctorsDetailsPageState();
+}
+
+class _DoctorsDetailsPageState extends State<DoctorsDetailsPage> {
+  List<Map<String,dynamic>> getDoctor=[];
+
+  Future<void> getGibDoctors() async {
+    try {
+
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.itemId}');
+
+      print("Doctor fetch Url:$url");
+      final response = await http.get(url);
+
+      print("Response:$response");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        print("responseData:$responseData");
+        print("statusCode:${response.statusCode}");
+        print("statusCode:${response.body}");
+        setState(() {
+          getDoctor = itemGroups.cast<Map<String, dynamic>>();
+          print("doctor:$getDoctor");
+        });
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    if(widget.itemId!.isNotEmpty){
+    getGibDoctors();}
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Doctor Details"),
+        title: Text("Doctor Details",style: Theme.of(context).textTheme.bodySmall),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/heartstetheshhope.png"),
+            image: AssetImage("assets/img_3.png"),
             colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.2), BlendMode.dstATop),
             fit: BoxFit.cover,
           ),
@@ -131,7 +214,7 @@ class DoctorsDetailsPage extends StatelessWidget {
                             width: 90,
                             // width:double.infinity,
                             // height: 300,
-                            child: Image.network('$data["Image"]',fit: BoxFit.cover,)),
+                            child: Image.network('${getDoctor[0]["image"]}',fit: BoxFit.cover,)),
                       ),
                       const SizedBox(height: 20,),
 
@@ -139,11 +222,9 @@ class DoctorsDetailsPage extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.topLeft,
-                          child: Text("Doctor Name : Dr."'${data['First Name']}\n\n'
-                              "Hospital Name : " '${data['Company Name']}\n\n'
-                              "Hospital Address : "'${data['Company Address']}\n\n'
-
-
+                          child: Text("Doctor Name : Dr."'${getDoctor[0]['first_name']}\n\n'
+                              "Hospital Name : " '${getDoctor[0]['company_name']}\n\n'
+                              "Hospital Address : "'${getDoctor[0]['company_address']}\n\n'
                           ),
                         ),
                       ),

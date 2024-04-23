@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:gipapp/profile.dart';
+import 'package:http/http.dart'as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,11 +48,83 @@ class GuestHomePage extends StatefulWidget {
 
 class _GuestHomePageState extends State<GuestHomePage> {
 
+  List<Map<String,dynamic>>userdata=[];
+  Future<void> fetchData(String? userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                // fetchName = userdata[0]["first_name"]??"";
+                // fetchLastName= userdata[0]['last_name']??"";
+                // fetchMemberId=userdata[0]["member_id"]??"";
+                // fetchMemberType = userdata[0]["member_type"]??"";
+                // fetchTeamName = userdata[0]["team_name"]??"";
+                // fetchMobile = userdata[0]["mobile"]??"";
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+
+
+  ///offers fetch
+  List<Map<String,dynamic>>offersdata=[];
+  Future<void> offersfetchData() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final response = await http.get(url);
+      print(url);
+
+      if (response.statusCode == 200) {
+        // print("status code: ${response.statusCode}");
+        // print("status body: ${response.body}");
+
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            offersdata = responseData.cast<Map<String, dynamic>>();
+            //  print("offers data : $offersdata");
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+
+
   //  final CalendarController _calendarController =  CalendarController();
 
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
+    offersfetchData();
+    fetchData(widget.userId);
 
     return Scaffold(
    //   backgroundColor: Colors.green[50],
@@ -116,7 +190,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             const SizedBox(height: 10,),
 
                             Text(
-                              'Karthi',
+                           userdata.isNotEmpty?   userdata[0]["first_name"]:"",
                               style: GoogleFonts.aBeeZee(
                                 fontSize: 20,
                                 color: Colors.indigo,
@@ -140,14 +214,14 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                     fontWeight: FontWeight.bold,
                                   ),),
 
-                                Text( DateFormat()
+                               /* Text( DateFormat()
                                 // displaying formatted date
                                     .format(DateTime.now()),
                                   style: GoogleFonts.aBeeZee(
                                     fontSize: 10,
                                     color: Colors.indigo,
                                     fontWeight: FontWeight.bold,
-                                  ),),
+                                  ),),*/
                               ],
                             ),
                           ],
@@ -170,9 +244,45 @@ class _GuestHomePageState extends State<GuestHomePage> {
                       alignment: Alignment.topLeft,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Text('   Offers',style: Theme.of(context).textTheme.displayLarge,),
+                        child: Text('     Offers',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
                       ),
                     ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Container(
+                        height: 700,
+                        child: Row(
+                          children: offersdata.map((offer) {
+                            String companyName = offer['company_name'] ?? '';
+                            String name = offer['name'] ?? '';
+                            String offerImage = offer['offer_image'] ?? '';
+                            // print("image - $offerImage");
+
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 120,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+
 /*
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -348,7 +458,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     ),
 */
 
-                    const SizedBox(height: 15,),
+                 /*   const SizedBox(height: 15,),
                     Container(
                       width: 390,
                       padding: const EdgeInsets.all(10.0),
@@ -643,7 +753,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                       ),
                     ),
                     const SizedBox(height: 180,),
-
+*/
 
 
 

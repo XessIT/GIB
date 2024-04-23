@@ -63,8 +63,9 @@ class _ReferralPageState extends State<ReferralPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(iconTheme: IconThemeData(color: Colors.white),
         actions: [
+
           IconButton(onPressed:(){
             Navigator.push(context, MaterialPageRoute(builder: (context) => const SlipHistory())); },
               icon: const Icon(Icons.more_vert)),

@@ -15,12 +15,16 @@
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    $table = isset($_GET['table']) ? $_GET['table'] : "";
     if ($table == "offers") {
-            $offerlist = "SELECT * FROM offers";
+            $offerlist = "SELECT * FROM offers where block_status='Unblock'";
             $offerResult = mysqli_query($conn, $offerlist);
             if ($offerResult && mysqli_num_rows($offerResult) > 0) {
                 $offers = array();
                 while ($row = mysqli_fetch_assoc($offerResult)) {
                     $offers[] = $row;
+                  /*    while ($row = mysqli_fetch_assoc($offerResult)) {
+                                    $row['offer_image'] = base64_encode(file_get_contents($row['offer_image'])); // Encode image data to base64
+                                    $offers[] = $row;
+                                } */
                 }
                 echo json_encode($offers);
             } else {

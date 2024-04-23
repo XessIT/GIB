@@ -79,7 +79,7 @@ class _CompletedState extends State<Completed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
+      body:/* ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
                     Map fromitem = [index] as Map;
@@ -151,8 +151,66 @@ class _CompletedState extends State<Completed> {
                     return Container();
                   }
 
-              )
+              )*/
+      Center(
+        child: Column(
+          children: [
+            ExpansionTile(
+              leading: Icon(Icons.call_made, color: Colors.green[800],),
+              title: Text("Bhuvana"),
 
+              children: [
+                const SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:  [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text('Referrer Name  :'"Nasreen"),
+                    ),
+
+                  ],
+                ),
+
+                const SizedBox(height: 10,),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children:  [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text('Purpose  :  '"Purpose"),
+                      ),
+                    ]
+
+                ),
+
+                const SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:  [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text('Feedback   : '"Successful Reason"),
+                    ),
+
+                  ],
+                ),
+                const SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:  [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child:  Text('Date   :'"Date"),
+                    ),
+
+                  ],
+                ),
+              ],
+            )
+          ],
+        ),
+      )
     );
   }
 }
@@ -184,7 +242,103 @@ class _PendingState extends State<Pending> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body:
+
+
+        Center(
+          child: Column(
+            children: [
+              ExpansionTile(
+                leading:
+                    const Icon(Icons.call_made, color: Colors.red,),
+                title:
+                     Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20,),
+                          Text('Nasreen'),
+                        ],
+                      ),
+                    ),
+
+                    IconButton(
+                        onPressed: () async {
+                          final call = Uri.parse("tel://""1234567890");
+                          if (await canLaunchUrl(call)) {
+                            launchUrl(call);
+                          } else {
+                            throw 'Could not launch $call';
+                          }
+                        },
+                        icon: const Icon(Icons.call,color: Colors.green,)),
+                  ],
+                ),
+
+                children: [
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Referrer Name :"'"Baby"'),
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            final call = Uri.parse("tel://""1234567876543");
+                            if (await canLaunchUrl(call)) {
+                              launchUrl(call);
+                            } else {
+                              throw 'Could not launch $call';
+                            }
+                          },
+                          icon: const Icon(Icons.call,color: Colors.green,)),
+                    ],
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Purpose : " 'Purpose'),
+                      ),
+                    ],
+                  ),
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child:  Text('Date   :'"Date"),
+
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text('Reason  : '"Hold Reason"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
+      /*ListView.builder(
                     itemCount: 10,
                     itemBuilder: (context, index) {
                       Map fromitem = [index] as Map;
@@ -302,7 +456,7 @@ class _PendingState extends State<Pending> {
                       return Container();
                     }
                 )
-
+*/
     );
 
   }
@@ -332,7 +486,66 @@ class _UnsuccessfulState extends State<Unsuccessful> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
+      body:   Center(
+        child: Column(
+          children: [
+            ExpansionTile(
+              leading: Icon(Icons.call_made, color: Colors.green[800],),
+
+              title:Text("Bhuvana"),
+
+              children: [
+                const SizedBox(height: 10,),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children:  [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text('Referrer Name  :Baby'),
+                    ),
+
+                  ],
+                ),
+
+                const SizedBox(height: 10,),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children:  [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text('Purpose  :  Purpose'),
+                      ),
+                    ]
+
+                ),
+
+                const SizedBox(height: 10,),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children:  [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text('UnSuccessful Reason  :UnSuccessful Reason '),
+                    ),
+
+                  ],
+                ),
+                const SizedBox(height: 10,),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text('Date   :Date'),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+      /*ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
                     Map fromitem = [index] as Map;
@@ -404,7 +617,7 @@ class _UnsuccessfulState extends State<Unsuccessful> {
                     return Container();
                   }
 
-              )
+              )*/
 
     );
   }

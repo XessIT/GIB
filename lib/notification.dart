@@ -1,66 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'meeting.dart';
-
-class NotificationPage extends StatelessWidget {
-  const NotificationPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: MyNotification(),
-    );
-  }
-}
-
-class MyNotification extends StatefulWidget {
-  const MyNotification({Key? key}) : super(key: key);
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyNotification> createState() => _MyNotificationState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _MyNotificationState extends State<MyNotification> {
+class _NotificationScreenState extends State<NotificationScreen> {
+
+   String channelId = 'my_channel_id';
+   String channelName = 'My Channel';
+   String channelDescription = 'Channel for my app notifications';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text('Notifications')),
-        centerTitle: true,
-      ),
       body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 20,),
-            InkWell(
-              onTap: (){
-                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const MeetingUpcoming()),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green,width: 2),
-                    borderRadius: BorderRadius.circular(20.0)
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Click to See Meeting Notification',
-                    style: Theme.of(context).textTheme.bodyText1,),
-                    //Badge(
-                     // badgeContent: const Text('12'), //commend date 30.01.2023
-                   // )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: ElevatedButton(
+          onPressed: () {
+            showNotification('Ticket Booked', 'Your bus ticket has been booked successfully!');
+            saveNotificationLocally('Ticket Booked', 'Your bus ticket has been booked successfully!');
+          },
+          child: Text('Book Ticket'),
+        )
+        ,
       ),
     );
   }
+   Future<void> showNotification(String title, String body) async {
+     const AndroidNotificationDetails androidPlatformChannelSpecifics =
+     AndroidNotificationDetails(
+       'your_channel_id', // Replace with your own channel ID
+       'your_channel_name', // Replace with your own channel name
+      // 'your_channel_description', // Replace with your own channel description
+       importance: Importance.max,
+       priority: Priority.high,
+     );
+     const NotificationDetails platformChannelSpecifics =
+     NotificationDetails(android: androidPlatformChannelSpecifics);
+     await FlutterLocalNotificationsPlugin().show(
+       0, // Notification ID
+       title, // Title of the notification
+       body, // Body of the notification
+       platformChannelSpecifics,
+     );
+   }
+
+   Future<void> saveNotificationLocally(String title, String body) async {
+     final SharedPreferences prefs = await SharedPreferences.getInstance();
+     prefs.setString('last_notification_title', title);
+     prefs.setString('last_notification_body', body);
+   }
+
 }
+
 

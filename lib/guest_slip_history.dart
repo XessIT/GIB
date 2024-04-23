@@ -1,48 +1,44 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
+
 class GuestHistory extends StatelessWidget {
-  String userId = "";
-  String userMobile = "";
-   GuestHistory({Key? key, required this.userId}) : super(key: key);
+  final String userId;
+
+  const GuestHistory({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return
-       Scaffold(
-        body:SlipHistory(userId :userId) ,
-      );
+    return Scaffold(
+      body: SlipHistory(userId: userId),
+    );
   }
 }
+
 class SlipHistory extends StatefulWidget {
-  String? userId="";
-  String? userMobile="";
-   SlipHistory({Key? key, required this.userId}) : super(key: key);
+  final String userId;
+
+  const SlipHistory({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<SlipHistory> createState() => _SlipHistoryState();
 }
 
 class _SlipHistoryState extends State<SlipHistory> {
-  String? uid="";
-  String? mobile ="";
-
+  List<Map<String, dynamic>> visitorsFetchdata = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     visitorsFetch();
     super.initState();
   }
 
-
-
-  //register_meeting data fetch code
-  List<Map<String,dynamic>>visitorsFetchdata=[];
   Future<void> visitorsFetch() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/visiters_slip.php?user_id=${widget.userId.toString()}');
+      final url = Uri.parse(
+          'http://localhost/GIB/lib/GIBAPI/visiters_slip.php?user_id=${widget
+              .userId}');
       final response = await http.get(url);
       print("visitors url:$url");
 
@@ -54,82 +50,119 @@ class _SlipHistoryState extends State<SlipHistory> {
         if (responseData is List<dynamic>) {
           setState(() {
             visitorsFetchdata = responseData.cast<Map<String, dynamic>>();
-
           });
         } else {
-          // Handle invalid response data (not a List)
           print('Invalid response visitors data format');
         }
       } else {
-        // Handle non-200 status code
         print('visitors Error: ${response.statusCode}');
       }
     } catch (error) {
-      // Handle other errors
       print('visitors Error: $error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Group visitors by date
+    Map<String, List<Map<String, dynamic>>> groupedVisitors =
+    groupByDate(visitorsFetchdata);
+
     return Scaffold(
-        appBar: AppBar(centerTitle: true,
-          iconTheme:  const IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Guest History',
+          style: Theme
+              .of(context)
+              .textTheme
+              .bodySmall,
         ),
-          title: Text('Guest History',style: Theme.of(context).textTheme.bodySmall),
-        ),
-        body: ListView.builder(
-                    itemCount: visitorsFetchdata.length,
-                    itemBuilder: (context, index) {
-                      Map fromitem = visitorsFetchdata.elementAt(index);
-                        return Center(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10,),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text("Date  : ""${fromitem["meeting_date"]}",style: TextStyle(color: Colors.blue),)),
-                              ),
-                              const SizedBox(height: 10,),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                    child: Text("Guest Name  : ""${fromitem["guest_name"]}"),
-                                  ),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: ListView.builder(
+        itemCount: groupedVisitors.length,
+        itemBuilder: (context, index) {
+          String date = groupedVisitors.keys.elementAt(index);
+          List<Map<String, dynamic>> visitors = groupedVisitors[date]!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  date,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+               // physics: NeverScrollableScrollPhysics(),
+                itemCount: visitors.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> visitor = visitors[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: 300,
+                      height: 83,
+                    //  padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.green, width: 1),
+                          borderRadius: BorderRadius.circular(10.0)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text("${visitor["guest_name"]}"),
+                              ],
+                            ),
+                            SizedBox(height: 10,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Location: ${visitor["location"]}"),
+                                Text("Time: ${visitor["time"]}"),
+                              ],
+                            ),
 
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                    child: Text("Time  :  ""${fromitem["time"]}"),
-                                  ),
-
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                    child: Text("Location  : ""${fromitem["location"]}"),
-                                  ),
-
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-
-                      return  Center(   child: Container(),);
-                      //}
-
-
-                    })
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      ),
     );
+  }
+
+  Map<String, List<Map<String, dynamic>>> groupByDate(
+      List<Map<String, dynamic>> visitors) {
+    Map<String, List<Map<String, dynamic>>> groupedVisitors = {};
+    DateTime now = DateTime.now();
+    int currentYear = now.year;
+    for (var visitor in visitors) {
+      DateTime meetingDate = DateTime.parse(visitor["meeting_date"]);
+      if (meetingDate.year == currentYear) {
+        String date = visitor["meeting_date"];
+        if (!groupedVisitors.containsKey(date)) {
+          groupedVisitors[date] = [];
+        }
+        groupedVisitors[date]!.add(visitor);
+      }
+    }
+    return groupedVisitors;
   }
 }

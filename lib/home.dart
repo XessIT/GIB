@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:gipapp/about_view.dart';
 import 'package:gipapp/profile.dart';
+import 'package:gipapp/year_meeting_details.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Offer/offer.dart';
-import 'about.dart';
 import 'add_member.dart';
 import 'attendance.dart';
 import 'attendance_scanner.dart';
@@ -20,7 +20,7 @@ import 'gib_doctors.dart';
 import 'gib_gallery.dart';
 import 'gib_members.dart';
 import 'guest_slip.dart';
-import 'home1.dart';
+import 'guest_slip_history.dart';
 import 'login.dart';
 import 'meeting.dart';
 import 'my_activity.dart';
@@ -33,8 +33,6 @@ class Homepage extends StatelessWidget {
 
   final String? userType;
   final String? userID;
-
-
   Homepage({
     Key? key,
 
@@ -95,13 +93,16 @@ class _HomeState extends State<Home> {
   String? fetchMemberId="";
   String? fetchTeamName ="";
   String? fetchMobile ="";
-
+String? memberType ="Executive";
   @override
   void initState() {
-   // print("UserId: ${widget.userId}");
+
+    print("UserId: ${widget.userId}");
+    offersfetchData();
+    wishData(memberType!);
+
     // TODO: implement initState
     super.initState();
-    //notificationsServices.initialiseNotifications();
   }
   final bdayDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
   TextEditingController guestcount =TextEditingController();
@@ -123,8 +124,6 @@ class _HomeState extends State<Home> {
             dynamicdata = responseData.cast<Map<String, dynamic>>();
             if (dynamicdata.isNotEmpty) {
               setState(() {
-              //  print("dynamic data :-- $dynamicdata");
-
               });
             }
           });
@@ -142,14 +141,41 @@ class _HomeState extends State<Home> {
     }
   }
 
-///registration table code fetch
+///Wish data table code fetch
+  List<Map<String,dynamic>>wishdata=[];
+  Future<void> wishData(String? member_type) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&member_type=$member_type');
+      final response = await http.get(url);
+    //  print("Wish url:$url");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            print("user data $userdata");
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+
   List<Map<String,dynamic>>userdata=[];
   Future<void> fetchData(String? userId) async {
     try {
       //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
-     //  print("fetch url:$url");
+      //  print("fetch url:$url");
 
       if (response.statusCode == 200) {
         // print("fetch status code:${response.statusCode}");
@@ -165,9 +191,8 @@ class _HomeState extends State<Home> {
                 fetchLastName= userdata[0]['last_name']??"";
                 fetchMemberId=userdata[0]["member_id"]??"";
                 fetchMemberType = userdata[0]["member_type"]??"";
-               fetchTeamName = userdata[0]["team_name"]??"";
-               fetchMobile = userdata[0]["mobile"]??"";
-
+                fetchTeamName = userdata[0]["team_name"]??"";
+                fetchMobile = userdata[0]["mobile"]??"";
               });
             }
           });
@@ -185,7 +210,39 @@ class _HomeState extends State<Home> {
     }
   }
 
-///register Meeting data store code
+///offers fetch
+  List<Map<String,dynamic>>offersdata=[];
+  Future<void> offersfetchData() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final response = await http.get(url);
+      print(url);
+
+      if (response.statusCode == 200) {
+        // print("status code: ${response.statusCode}");
+        // print("status body: ${response.body}");
+
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            offersdata = responseData.cast<Map<String, dynamic>>();
+          //  print("offers data : $offersdata");
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+
+  ///register Meeting data store code
   String? registerStatus="Register";
   Future<void> registerDateStoreDatabase(String meetingId,String meetingType, String meetingDate, String meetingPlace) async {
     try {
@@ -252,7 +309,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     fetchMeetingData();
@@ -262,7 +318,6 @@ class _HomeState extends State<Home> {
       drawer:  SafeArea(
           child: NavDrawer(userType: widget.userType.toString(), userId: widget.userId,
           )),
-
       backgroundColor: Colors.white,
       bottomNavigationBar: BottomAppBar(
         color: Colors.green.shade900,
@@ -270,11 +325,11 @@ class _HomeState extends State<Home> {
           children: [
             SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.search,color: Colors.white,), onPressed: () {})),
             const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.people_alt_outlined,color: Colors.white,), onPressed: () {})),
-
+            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.people_alt_outlined,color: Colors.white,), onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHistory(userId: widget.userId.toString(),)));
+            })),
             const Spacer(),
             SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.home_outlined,color: Colors.white,), onPressed: () {})),
-
             const Spacer(),
             SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.settings_outlined,color: Colors.white,), onPressed: () {})),
             const Spacer(),
@@ -282,6 +337,9 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>const MeetingUpdateDate()));
+      },child: const Icon(Icons.calendar_month_outlined),),
       appBar: AppBar(centerTitle: true,
         actions: [
           // IconButton(onPressed: (){
@@ -300,6 +358,7 @@ class _HomeState extends State<Home> {
 
             child: Column(
               children: [
+
                 SafeArea(
                   child: SizedBox(
                     width: w,
@@ -394,7 +453,104 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                       const SizedBox(height: 10,),
-                      Row(
+                  Container(
+                    height: 100,
+                    child:ListView.builder(
+                      itemCount: userdata.length,
+                      itemBuilder: (context, index) {
+                        final user = userdata[index];
+                        final dob = user['dob'] as String?;
+                        if (dob != null) {
+                          final formattedDob = formatDateString(dob); // Format date
+                          final today = DateTime.now();
+                          final userDob = DateTime.parse(formattedDob);
+                          if (userDob.month == today.month && userDob.day == today.day) {
+                            return Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(3.0),
+                                  child: Column(
+                                    children: [
+                                      InkWell(
+                                        onTap:(){
+                                          showDialog<void>(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                title: const Text('Convey Your Wish',style: TextStyle(color: Colors.green),),
+                                                content:  SizedBox(width: 300,
+                                                  child: TextFormField(
+                                                    controller: wishing,
+                                                    validator: (value){
+                                                      if(value!.isEmpty){
+                                                        return "Convey Your wishes";
+                                                      }else{
+                                                        return null;
+                                                      }
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        hintText:"Share Your Hearty Wishes",
+                                                        suffixIcon: IconButton(onPressed: (){
+                                                          wishing.clear();
+                                                        }, icon: const Icon(Icons.cancel_presentation,color: Colors.red,))
+                                                    ) ,
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        child: const Text('Wish',),
+                                                        onPressed:  ()  {
+                                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                              content: Text("Your Wishes Conveyed")));
+                                                        },
+                                                      ),
+                                                      TextButton(
+                                                        child:  const Text('Cancel',),
+                                                        onPressed: () {
+                                                          //notificationsServices.sendNotification("hello", "My First Notification");
+
+                                                          Navigator.pop(context);
+                                                          // Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+                                                        },
+                                                      ),
+
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            }, );
+
+                        },
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage("assets/pro1.jpg"),
+                                          radius: 25,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${user['first_name']} ",
+                                        style: Theme.of(context).textTheme.titleSmall,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        }
+                        return SizedBox();
+                      },
+                    ),
+                  ),
+
+
+///birthday design starts here
+
+/*
+                        Row(
                         children: [
                           const SizedBox(width: 20,),
 
@@ -454,6 +610,7 @@ class _HomeState extends State<Home> {
 
                         ],
                       ),
+*/
                       const SizedBox(height: 8,),
                       Container(
                         //  height: 300,
@@ -626,174 +783,37 @@ class _HomeState extends State<Home> {
                         scrollDirection: Axis.horizontal,
                         child: Container(
                           child: Row(
-                            children: [
-                              SizedBox(width: 15,),
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                            children: offersdata.map((offer) {
+                              String companyName = offer['company_name'] ?? '';
+                              String name = offer['name'] ?? '';
+                              String offerImage = offer['offer_image'] ?? '';
+                             // print("image - $offerImage");
+
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 120,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
+                                      ),
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-                              //Upcoming Meeting Card
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    decoration: BoxDecoration(
-
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset("assets/img_1.png"),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Zappy\nPhotography",style: Theme.of(context).textTheme.titleSmall,),
-
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(width: 10,),
-
-
-                            ],
+                                    SizedBox(height: 5),
+                                    Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ),
+
                       SizedBox(height: 8,),
                       Align(
                         alignment: Alignment.topLeft,
@@ -904,9 +924,6 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                       SizedBox(height: 100,),
-
-
-
                     ],
                   ),
                 ),
@@ -917,6 +934,10 @@ class _HomeState extends State<Home> {
       ),
     );
 
+  }
+  String formatDateString(String dateString) {
+    final parts = dateString.split('-');
+    return "${parts[2]}-${parts[1]}-${parts[0]}"; // Convert to yyyy-mm-dd format
   }
 }
 
@@ -1061,7 +1082,7 @@ class _NavDrawerState extends State<NavDrawer> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>  const NotificationPage()),
+                        MaterialPageRoute(builder: (context) =>  const NotificationScreen()),
                       );
                     },
                   ),

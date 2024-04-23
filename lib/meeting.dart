@@ -26,9 +26,11 @@ class _MeetingUpcomingPageState extends State<MeetingUpcomingPage> {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Meeting',),
+          title:  Text('Meeting',style: Theme.of(context).textTheme.bodySmall),
           centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
+
         body: const Column(
             children: [
               //TABBAR STARTS
@@ -129,6 +131,7 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
   List<String>item=["a","b","c"];
 
   List<Map<String, dynamic>> data=[];
+/*
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
@@ -165,6 +168,49 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
       throw e; // rethrow the error if needed
     }
   }
+*/
+
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        // No need to call setState here because we're not updating the UI at this point
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['meeting_date']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the meeting date is after the current date and within the current year
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now()) && isCurrentYear;
+
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -173,7 +219,8 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body:data.isNotEmpty
+            ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               // const SizedBox(height:2);
@@ -232,9 +279,15 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
                 ),
               );
             })
+            :Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
+
+
+
+
 class CompletedNetworkMeeting extends StatefulWidget {
   CompletedNetworkMeeting({Key? key}) : super(key: key);
 
@@ -266,7 +319,9 @@ class _CompletedNetworkMeetingState extends State<CompletedNetworkMeeting> {
           }
           print('Validity Date: $validityDate');
           print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isBefore(DateTime.now()) && isCurrentYear;
+       //   bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
           print('Satisfies Filter: $satisfiesFilter');
           return satisfiesFilter;
         }).toList();
@@ -291,7 +346,9 @@ class _CompletedNetworkMeetingState extends State<CompletedNetworkMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:ListView.builder(
+
+        body:data.isNotEmpty
+            ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               // const SizedBox(height:2);
@@ -339,6 +396,7 @@ class _CompletedNetworkMeetingState extends State<CompletedNetworkMeeting> {
                 ),
               );
             })
+            :Center(child: const Text("There is No Meeting")),
     );
   }
 }
@@ -401,6 +459,7 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
   String type = "Team Meeting";
 
   List<Map<String, dynamic>> data=[];
+/*
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
@@ -437,6 +496,48 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
       throw e; // rethrow the error if needed
     }
   }
+*/
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        // No need to call setState here because we're not updating the UI at this point
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['meeting_date']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the meeting date is after the current date and within the current year
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now()) && isCurrentYear;
+
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -445,7 +546,8 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body: data.isNotEmpty
+            ?ListView.builder(
           /* gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 5.0,
@@ -521,6 +623,8 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
               );
 
             })
+            :Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
@@ -555,7 +659,10 @@ class _CompletedTeamMeetingState extends State<CompletedTeamMeeting> {
           }
           print('Validity Date: $validityDate');
           print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
+
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isBefore(DateTime.now()) && isCurrentYear;
+        //  bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
           print('Satisfies Filter: $satisfiesFilter');
           return satisfiesFilter;
         }).toList();
@@ -580,7 +687,8 @@ class _CompletedTeamMeetingState extends State<CompletedTeamMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body:data.isNotEmpty
+        ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               const SizedBox(height: 20,);
@@ -637,6 +745,8 @@ class _CompletedTeamMeetingState extends State<CompletedTeamMeeting> {
                 ),
               );
             })
+        : Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
@@ -700,6 +810,9 @@ class UpComingTrainingProgram extends StatefulWidget {
 class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
   String type ="Training Program";
   List<Map<String, dynamic>> data=[];
+
+
+/*
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
@@ -736,6 +849,49 @@ class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
       throw e; // rethrow the error if needed
     }
   }
+*/
+
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        // No need to call setState here because we're not updating the UI at this point
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['meeting_date']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the meeting date is after the current date and within the current year
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now()) && isCurrentYear;
+
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -744,7 +900,8 @@ class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body: data.isNotEmpty
+        ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               const SizedBox(height: 20,);
@@ -801,6 +958,8 @@ class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
               );
 
             })
+        :Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
@@ -833,7 +992,10 @@ class _CompletedTrainingProgramState extends State<CompletedTrainingProgram> {
           }
           print('Validity Date: $validityDate');
           print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isBefore(DateTime.now()) && isCurrentYear;
+
+      //    bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
           print('Satisfies Filter: $satisfiesFilter');
           return satisfiesFilter;
         }).toList();
@@ -858,62 +1020,65 @@ class _CompletedTrainingProgramState extends State<CompletedTrainingProgram> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
-            itemCount: data.length,
-            itemBuilder:(context, i){
-              const SizedBox(height: 20,);
-              return Expanded(
-                child: Card(
-                  //   elevation: 1,
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            //DATE TEXT STARTS
-                            //   const SizedBox(width: 23,),
-                            //  SizedBox(height: 30,),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('${data[i]['meeting_date']}',
-                                //format(DateTime.now()),style:  TextStyle(color: Colors.green[900],fontWeight:FontWeight.bold),
-                              ),
+      body:data.isNotEmpty
+          ? ListView.builder(
+          itemCount: data.length,
+          itemBuilder:(context, i){
+            const SizedBox(height: 20,);
+            return Expanded(
+              child: Card(
+                //   elevation: 1,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          //DATE TEXT STARTS
+                          //   const SizedBox(width: 23,),
+                          //  SizedBox(height: 30,),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Text('${data[i]['meeting_date']}',
+                              //format(DateTime.now()),style:  TextStyle(color: Colors.green[900],fontWeight:FontWeight.bold),
                             ),
-                          ],
-                        ),
-                        //NETWORK MEETING TEXT STARTS
-                        //   const SizedBox(width: 30,),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Align(alignment:Alignment.topLeft,
-                                child: Text('${data[i]['from_time']}-\n'
-                                    '${data[i]['to_time']}'),
-                              ),
-                              Align(alignment:Alignment.center,
-                                  child: Text('${data[i]['meeting_name']}')),
-                              Align(alignment:Alignment.topRight,
-                                child: RichText(
-                                  text:  TextSpan(
-                                      children: [
-                                        const WidgetSpan(child: Icon(Icons.location_on)),
-                                        TextSpan(text: ('${data[i]['place']}'),style: const TextStyle(color: Colors.black)
-                                        )
-                                      ]
-                                  ),
+                          ),
+                        ],
+                      ),
+                      //NETWORK MEETING TEXT STARTS
+                      //   const SizedBox(width: 30,),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Align(alignment:Alignment.topLeft,
+                              child: Text('${data[i]['from_time']}-\n'
+                                  '${data[i]['to_time']}'),
+                            ),
+                            Align(alignment:Alignment.center,
+                                child: Text('${data[i]['meeting_name']}')),
+                            Align(alignment:Alignment.topRight,
+                              child: RichText(
+                                text:  TextSpan(
+                                    children: [
+                                      const WidgetSpan(child: Icon(Icons.location_on)),
+                                      TextSpan(text: ('${data[i]['place']}'),style: const TextStyle(color: Colors.black)
+                                      )
+                                    ]
                                 ),
                               ),
-                            ]
-                        ),
-                      ],
-                    ),
+                            ),
+                          ]
+                      ),
+                    ],
                   ),
                 ),
-              );
-            })
+              ),
+            );
+          })
+          :Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
@@ -986,6 +1151,48 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final List<dynamic> itemGroups = responseData;
+        // No need to call setState here because we're not updating the UI at this point
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['meeting_date']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the meeting date is after the current date and within the current year
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now()) && isCurrentYear;
+
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
+/*
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
         setState(() {});
         List<dynamic> filteredData = itemGroups.where((item) {
           DateTime validityDate;
@@ -1014,6 +1221,7 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
       throw e; // rethrow the error if needed
     }
   }
+*/
   @override
   void initState() {
     super.initState();
@@ -1022,7 +1230,8 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body:data.isNotEmpty
+        ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               const SizedBox(height: 20,);
@@ -1076,6 +1285,8 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
                 ),
               );
             })
+        :Center(child: const Text("There is No Meeting")),
+
     );
   }
 }
@@ -1108,7 +1319,11 @@ class _CompletedGIBMeetingState extends State<CompletedGIBMeeting> {
           }
           print('Validity Date: $validityDate');
           print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
+
+
+          bool isCurrentYear = validityDate.year == DateTime.now().year;
+          bool satisfiesFilter = validityDate.isBefore(DateTime.now()) && isCurrentYear;
+        //  bool satisfiesFilter =  validityDate.isBefore(DateTime.now());
           print('Satisfies Filter: $satisfiesFilter');
           return satisfiesFilter;
         }).toList();
@@ -1133,7 +1348,8 @@ class _CompletedGIBMeetingState extends State<CompletedGIBMeeting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
+        body:data.isNotEmpty
+        ? ListView.builder(
             itemCount: data.length,
             itemBuilder:(context, i){
               const SizedBox(height: 20,);
@@ -1186,6 +1402,8 @@ class _CompletedGIBMeetingState extends State<CompletedGIBMeeting> {
                 ),
               );
             })
+        :const Center(child: Text("There is No Meeting")),
+
     );
   }
 }

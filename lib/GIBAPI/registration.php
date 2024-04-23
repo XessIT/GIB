@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
     $member_id = isset($_GET['member_id']) ? mysqli_real_escape_string($conn, $_GET['member_id']) : "";
     $referrer_id = isset($_GET['referrer_id']) ? mysqli_real_escape_string($conn, $_GET['referrer_id']) : "";
+    $member_type = isset($_GET['member_type']) ? mysqli_real_escape_string($conn, $_GET['member_type']) : "";
 
                  // Fetch data from the registration table
                          if(isset($_GET['referrer_id'])){
@@ -65,8 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         }else if(isset($_GET["id"])){
                           $registrationlist = " SELECT * FROM registration where id = '$id' ";
                         }
+                         else if(isset($_GET['member_type'])){
+
+                          $registrationlist = "SELECT * FROM registration where member_type='$member_type' AND block_status ='UnBlock' AND admin_rights ='Accepted'";
+
+                          }
                         else{
-                        echo "Invalid parameter";
+                          echo "Invalid parameter";
                         }
                         $registrationResult = mysqli_query($conn, $registrationlist);
                         if ($registrationResult && mysqli_num_rows($registrationResult) > 0) {

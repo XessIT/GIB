@@ -49,6 +49,7 @@ dependencies:
   provider: ^6.1.2
   image_cropper: ^5.0.1
   video_player: ^2.8.2
+  flutter_local_notifications: ^17.0.0
 
 
 dev_dependencies:
@@ -104,6 +105,7 @@ flutter:
     - assets/img_1.png
     - assets/img_2.png
     - assets/Untitled (3).png
+    - assets/img_3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
