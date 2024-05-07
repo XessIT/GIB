@@ -23,9 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $id = mysqli_real_escape_string($conn, $_GET['id']);
 
         $userlist = "SELECT * FROM registration WHERE member_type = '$member_type'AND id !='$id' AND district = '$district' AND  chapter = '$chapter'";
-/* =======
-        $userlist = "SELECT * FROM registration where member_type!='Non-Executive'";
->>>>>>> fd1cdcf31b472149a016a5f7231bd858ca467ea1 */
         $userResult = mysqli_query($conn, $userlist);
         if ($userResult && mysqli_num_rows($userResult) > 0) {
             $users = array();

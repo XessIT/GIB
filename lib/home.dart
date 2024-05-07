@@ -12,6 +12,7 @@ import 'Offer/offer.dart';
 import 'add_member.dart';
 import 'attendance.dart';
 import 'attendance_scanner.dart';
+import 'awesome_dilog.dart';
 import 'blood_group.dart';
 import 'business.dart';
 import 'change_mpin.dart';
@@ -54,9 +55,7 @@ class Homepage extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
-
   final String? userType;
-
   final String? userId;
 
   Home({
@@ -75,7 +74,6 @@ class _HomeState extends State<Home> {
   TextEditingController wishing = TextEditingController();
   File? pickedimage;
   bool showLocalImage = false;
-
   String? name = "";
   String? image = "";
   String? membertype = "";
@@ -98,8 +96,8 @@ String? memberType ="Executive";
   void initState() {
 
     print("UserId: ${widget.userId}");
-    offersfetchData();
-    wishData(memberType!);
+   // offersfetchData();
+  //  wishData(memberType!);
 
     // TODO: implement initState
     super.initState();
@@ -311,8 +309,8 @@ String? memberType ="Executive";
 
   @override
   Widget build(BuildContext context) {
-    fetchMeetingData();
-    fetchData(widget.userId.toString());
+  //  fetchMeetingData();
+    //fetchData(widget.userId.toString());
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
       drawer:  SafeArea(
@@ -333,7 +331,10 @@ String? memberType ="Executive";
             const Spacer(),
             SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.settings_outlined,color: Colors.white,), onPressed: () {})),
             const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.bloodtype_outlined,color: Colors.white,), onPressed: () {})),
+            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.bloodtype_outlined,color: Colors.white,), onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>awesomeDilog()));
+
+            })),
           ],
         ),
       ),
@@ -355,10 +356,8 @@ String? memberType ="Executive";
       body: SingleChildScrollView(
         child: Center(
           child: Form(
-
             child: Column(
               children: [
-
                 SafeArea(
                   child: SizedBox(
                     width: w,
@@ -648,7 +647,7 @@ String? memberType ="Executive";
                                   String meetingPlace = meeting['place'];
                                   String meetingType = meeting['meeting_type'];
                                   String id = meeting['id'];
-                                  registerFetch(id);
+                                //  registerFetch(id);
                                   return Column(
                                     children: [
                                       const SizedBox(height: 30),
@@ -679,7 +678,7 @@ String? memberType ="Executive";
                                                               GlobalKey<FormState> tempKey =GlobalKey<FormState>();
 
                                                               //store purpose..
-                                                              registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
+                                                            //  registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
                                                               showDialog(
                                                                   context: context,
                                                                   builder: (ctx) =>
@@ -1073,7 +1072,7 @@ class _NavDrawerState extends State<NavDrawer> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>  const MyActivity()),
+                        MaterialPageRoute(builder: (context) =>  Activity(userId: widget.userId, userType: widget.userType,)),
                       );
                     },
                   ),

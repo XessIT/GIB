@@ -42,6 +42,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                  }
 
     }
+    elseif($table == "waiting"){
+            $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
+
+                $offerlist = "SELECT * FROM registration WHERE admin_rights = 'Waiting' AND referrer_mobile = '$mobile'";
+                     $offerResult = mysqli_query($conn, $offerlist);
+                     if ($offerResult && mysqli_num_rows($offerResult) > 0) {
+                         $offers = array();
+                         while ($row = mysqli_fetch_assoc($offerResult)) {
+                             $offers[] = $row;
+                         }
+                         echo json_encode($offers);
+                     } else {
+                         echo json_encode(array("message" => "No offers found"));
+                     }
+
+        }
     else if ($table == "registration") {
 
     $id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : "";
@@ -91,12 +107,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 }
 
+
 else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$data = json_decode(file_get_contents("php://input"));
+/* $uploadDir = 'uploads/';
+ if (!is_dir($uploadDir)) {
+     mkdir($uploadDir, 0755, true);
     // Handle the insert/update/delete actions
-   $data = json_decode(file_get_contents("php://input"));
-   $imagename = mysqli_real_escape_string($conn, $data->imagename);
-   // echo "Imagename: $imagename";
-   $imagedata = mysqli_real_escape_string($conn, $data->imagedata);
+
+   // Decode the base64 image data
+       $imageData = base64_decode($data->image);
+
+       // Generate a unique file name
+       $imageName = uniqid() . '.jpg'; // You can use any desired image extension
+
+       // Set the file path
+       $filePath = $uploadDir . $imageName; */
+      // Decode the base64 image data
+             $imageData = base64_decode($data->image);
+
+             // Generate a unique file name
+             $imageName = uniqid() . '.jpg';
+  // $imagename = mysqli_real_escape_string($conn, $data->imagename);
    $mobile = mysqli_real_escape_string($conn, $data->mobile);
    $password = mysqli_real_escape_string($conn, $data->password);
    $email = mysqli_real_escape_string($conn, $data->email);
@@ -132,13 +164,14 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    $website = mysqli_real_escape_string($conn, $data->website);
    $b_year = mysqli_real_escape_string($conn, $data->b_year);
    $referrer_id = mysqli_real_escape_string($conn, $data->referrer_id);
-    $path = "upload/$imagename";
+    $path = "upload/$imageName";
        $query = "INSERT INTO `registration`(
+       `image_name`,
+       `profile_image`,
        `mobile`,
        `password`,
        `email`,
        `member_type`,
-       `profile_image`,
        `first_name`,
        `last_name`,
        `company_name`,
@@ -172,11 +205,12 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        `referrer_id`
        )
        VALUES (
+       '$imageName',
+       '$path',
        '$mobile',
        '$password',
        '$email',
        '$member_type',
-       '$path',
        '$first_name',
        '$last_name',
        '$company_name',
@@ -209,7 +243,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        '$b_year',
        '$referrer_id'
        )";
-       file_put_contents($path, base64_decode($imagedata));
+
        $arr = [];
        $exe = mysqli_query($conn, $query);
 
@@ -218,11 +252,123 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        } else {
            $arr["success"] = false;
        }
-
        echo json_encode($arr);
-
+ //  }
 }
 
+/*  $uploadDir = 'uploads/';
+ if (!is_dir($uploadDir)) {
+     mkdir($uploadDir, 0755, true);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+   $data = json_decode(file_get_contents("php://input"));
+    // Decode the base64 image data
+    $imageData = base64_decode($data->image);
+
+    // Generate a unique file name
+    $imageName = uniqid() . '.jpg'; // You can use any desired image extension
+
+    // Set the file path
+    $filePath = $uploadDir . $imageName;
+
+    // Additional fields you want to store
+     *//* $mobile = $data->mobile;
+    $password  = $data->password;
+    $email  = $data->email;
+    $member_type  = $data->member_type;
+    $first_name  = $data->first_name;
+    $last_name = $data->last_name;
+    $company_name  = $data->company_name;
+    $blood_group  = $data->blood_group;
+    $place  = $data->place;
+    $pin  = $data->pin;
+    $referrer_mobile  = $data->referrer_mobile;
+    $OTP  = $data->OTP;
+    $block_status = $data->block_status;
+    $admin_rights = $data->admin_rights;
+    $type = $data->type;
+    $district = $data->district;
+    $chapter = $data->chapter;
+    $koottam = $data->koottam;
+    $marital_status = $data->marital_status;
+    $business_type = $data->business_type;
+    $company_address = $data->company_address;
+    $business_keywords = $data->business_keywords;
+    $education = $data->education;
+    $dob = $data->dob;
+    $native  = $data->native;
+    $kovil = $data->kovil;
+    $s_name = $data->s_name;
+    $WAD = $data->WAD;
+    $s_blood = $data->s_blood;
+    $s_father_koottam = $data->s_father_koottam;
+    $s_father_kovil = $data->s_father_kovil;
+    $past_experience = $data->past_experience;
+    $website = $data->website;
+    $b_year = $data->b_year;
+    $referrer_id  = $data->referrer_id; *//*
+    $mobile = mysqli_real_escape_string($conn, $data->mobile);
+       $password = mysqli_real_escape_string($conn, $data->password);
+       $email = mysqli_real_escape_string($conn, $data->email);
+       $member_type = mysqli_real_escape_string($conn, $data->member_type);
+       $first_name = mysqli_real_escape_string($conn, $data->first_name);
+       $last_name = mysqli_real_escape_string($conn, $data->last_name);
+       $company_name = mysqli_real_escape_string($conn, $data->company_name);
+       $blood_group = mysqli_real_escape_string($conn, $data->blood_group);
+       $place = mysqli_real_escape_string($conn, $data->place);
+       $pin = mysqli_real_escape_string($conn, $data->pin);
+       $referrer_mobile = mysqli_real_escape_string($conn, $data->referrer_mobile);
+       $OTP = mysqli_real_escape_string($conn, $data->OTP);
+       $block_status = mysqli_real_escape_string($conn, $data->block_status);
+       $admin_rights = mysqli_real_escape_string($conn, $data->admin_rights);
+       $type = mysqli_real_escape_string($conn, $data->type);
+       $district = mysqli_real_escape_string($conn, $data->district);
+       $chapter = mysqli_real_escape_string($conn, $data->chapter);
+       $koottam = mysqli_real_escape_string($conn, $data->koottam);
+       $marital_status = mysqli_real_escape_string($conn, $data->marital_status);
+       $business_type = mysqli_real_escape_string($conn, $data->business_type);
+       $company_address = mysqli_real_escape_string($conn, $data->company_address);
+       $business_keywords = mysqli_real_escape_string($conn, $data->business_keywords);
+       $education = mysqli_real_escape_string($conn, $data->education);
+       $dob = mysqli_real_escape_string($conn, $data->dob);
+       $native = mysqli_real_escape_string($conn, $data->native);
+       $kovil = mysqli_real_escape_string($conn, $data->kovil);
+       $s_name = mysqli_real_escape_string($conn, $data->s_name);
+       $WAD = mysqli_real_escape_string($conn, $data->WAD);
+       $s_blood = mysqli_real_escape_string($conn, $data->s_blood);
+       $s_father_koottam = mysqli_real_escape_string($conn, $data->s_father_koottam);
+       $s_father_kovil = mysqli_real_escape_string($conn, $data->s_father_kovil);
+       $past_experience = mysqli_real_escape_string($conn, $data->past_experience);
+       $website = mysqli_real_escape_string($conn, $data->website);
+       $b_year = mysqli_real_escape_string($conn, $data->b_year);
+       $referrer_id = mysqli_real_escape_string($conn, $data->referrer_id);
+    // Add more fields as needed...
+
+    // Save the image to the server
+    if (file_put_contents($filePath, $imageData)) {
+        // Insert the image details into the database
+        $imageInsertQuery = "INSERT INTO registration (
+            image_name, profile_image, mobile, password, email, member_type, first_name, last_name, company_name, blood_group, place, pin, referrer_mobile,
+            OTP, block_status, admin_rights, type, district, chapter, koottam, marital_status, business_type, company_address, business_keywords, education,
+            dob, native, kovil, s_name, WAD, s_blood, s_father_koottam, s_father_kovil, past_experience, website, b_year, referrer_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $statement = $conn->prepare($imageInsertQuery);
+        $statement->bind_param('sssss', $imageName, $filePath, $mobile, $password, $email, $member_type, $first_name, $last_name, $company_name,
+        $blood_group, $place, $pin, $referrer_mobile, $OTP, $block_status, $admin_rights, $type, $district, $chapter, $koottam,$marital_status,
+        $business_type, $company_address, $business_keywords, $education, $dob, $native, $kovil, $s_name, $WAD, $s_blood, $s_father_koottam,
+        $s_father_kovil, $past_experience, $website, $b_year, $referrer_id);
+
+        if ($statement->execute()) {
+            echo 'Image uploaded successfully.';
+        } else {
+            echo 'Failed to insert image details into the database.';
+        }
+
+        $statement->close();
+    } else {
+        echo 'Failed to save image on the server.';
+    }
+}
+} */
 else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
    // $data = json_decode(file_get_contents("php://input"), true);
    parse_str(file_get_contents("php://input"), $data);
@@ -342,16 +488,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         }
 
 else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $ID = isset($_GET['ID']) ? $_GET['ID'] : null;
+    $id = isset($_GET['id']) ? $_GET['id'] : null;
 
-    if (!$ID) {
+    if (!$id) {
         echo json_encode(array("error" => "ID is missing in the request"));
         exit;
     }
 
-    $ID = mysqli_real_escape_string($conn, $ID);
+    $id = mysqli_real_escape_string($conn, $id);
 
-    $sql = "DELETE FROM registration WHERE ID = '$ID'";
+    $sql = "DELETE FROM registration WHERE id = '$id'";
     $result = $conn->query($sql);
 
     if ($result === false) {

@@ -141,7 +141,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
  /* XFile? pickedImage; */
   late String imageName;
   late String imageData;
- // Uint8List? selectedImage;
+  Uint8List? selectedImage;
   Future<void> pickImageFromGallery() async {
     ImagePicker imagePicker = ImagePicker();
     XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -153,7 +153,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
 
       // Read the image file as bytes
       try {
-        List<int> imageBytes = await pickedImage!.readAsBytes();
+        final imageBytes = await pickedImage!.readAsBytes();
 
         // Verify that imageBytes contains the raw image data
         print('imageBytes length: ${imageBytes.length}');
@@ -162,6 +162,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
         String base64ImageData = base64Encode(imageBytes);
 
         setState(() {
+          selectedImage = imageBytes;
           imageName = pickedImage!.name;
          print('Image Name: $imageName');
           imageData = base64ImageData;
@@ -282,11 +283,12 @@ class _AddOfferPageState extends State<AddOfferPage> {
               children:  [
                 const SizedBox(height: 20,),
                 InkWell(
-                  child: CircleAvatar(
-                    backgroundImage: pickedImage != null
-                        ? Image.memory(pickedImage! as Uint8List).image
-                        : const AssetImage('assets/add_offer.png'),
-                    radius:75,
+                 child: ClipOval(
+                    child: selectedImage != null
+                        ? Image.memory(
+                      selectedImage!,
+                    )
+                        : Icon(Icons.person),
                   ),
                   onTap: () {
                     showModalBottomSheet(context: context, builder: (ctx){
@@ -484,14 +486,17 @@ class RunningPage extends StatefulWidget {
 }
 
 class _RunningPageState extends State<RunningPage> {
+  Uint8List? _imageBytes;
 
   @override
   void initState() {
     getData();
+   // _fetchImages();
     // TODO: implement initState
     super.initState();
   }
   List<Map<String, dynamic>> data=[];
+
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
@@ -540,6 +545,22 @@ class _RunningPageState extends State<RunningPage> {
     }
 
   }
+  Future<Uint8List?> getImageBytes(String imageUrl) async {
+    try {
+      print('imageUrl: $imageUrl');
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return null;
+    }
+  }
+
   Future<void> delete(String ID) async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?ID=$ID');
@@ -583,16 +604,85 @@ class _RunningPageState extends State<RunningPage> {
       // Handle error as needed
     }
   }
+
+  /// 6-5-24 FETCH IMAGE
+  /*Future<void> _fetchImage() async {
+    final url = 'http://localhost/GIB/lib/GIBAPI/image_fetch_offers.php?id=${widget.userId}';
+    print('0000000000000000000000000000');
+    print('gowtham: $url');
+    print('0000000000000000000000000000');
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      setState(() {
+        _imageBytes = response.bodyBytes;
+      });
+      print('1111111111111111111111');
+
+      print('gowtham: $_imageBytes');
+      print('111111111111111111111111111');
+
+    } else {
+      print('Failed to fetch image.');
+    }
+  }*/
+  List<Uint8List> _imageBytesList = [];
+  List<Map<String, dynamic>> _imageDataList = [];
+  Future<void> _fetchImages() async {
+    final url = 'http://localhost/GIB/lib/GIBAPI/image_fetch_offers.php?id=${widget.userId}';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> imageData = jsonDecode(response.body);
+
+      _imageBytesList.clear();
+      _imageDataList.clear();
+
+      for (var data in imageData) {
+        final imageUrl =
+            'http://localhost/GIB/lib/GIBAPI/${data['offer_image']}';
+        final imageResponse = await http.get(Uri.parse(imageUrl));
+        if (imageResponse.statusCode == 200) {
+          Uint8List imageBytes = imageResponse.bodyBytes;
+          setState(() {
+            _imageBytesList.add(imageBytes);
+            _imageDataList.add(data);
+          });
+        }
+      }
+    } else {
+      print('Failed to fetch images.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:  ListView.builder(
+        body: /*ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (context, i) {
+            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+            return Center(
+              child: Column(
+                children: [
+                  // Display image
+                  Image.network(
+                    imageUrl, // Assuming data[i]["offer_image"] contains the asset path
+                    width: 40,
+                    height: 40,
+                  ),
+                  // Your other UI elements
+                ],
+              ),
+            );
+          },
+        )
+    );*/
+        ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
-              String dateString = data[i]['validity'];
-              print("image: ${data[i]["offer_image"]}");
-              String imageUrl = Uri.encodeFull(data[i]['offer_image']);
-              print(imageUrl); // This will print the properly encoded URL
+             String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+              String dateString = data[i]['validity']; // This will print the properly encoded URL
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
               return Center(
                 child: Column(
@@ -604,13 +694,17 @@ class _RunningPageState extends State<RunningPage> {
                         Container(
                           width:40,
                           height: 40,
-                          child: Image.network(imageUrl),
+                          child: Image.network(
+                    imageUrl, // Assuming data[i]["offer_image"] contains the asset path
+                    width: 40,
+                    height: 40,
+                  ),
                         ),
-                        //CIRCLEAVATAR STARTS
-                        /* CircleAvatar(
+                       /* //CIRCLEAVATAR STARTS
+                         CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.cyan,
-                           backgroundImage: Image.network(imageUrl).image,
+                           backgroundImage: Image.network(imageUrl),
                                   //IMAGE STARTS CIRCLEAVATAR
                                 //  Image.network('${data[i]['offer_image']}').image,
                           child: Stack(
@@ -626,17 +720,17 @@ class _RunningPageState extends State<RunningPage> {
                               ),
                             ],
                           ),
-                        ),*/
-                        //END CIRCLEAVATAR
+                        ),
+                        //END CIRCLEAVATAR*/
 
                         Column(
                           children: [
                             //START TEXTS
-                            /*Text('${data[i]['company_name']}',
+                            Text('${data[i]['company_name']}',
                                       //Text style starts
                                       style: const TextStyle(
                                           color: Colors.green,
-                                          fontSize: 15),),*/
+                                          fontSize: 15),),
                             const SizedBox(height: 10,),
                             //start texts
                             Text('${data[i]['offer_type']} - ${data[i]['name']}',

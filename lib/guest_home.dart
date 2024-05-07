@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
@@ -47,7 +48,7 @@ class GuestHomePage extends StatefulWidget {
 }
 
 class _GuestHomePageState extends State<GuestHomePage> {
-
+  Uint8List? _imageBytes;
   List<Map<String,dynamic>>userdata=[];
   Future<void> fetchData(String? userId) async {
     try {
@@ -61,13 +62,9 @@ class _GuestHomePageState extends State<GuestHomePage> {
             userdata = responseData.cast<Map<String, dynamic>>();
             if (userdata.isNotEmpty) {
               setState(() {
-                // fetchName = userdata[0]["first_name"]??"";
-                // fetchLastName= userdata[0]['last_name']??"";
-                // fetchMemberId=userdata[0]["member_id"]??"";
-                // fetchMemberType = userdata[0]["member_type"]??"";
-                // fetchTeamName = userdata[0]["team_name"]??"";
-                // fetchMobile = userdata[0]["mobile"]??"";
+                _imageBytes = base64Decode(userdata[0]['profile_image']);
               });
+              print("Image: $_imageBytes");
             }
           });
         } else {
@@ -116,7 +113,12 @@ class _GuestHomePageState extends State<GuestHomePage> {
       print('Error: $error');
     }
   }
-
+  @override
+  void initState() {
+    super.initState();
+    offersfetchData();
+    fetchData(widget.userId);
+  }
 
   //  final CalendarController _calendarController =  CalendarController();
 
@@ -175,11 +177,21 @@ class _GuestHomePageState extends State<GuestHomePage> {
                   height: 100,
                   child: Row(
                     children: [
-                      const Padding(
+                       Padding(
                         padding: EdgeInsets.only(left:8.0),
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage("assets/pro1.jpg"),
-                          radius: 35,
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          child: FittedBox(
+                            fit: BoxFit.fill,
+                            child: ClipOval(
+                              child: _imageBytes != null
+                                  ? Image.memory(
+                                _imageBytes!,
+                              )
+                                  : Icon(Icons.person),
+                            ),
+                          ),
                         ),
                       ),
                       Padding(
