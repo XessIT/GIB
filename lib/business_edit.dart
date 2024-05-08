@@ -19,6 +19,8 @@ class BusinessEditPage extends StatefulWidget {
   final String? currentybe;
   final String? id;
   final String? currentbusinessimage;
+  final String? imageUrl;
+
   const BusinessEditPage({super.key,
     required this.currentbusinesstype,
     required  this.currentcompanyname,
@@ -31,6 +33,7 @@ class BusinessEditPage extends StatefulWidget {
     required  this.currentybe,
     required this.id,
     required this.currentbusinessimage,
+    required this.imageUrl,
 
   });
 
@@ -42,11 +45,11 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
   final _formKey = GlobalKey<FormState>();
 
-
-
-
+  String uid = '';
   @override
   void  initState() {
+    image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl}';
+
     companynamecontroller = TextEditingController(text: widget.currentcompanyname,);
     businesskeywordcontroller = TextEditingController(text: widget.currentbusinesskeywords,);
     mobilecontroller = TextEditingController(text: widget.currentmobile,);
@@ -55,6 +58,8 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
     websitecontroller = TextEditingController(text: widget.currentwebsite,);
     ybecontroller = TextEditingController(text: widget.currentybe,);
     businesstype = widget.currentbusinesstype!;
+    uid = widget.id!;
+    print('uid: $uid');
     // TODO: implement build
     super.initState();
   }
@@ -72,10 +77,26 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   Future<void> Edit() async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_edit.php');
-      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      print('url: $url');
+      print('id: ${widget.id}');
+      final requestBody = jsonEncode({
+        'business_image': widget.imageUrl,
+        "company_name": companynamecontroller.text,
+        "mobile": mobilecontroller.text,
+        "email": emailcontroller.text,
+        "company_address": addresscontroller.text,
+        "website": websitecontroller.text,
+        "b_year": ybecontroller.text,
+        "business_keywords": businesskeywordcontroller.text,
+        "business_type": businesstype,
+        "id": widget.id
+      });
+
+      print("Request Body: $requestBody");
       final response = await http.put(
         url,
         body: jsonEncode({
+          'business_image': widget.imageUrl,
           "company_name": companynamecontroller.text,
           "mobile": mobilecontroller.text,
           "email": emailcontroller.text,
@@ -90,42 +111,113 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
       print(url);
       print("ResponseStatus: ${response.statusCode}");
       if (response.statusCode == 200) {
-        print("Offers response: ${response.body}");
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context)=> Profile(userID: widget.id, userType: '',)),);
+        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        print("Raw response body: ${response.body}");
+        print("Message: ${responseData['message']}");
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Profile(userID: widget.id, userType: '',)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Profile Successfully Updated")));
       } else {
         print("Error: ${response.statusCode}");
       }
+
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
+  Future<void> Update() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_edit.php');
+      print('url: $url');
+      print('id: ${widget.id}');
+      final requestBody = jsonEncode({
+        'imagename': imageName,
+        'imagedata': imageData,
+        "company_name": companynamecontroller.text,
+        "mobile": mobilecontroller.text,
+        "email": emailcontroller.text,
+        "company_address": addresscontroller.text,
+        "website": websitecontroller.text,
+        "b_year": ybecontroller.text,
+        "business_keywords": businesskeywordcontroller.text,
+        "business_type": businesstype,
+        "id": widget.id
+      });
+
+      print("Request Body: $requestBody");
+      final response = await http.put(
+        url,
+        body: jsonEncode({
+          'imagename': imageName,
+          'imagedata': imageData,
+          "company_name": companynamecontroller.text,
+          "mobile": mobilecontroller.text,
+          "email": emailcontroller.text,
+          "company_address": addresscontroller.text,
+          "website": websitecontroller.text,
+          "b_year": ybecontroller.text,
+          "business_keywords": businesskeywordcontroller.text,
+          "business_type": businesstype,
+          "id": widget.id
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        print("Raw response body: ${response.body}");
+        print("Message: ${responseData['message']}");
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Profile(userID: widget.id, userType: '',)));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Profile Successfully Updated")));
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+
     } catch (e) {
       print("Error during signup: $e");
       // Handle error as needed
     }
   }
 
+
   Future<File?> CropImage({required File imageFile}) async{
     CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
     if(croppedImage == null) return null;
     return File(croppedImage.path);
   }
-
-  String image = "";
   bool showLocalImage = false;
-  File? pickedimage;
-  pickImageFromGallery() async {
-    ImagePicker imagepicker = ImagePicker();
-    XFile? file = await imagepicker.pickImage(source: ImageSource.gallery);
-    showLocalImage = true;
-    print('${file?.path}');
-    pickedimage = File(file!.path);
-    pickedimage = await CropImage(imageFile: pickedimage!);
-    setState(() {
+  String image="";
 
-    });
-    if(file == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+  String imageUrl = "";
+  File? pickedImage;
+  late String imageName;
+  late String imageData;
+  Uint8List? selectedImage;
+  Future<void> pickImageFromGallery() async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      // Verify that pickedImage is indeed an XFile
+      print('pickedImage type: ${pickedImage.runtimeType}');
 
+      // Read the image file as bytes
+      try {
+        final imageBytes = await pickedImage!.readAsBytes();
+        // Encode the bytes to base64
+        String base64ImageData = base64Encode(imageBytes);
+        setState(() {
+          selectedImage = imageBytes;
+          imageName = pickedImage!.name;
+          print('Image Name: $imageName');
+          imageData = base64ImageData;
+          print('Base64 Image Data: $imageData');
+        });
+      } catch (e) {
+        print('Error reading image file: $e');
+      }
+    }
   }
 
   pickImageFromCamera() async {
@@ -133,8 +225,8 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
     XFile? file = await imagepicker.pickImage(source: ImageSource.camera);
     showLocalImage = true;
     print('${file?.path}');
-    pickedimage = File(file!.path);
-    pickedimage = await CropImage(imageFile: pickedimage!);
+    pickedImage = File(file!.path);
+    pickedImage = await CropImage(imageFile: pickedImage!);
     setState(() {
 
     });
@@ -168,40 +260,32 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                     style: Theme.of(context).textTheme.headline2,),
                   const SizedBox(width: 20,),
                   InkWell(
-                    child: CircleAvatar(
-                      backgroundImage: pickedimage == null ? NetworkImage(image!)
-                          : Image.file(pickedimage!).image,
-                      /* backgroundImage: imageUrl == " " ? const AssetImage('assets/images.png')
-                        : Image.network(imageUrl) as ImageProvider,*/
-                      /* backgroundImage: showLocalImage == false ? const AssetImage('assets/profile.jpg')
-                        : FileImage(pickedimage!) as ImageProvider,*/
-                      radius: 50,
+                    child: ClipOval(
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        child: selectedImage == null ? Image.network(image) : Image.memory(selectedImage!),
+                      ),
                     ),
                     onTap: () {
-                      showModalBottomSheet(context: context, builder: (ctx){
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: const Icon(Icons.camera_alt),
-                              title: const Text("With Camera"),
-                              onTap: () async {
-                                pickImageFromCamera();
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.storage),
-                              title: const Text("From Gallery"),
-                              onTap: () {
-                                pickImageFromGallery();
-                                //  pickImageFromDevice();
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ],
-                        );
-                      });
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (ctx) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                leading: Icon(Icons.storage),
+                                title: Text("From Gallery"),
+                                onTap: () {
+                                  pickImageFromGallery();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
 
@@ -431,7 +515,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                           color: Colors.green[800],
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              Edit();
+                              selectedImage == null ? Edit() : Update();
                             }
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

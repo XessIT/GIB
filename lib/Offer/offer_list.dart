@@ -106,7 +106,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
     offers();
 */
     getData();
-   // print("USER ID---${widget.userId}");
+    // print("USER ID---${widget.userId}");
     // TODO: implement initState
     super.initState();
   }
@@ -138,7 +138,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
   }*/
 
   bool showLocalImage = false;
- /* XFile? pickedImage; */
+  /* XFile? pickedImage; */
   late String imageName;
   late String imageData;
   Uint8List? selectedImage;
@@ -158,9 +158,9 @@ class _AddOfferPageState extends State<AddOfferPage> {
         setState(() {
           selectedImage = imageBytes;
           imageName = pickedImage!.name;
-         print('Image Name: $imageName');
+          print('Image Name: $imageName');
           imageData = base64ImageData;
-         print('Base64 Image Data: $imageData');
+          print('Base64 Image Data: $imageData');
         });
       } catch (e) {
         print('Error reading image file: $e');
@@ -175,9 +175,9 @@ class _AddOfferPageState extends State<AddOfferPage> {
       List<int> imageBytes = await pickedImage!.readAsBytes();
       setState(() {
         imageName = pickedImage!.name;
-     //   print('Image Name: $imageName');
+        //   print('Image Name: $imageName');
         imageData = base64Encode(imageBytes);
-      //  print('Image Data: $imageData');
+        //  print('Image Data: $imageData');
       });
     }
   }
@@ -188,7 +188,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
     print('Attempting to make HTTP request...');
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=registration&id=${widget.userId}');
-   //   print(url);
+      //   print(url);
       final response = await http.get(url);
       // print("ResponseStatus: ${response.statusCode}");
       // print("Response: ${response.body}");
@@ -295,7 +295,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             leading: const Icon(Icons.camera_alt),
                             title: const Text("With Camera"),
                             onTap: () async {
-                               pickImageFromCamera();
+                              pickImageFromCamera();
                               Navigator.of(context).pop();
                             },
                           ),
@@ -304,7 +304,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             title: const Text("From Gallery"),
                             onTap: () {
                               pickImageFromGallery();
-                             // getImage();
+                              // getImage();
                               Navigator.of(context).pop();
                             },
                           )
@@ -483,7 +483,6 @@ class _RunningPageState extends State<RunningPage> {
   @override
   void initState() {
     getData();
-   // _fetchImages();
     // TODO: implement initState
     super.initState();
   }

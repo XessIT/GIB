@@ -22,9 +22,10 @@ if ($conn->connect_error) {
 }
 
 // Fetch image data from the database
+// Fetch image data from the database
 $userId = $_GET['userId']; // Get the userId from the URL query parameters
 
-$sql = "SELECT offer_image, id FROM offers WHERE user_id = '$userId' ORDER BY id DESC LIMIT ";
+$sql = "SELECT image_path, id FROM mygallery WHERE user_id = '$userId' ORDER BY id DESC ";
 $result = $conn->query($sql);
 
 $imageData = array();
@@ -32,7 +33,7 @@ $imageData = array();
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $imageData[] = array(
-            'offer_image' => $row['offer_image'],
+            'image_path' => $row['image_path'],
             'id' => $row['id']
         );
     }
