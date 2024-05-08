@@ -151,6 +151,7 @@ class _ActivityState extends State<Activity> {
       body: data.isNotEmpty ? ListView.builder(
           itemCount: data.length,
           itemBuilder: (context, i) {
+            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
               return
                 Center(
                   child: Padding(
@@ -163,9 +164,9 @@ class _ActivityState extends State<Activity> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                const CircleAvatar(
-                                  backgroundImage: AssetImage("assets/pro1.jpg"),
-                                  radius: 35,
+                                CircleAvatar(
+                                  radius: 35, // adjust the radius as per your requirement
+                                  backgroundImage: NetworkImage(imageUrl),
                                 ),
                                 Expanded(
                                   child: Column(

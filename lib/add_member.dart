@@ -190,15 +190,15 @@ class _GuestState extends State<Guest> {
   }
   XFile? pickedImage;
   bool showLocalImage = false;
-
+  Uint8List? selectedImage;
   pickImageFromGallery() async {
     ImagePicker imagePicker = ImagePicker();
     pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
     if (pickedImage != null) {
-      List<int> imageBytes = await pickedImage!.readAsBytes();
+      final imageBytes = await pickedImage!.readAsBytes();
       setState(() {
-        imagename = pickedImage!.name;
+        selectedImage = imageBytes;
         print('Image Name: $imagename');
         imagedata = base64Encode(imageBytes);
         print('Image Data: $imagedata');
@@ -274,7 +274,7 @@ class _GuestState extends State<Guest> {
 
 
   ///get image from file code starts here
-  Uint8List? selectedImage;
+
   String message = "";
   TextEditingController caption = TextEditingController();
   String? imagename;
@@ -428,13 +428,13 @@ class _GuestState extends State<Guest> {
                 child: Column(
                   children: [
                     const SizedBox(width: 20,),
-
                     InkWell(
-                      child:  CircleAvatar(
-                        radius: 60,
-                        backgroundImage: pickedImage != null
-                            ? Image.memory(pickedImage! as Uint8List).image
-                            : const AssetImage('assets/img.png'),
+                      child:  ClipOval(
+                        child: selectedImage != null
+                            ? Image.memory(
+                          selectedImage!,
+                        )
+                            : Icon(Icons.person),
                       ),
                       onTap: () {
                         showModalBottomSheet(context: context, builder: (ctx) {
@@ -1543,8 +1543,7 @@ class _GuestState extends State<Guest> {
                                       "Vilosanan",
                                       "Viradhan",
                                       "Viraivulan"
-                                    ]
-                                        .map<DropdownMenuItem<String>>((
+                                    ].map<DropdownMenuItem<String>>((
                                         String value) {
                                       return DropdownMenuItem<String>(
                                           value: value,
@@ -2121,7 +2120,7 @@ class _GuestState extends State<Guest> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5.0)),
                             onPressed: () {
-                              //   signUp();
+                              //signUp();
                               uploadImage();
                             },
                             child: const Text('save',

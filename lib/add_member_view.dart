@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AddMemberView extends StatelessWidget {
   final String userType;
-  String? userID;
+  final String? userID;
   AddMemberView({Key? key,
     required this.userType,
     required this. userID,
@@ -58,7 +58,7 @@ class AddMemberView extends StatelessWidget {
 }
 class PendingView extends StatefulWidget {
   final String userType;
-  String? userID;
+  final String? userID;
   PendingView({Key? key,
     required this.userType,
     required this. userID,  }) : super(key: key);
@@ -162,6 +162,7 @@ class _PendingViewState extends State<PendingView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return  Center(
                   child: Padding(
@@ -174,8 +175,8 @@ class _PendingViewState extends State<PendingView> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  const CircleAvatar(
-                                    backgroundImage: AssetImage("assets/pro1.jpg"),
+                                   CircleAvatar(
+                                    backgroundImage: NetworkImage(imageUrl),
                                     radius: 35,
                                   ),
                                   Expanded(
@@ -216,7 +217,7 @@ class _PendingViewState extends State<PendingView> {
 }
 class ApprovedView extends StatefulWidget {
   final String userType;
-  String? userID;
+  final String? userID;
    ApprovedView({Key? key,
      required this.userType,
      required this. userID,
@@ -319,48 +320,49 @@ class _ApprovedViewState extends State<ApprovedView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
-
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 5,),
-                      Container(
-                        width: 350,
-                        height: 80,
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                                color: Colors.green, width: 1),
-                          ),
-                        ),
-                        child: ListTile(
-                          leading:
-                          SizedBox(
-                            height: 80,
-                            child: CircleAvatar(
-                            ),
-                          ),
-                          title: Text('${AdminRightsdata[i]['first_name']} ${AdminRightsdata[i]['last_name']}'),
-                          subtitle: Text(
-                              '${AdminRightsdata[i]['company_name']}'),
-                          trailing: IconButton(
-                              onPressed: () async {
-                                final call = Uri.parse(
-                                    "tel://${AdminRightsdata[i]['mobile']}");
-                                if (await canLaunchUrl(call)) {
-                                  launchUrl(call);
-                                } else {
-                                  throw 'Could not launch $call';
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.call, color: Colors.green,)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(imageUrl),
+                                    radius: 35,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text('${AdminRightsdata[i]['first_name']}'),
+                                        Text('${AdminRightsdata[i]['company_name']}'),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () async {
+                                        final call = Uri.parse(
+                                            "tel://${AdminRightsdata[i]['mobile']}");
+                                        if (await canLaunchUrl(call)) {
+                                          launchUrl(call);
+                                        } else {
+                                          throw 'Could not launch $call';
+                                        }
+                                      },
+                                      icon: Icon(
+                                        Icons.call, color: Colors.green[900],)),
+                                ],
+                              ),
+                            ]
                         ),
                       ),
-
-                    ],
+                    ),
                   ),
                 );
               }
@@ -374,7 +376,7 @@ class _ApprovedViewState extends State<ApprovedView> {
 
 class RejectedView extends StatefulWidget {
   final String userType;
-  String? userID;
+  final String? userID;
    RejectedView({Key? key,
      required this.userType,
      required this. userID,
@@ -477,46 +479,49 @@ class _RejectedViewState extends State<RejectedView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 5,),
-                      Container(
-                        width: 350,
-                        height: 80,
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                                color: Colors.red, width: 1),
-                          ),
-                        ),
-                        child: ListTile(
-                          leading:
-                          SizedBox(
-                            height: 80,
-                            child: CircleAvatar(
-                            ),
-                          ),
-                          title: Text('${AdminRightsdata[i]['first_name']} ${AdminRightsdata[i]['last_name']}'),
-                          subtitle: Text(
-                              '${AdminRightsdata[i]['company_name']}'),
-                          trailing: IconButton(
-                              onPressed: () async {
-                                final call = Uri.parse(
-                                    "tel://${AdminRightsdata[i]['mobile']}");
-                                if (await canLaunchUrl(call)) {
-                                  launchUrl(call);
-                                } else {
-                                  throw 'Could not launch $call';
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.call, color: Colors.green,)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(imageUrl),
+                                    radius: 35,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text('${AdminRightsdata[i]['first_name']}'),
+                                        Text('${AdminRightsdata[i]['company_name']}'),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () async {
+                                        final call = Uri.parse(
+                                            "tel://${AdminRightsdata[i]['mobile']}");
+                                        if (await canLaunchUrl(call)) {
+                                          launchUrl(call);
+                                        } else {
+                                          throw 'Could not launch $call';
+                                        }
+                                      },
+                                      icon: Icon(
+                                        Icons.call, color: Colors.green[900],)),
+                                ],
+                              ),
+                            ]
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               }

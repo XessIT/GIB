@@ -115,57 +115,52 @@ class _BloodListState extends State<BloodList> {
          : ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
             String getMobile = data[i]["mobile"];
             return
-                Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20,),
-                      Visibility(
-                        //visible: visible=false,
-                        child: InkWell(
-                          child: Container(
-                              width: 350,
-                              height: 80,
-                              padding: const EdgeInsets.all(5.0),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.green, width: 1),
-                                  borderRadius: BorderRadius.circular(
-                                      10.0)
-                              ),
-                              child: ListTile(
-                                leading: SizedBox(
-                                  height: 80.0,
-                                  width: 80.0, // fixed width and height
-                                  /* child: Image.network(
-                                          '${thisitem['Image']}',
-                                          fit: BoxFit.cover,),*/
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                CircleAvatar(
+                                  radius: 35, // adjust the radius as per your requirement
+                                  backgroundImage: NetworkImage(imageUrl),
                                 ),
-                                /* const CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                      'assets/profile.jpg',),
-                                   // radius: 40,
-                                  ),*/
-                                title: Text('${data[i]['first_name']} ${data[i]['last_name']}'),
-                                subtitle: Text(
-                                    '${data[i]['companyname']}'),
-                                // subtitle: Text(documentSnapshot['Company Name']),
-                                trailing: IconButton(
-                                    onPressed: () {
-                                      launch(
-                                          "tel://'${data[i]['mobile']}'");
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text('${data[i]['first_name']}'),
+                                      Text('${data[i]['company_name']}'),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () async {
+                                      final call = Uri.parse(
+                                          "tel://${data[i]['mobile']}");
+                                      if (await canLaunchUrl(call)) {
+                                        launchUrl(call);
+                                      } else {
+                                        throw 'Could not launch $call';
+                                      }
                                     },
-                                    icon: const Icon(
-                                      Icons.call, color: Colors.green,)),
-                              )
-                          ),
-                        ),
+                                    icon: Icon(
+                                      Icons.call, color: Colors.green[900],)),
+                              ],
+                            ),
+                          ]
                       ),
-                      // const SizedBox(height: 5,)
-                    ],
+                    ),
                   ),
-                );
+                ),
+              );
 
             }
 

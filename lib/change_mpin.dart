@@ -10,7 +10,7 @@ import 'package:http/http.dart'as http;
 class ChangeMPin extends StatelessWidget {
 
   final String userType;
-  String? userID;
+  final String? userID;
    ChangeMPin({
      Key? key,
      required this.userType,
@@ -27,7 +27,7 @@ class ChangeMPin extends StatelessWidget {
 
 class Change extends StatefulWidget {
   final String userType;
-  String? userID;
+  final String? userID;
    Change({
      Key? key,
      required this.userType,
@@ -39,7 +39,9 @@ class Change extends StatefulWidget {
 }
 
 class _ChangeState extends State<Change> {
-  bool _isObscure = true;
+  bool _isOldObscure = true;
+  bool _isNewObscure = true;
+  bool _isConfirmObscure = true;
   var Password=" ";
   final _formKey = GlobalKey<FormState>();
   TextEditingController oldpassword = TextEditingController();
@@ -127,12 +129,16 @@ String passwordCheck="";
       // Appbar starts
       appBar: AppBar(
         // Appbar title
-        title: const Center(child: Text('Change M-Pin')),
+        title:  Text('Change M-Pin', style: Theme.of(context).textTheme.bodySmall),
+        centerTitle: true,
         leading:IconButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: '',)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: widget.userType, userId: widget.userID,)));
             },
             icon: const Icon(Icons.arrow_back)),
+        iconTheme:  const IconThemeData(
+          color: Colors.white, // Set the color for the drawer icon
+        ),
       ),
       // Appbar ends
 
@@ -170,17 +176,17 @@ String passwordCheck="";
                         return null;
                       }
                     },
-                    obscureText: _isObscure,
+                    obscureText: _isOldObscure,
                     decoration: InputDecoration(
                       labelText: 'Old M-Pin',
                       hintText: 'Enter your Old M-Pin',
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isObscure ? Icons.visibility : Icons.visibility_off,
+                          _isOldObscure ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
-                            _isObscure = !_isObscure;
+                            _isOldObscure = !_isOldObscure;
                           });
                         },
                       ),
@@ -206,17 +212,17 @@ String passwordCheck="";
                         return null;
                       }
                     },
-                    obscureText: _isObscure,
+                    obscureText: _isNewObscure,
                     decoration: InputDecoration(
                       labelText: 'New M-Pin',
                       hintText: 'Enter your New M-Pin',
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isObscure ? Icons.visibility : Icons.visibility_off,
+                          _isNewObscure ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
-                            _isObscure = !_isObscure;
+                            _isNewObscure = !_isNewObscure;
                           });
                         },
                       ),
@@ -246,17 +252,17 @@ String passwordCheck="";
                         return null;
                       }
                     },
-                    obscureText: _isObscure,
+                    obscureText: _isConfirmObscure,
                     decoration: InputDecoration(
                       labelText: 'Confirm M-Pin',
                       hintText: 'Enter your Confirm M-Pin',
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isObscure ? Icons.visibility : Icons.visibility_off,
+                          _isConfirmObscure ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
-                            _isObscure = !_isObscure;
+                            _isConfirmObscure = !_isConfirmObscure;
                           });
                         },
                       ),

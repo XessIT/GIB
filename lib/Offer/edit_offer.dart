@@ -9,7 +9,7 @@ import 'offer_list.dart';
 
 class EditOffer extends StatefulWidget {
 
-//  final String? currentimage;
+  final String? currentimage;
   final String? currentproductname;
   final String? currenttype;
   final String? currentDiscount;
@@ -18,7 +18,7 @@ class EditOffer extends StatefulWidget {
   final String user_id;
 
   EditOffer({Key? key,
-   // required this.currentimage,
+    required this.currentimage,
     required this.currentproductname,
     required this.currenttype,
     required this.currentDiscount,
@@ -54,13 +54,14 @@ class _EditOfferState extends State<EditOffer> {
       text: widget.currentvalidity,
     );
     type = widget.currenttype;
-  //  imageUrl = widget.currentimage!;
+    image = widget.currentimage!;
+    imageUrl = 'http://localhost/GIB/lib/GIBAPI/$image';
   }
-
+  String? image = "";
   String imageUrl = "";
   bool showLocalImage = false;
   File? pickedimage;
-  pickImageFromGallery() async {
+  /*pickImageFromGallery() async {
     ImagePicker imagepicker = ImagePicker();
     XFile? file = await imagepicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
@@ -72,8 +73,36 @@ class _EditOfferState extends State<EditOffer> {
     if(file == null) return;
     String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
 
-  }
+  }*/
 
+  late String imageName;
+  late String imageData;
+  Uint8List? selectedImage;
+  Future<void> pickImageFromGallery() async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    showLocalImage = true;
+    if (pickedImage != null) {
+      // Verify that pickedImage is indeed an XFile
+      print('pickedImage type: ${pickedImage.runtimeType}');
+
+      // Read the image file as bytes
+      try {
+        final imageBytes = await pickedImage!.readAsBytes();
+        // Encode the bytes to base64
+        String base64ImageData = base64Encode(imageBytes);
+        setState(() {
+          selectedImage = imageBytes;
+          imageName = pickedImage!.name;
+          print('Image Name: $imageName');
+          imageData = base64ImageData;
+          print('Base64 Image Data: $imageData');
+        });
+      } catch (e) {
+        print('Error reading image file: $e');
+      }
+    }
+  }
   pickImageFromCamera() async {
     ImagePicker imagepicker = ImagePicker();
     XFile? file = await imagepicker.pickImage(source: ImageSource.camera);
@@ -87,7 +116,7 @@ class _EditOfferState extends State<EditOffer> {
     String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
   }
 
-  String? image = "";
+
   Future<void> Editoffers() async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
@@ -97,6 +126,40 @@ class _EditOfferState extends State<EditOffer> {
       final response = await http.put(
         url,
         body: jsonEncode({
+          "imagename": imageName,
+          "imagedata": imageData,
+          "name": namecontroller.text,
+          "discount": discountcontroller.text,
+          "validity": formattedDate,
+          "offer_type": type,
+          "ID": widget.Id
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        print("Offers response: ${response.body}");
+
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
+
+  Future<void> UpdateOffers() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(_date.text);
+      final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      final response = await http.put(
+        url,
+        body: jsonEncode({
+          "offer_image": image,
           "name": namecontroller.text,
           "discount": discountcontroller.text,
           "validity": formattedDate,
@@ -123,8 +186,11 @@ class _EditOfferState extends State<EditOffer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Offer'),
+        title: Text('Edit Offer', style: Theme.of(context).textTheme.bodySmall,),
         centerTitle: true,
+        iconTheme:  const IconThemeData(
+          color: Colors.white, // Set the color for the drawer icon
+        ),
       ),
 
       body: Center(
@@ -135,8 +201,8 @@ class _EditOfferState extends State<EditOffer> {
               const SizedBox(height: 20,),
               InkWell(
                 child: CircleAvatar(
-                  backgroundImage: pickedimage == null ? NetworkImage(imageUrl!)
-                      : Image.file(pickedimage!).image,
+                  backgroundImage: selectedImage == null ? NetworkImage(imageUrl!)
+                      : Image.memory(selectedImage!).image,
                   radius: 75,
                 ),
                 onTap: () {
@@ -272,7 +338,19 @@ class _EditOfferState extends State<EditOffer> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Login button starts
+                  // Cancel button starts
+                  MaterialButton(
+                      minWidth: 130,
+                      height: 50,
+                      color: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel',
+                        style: TextStyle(color: Colors.white),)),
+                  // Cancel button ends
+                  // Update button starts
                   MaterialButton(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
                       minWidth: 130,
@@ -284,7 +362,7 @@ class _EditOfferState extends State<EditOffer> {
                               content: Text("Please Select the Type")));
                         }
                         else if (_formKey.currentState!.validate()) {
-                          Editoffers();
+                          selectedImage != null ? Editoffers() : UpdateOffers();
                           Navigator.push(context,
                             MaterialPageRoute(builder: (context)=> OfferList(userId: widget.user_id)),);
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -294,19 +372,6 @@ class _EditOfferState extends State<EditOffer> {
                       child: const Text('Update',
                         style: TextStyle(color: Colors.white),)),
                   // Update button ends
-
-                  // Cancel button starts
-                  MaterialButton(
-                      minWidth: 130,
-                      height: 50,
-                      color: Colors.green[800],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                      onPressed: (){
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Cancel',
-                        style: TextStyle(color: Colors.white),)),
-                  // Cancel button ends
                 ],
               ),
 

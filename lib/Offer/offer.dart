@@ -90,6 +90,7 @@ class _OffersPageState extends State<OffersPage> {
           itemBuilder: (context, i) {
             String dateString = data[i]['validity'];
             DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
             // final DocumentSnapshot documentSnapshot = streamSnapshot.data!.docs[index];
             return SizedBox(
               height: 240,
@@ -108,8 +109,7 @@ class _OffersPageState extends State<OffersPage> {
                           color: Colors.green[900],)),),
                   CircleAvatar(
                     radius: 45,
-                    backgroundColor: Colors.cyan,
-                    backgroundImage: Image.network('${data[i]['Image']}').image,
+                    backgroundImage: NetworkImage(imageUrl),
                     child: Stack(
                       children: [
                         Align(
@@ -123,16 +123,16 @@ class _OffersPageState extends State<OffersPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15,),
+                 const SizedBox(height: 5,),
                   Text('${data[i]['Company Name']}',
                     style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 15,),
+                 // const SizedBox(height: 15,),
                   Text('${data[i]['offer_type']} - ${data[i]['name']}',
                     style: const TextStyle(fontSize: 10,
                         fontWeight: FontWeight.bold),),
-                  const SizedBox(width: 1,),
+                //  const SizedBox(height: 5,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
