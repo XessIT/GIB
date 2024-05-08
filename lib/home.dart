@@ -168,7 +168,7 @@ String? memberType ="Executive";
       print('Error: $error');
     }
   }
-
+  String imageUrl = "";
   List<Map<String,dynamic>>userdata=[];
   Future<void> fetchData(String? userId) async {
     try {
@@ -193,6 +193,7 @@ String? memberType ="Executive";
                 fetchMemberType = userdata[0]["member_type"]??"";
                 fetchTeamName = userdata[0]["team_name"]??"";
                 fetchMobile = userdata[0]["mobile"]??"";
+                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
               });
             }
           });
@@ -365,13 +366,18 @@ String? memberType ="Executive";
                     height: 100,
                     child: Row(
                       children: [
-                        const Padding(
+                        Container(
+                          width: 40,
+                          height: 40,
+                          child: Image.network(imageUrl, width: 40,height: 40,),
+                        ),
+                        /*const Padding(
                           padding: EdgeInsets.only(left:8.0),
                           child: CircleAvatar(
-                            backgroundImage: AssetImage("assets/pro1.jpg"),
+                           // backgroundImage: AssetImage("assets/pro1.jpg"),
                             radius: 35,
                           ),
-                        ),
+                        ),*/
                         Padding(
                           padding:  EdgeInsets.only(left:8.0),
                           child: Column(
@@ -453,98 +459,98 @@ String? memberType ="Executive";
                         ],
                       ),
                       const SizedBox(height: 10,),
-                  Container(
-                    height: 100,
-                    child:ListView.builder(
-                      itemCount: userdata.length,
-                      itemBuilder: (context, index) {
-                        final user = userdata[index];
-                        final dob = user['dob'] as String?;
-                        if (dob != null) {
-                          final formattedDob = formatDateString(dob); // Format date
-                          final today = DateTime.now();
-                          final userDob = DateTime.parse(formattedDob);
-                          if (userDob.month == today.month && userDob.day == today.day) {
-                            return Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Column(
-                                    children: [
-                                      InkWell(
-                                        onTap:(){
-                                          showDialog<void>(
-                                            context: context,
-                                            builder: (BuildContext dialogContext) {
-                                              return AlertDialog(
-                                                backgroundColor: Colors.white,
-                                                title: const Text('Convey Your Wish',style: TextStyle(color: Colors.green),),
-                                                content:  SizedBox(width: 300,
-                                                  child: TextFormField(
-                                                    controller: wishing,
-                                                    validator: (value){
-                                                      if(value!.isEmpty){
-                                                        return "Convey Your wishes";
-                                                      }else{
-                                                        return null;
-                                                      }
-                                                    },
-                                                    decoration: InputDecoration(
-                                                        hintText:"Share Your Hearty Wishes",
-                                                        suffixIcon: IconButton(onPressed: (){
-                                                          wishing.clear();
-                                                        }, icon: const Icon(Icons.cancel_presentation,color: Colors.red,))
-                                                    ) ,
-                                                  ),
-                                                ),
-                                                actions: <Widget>[
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                    children: [
-                                                      TextButton(
-                                                        child: const Text('Wish',),
-                                                        onPressed:  ()  {
-                                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                              content: Text("Your Wishes Conveyed")));
-                                                        },
-                                                      ),
-                                                      TextButton(
-                                                        child:  const Text('Cancel',),
-                                                        onPressed: () {
-                                                          //notificationsServices.sendNotification("hello", "My First Notification");
-
-                                                          Navigator.pop(context);
-                                                          // Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-                                                        },
-                                                      ),
-
-                                                    ],
-                                                  ),
-                                                ],
-                                              );
-                                            }, );
-
-                        },
-                                        child: CircleAvatar(
-                                          backgroundImage: AssetImage("assets/pro1.jpg"),
-                                          radius: 25,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${user['first_name']} ",
-                                        style: Theme.of(context).textTheme.titleSmall,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                        }
-                        return SizedBox();
-                      },
-                    ),
-                  ),
+                  // Container(
+                  //   height: 100,
+                  //   child:ListView.builder(
+                  //     itemCount: userdata.length,
+                  //     itemBuilder: (context, index) {
+                  //       final user = userdata[index];
+                  //       final dob = user['dob'] as String?;
+                  //       if (dob != null) {
+                  //         final formattedDob = formatDateString(dob); // Format date
+                  //         final today = DateTime.now();
+                  //         final userDob = DateTime.parse(formattedDob);
+                  //         if (userDob.month == today.month && userDob.day == today.day) {
+                  //           return Row(
+                  //             children: [
+                  //               Padding(
+                  //                 padding: const EdgeInsets.all(3.0),
+                  //                 child: Column(
+                  //                   children: [
+                  //                     InkWell(
+                  //                       onTap:(){
+                  //                         showDialog<void>(
+                  //                           context: context,
+                  //                           builder: (BuildContext dialogContext) {
+                  //                             return AlertDialog(
+                  //                               backgroundColor: Colors.white,
+                  //                               title: const Text('Convey Your Wish',style: TextStyle(color: Colors.green),),
+                  //                               content:  SizedBox(width: 300,
+                  //                                 child: TextFormField(
+                  //                                   controller: wishing,
+                  //                                   validator: (value){
+                  //                                     if(value!.isEmpty){
+                  //                                       return "Convey Your wishes";
+                  //                                     }else{
+                  //                                       return null;
+                  //                                     }
+                  //                                   },
+                  //                                   decoration: InputDecoration(
+                  //                                       hintText:"Share Your Hearty Wishes",
+                  //                                       suffixIcon: IconButton(onPressed: (){
+                  //                                         wishing.clear();
+                  //                                       }, icon: const Icon(Icons.cancel_presentation,color: Colors.red,))
+                  //                                   ) ,
+                  //                                 ),
+                  //                               ),
+                  //                               actions: <Widget>[
+                  //                                 Row(
+                  //                                   mainAxisAlignment: MainAxisAlignment.end,
+                  //                                   children: [
+                  //                                     TextButton(
+                  //                                       child: const Text('Wish',),
+                  //                                       onPressed:  ()  {
+                  //                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  //                                             content: Text("Your Wishes Conveyed")));
+                  //                                       },
+                  //                                     ),
+                  //                                     TextButton(
+                  //                                       child:  const Text('Cancel',),
+                  //                                       onPressed: () {
+                  //                                         //notificationsServices.sendNotification("hello", "My First Notification");
+                  //
+                  //                                         Navigator.pop(context);
+                  //                                         // Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+                  //                                       },
+                  //                                     ),
+                  //
+                  //                                   ],
+                  //                                 ),
+                  //                               ],
+                  //                             );
+                  //                           }, );
+                  //
+                  //       },
+                  //                       child: CircleAvatar(
+                  //                         backgroundImage: AssetImage("assets/pro1.jpg"),
+                  //                         radius: 25,
+                  //                       ),
+                  //                     ),
+                  //                     Text(
+                  //                       "${user['first_name']} ",
+                  //                       style: Theme.of(context).textTheme.titleSmall,
+                  //                     )
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           );
+                  //         }
+                  //       }
+                  //       return SizedBox();
+                  //     },
+                  //   ),
+                  // ),
 
 
 ///birthday design starts here
@@ -935,10 +941,10 @@ String? memberType ="Executive";
     );
 
   }
-  String formatDateString(String dateString) {
-    final parts = dateString.split('-');
-    return "${parts[2]}-${parts[1]}-${parts[0]}"; // Convert to yyyy-mm-dd format
-  }
+  // String formatDateString(String dateString) {
+  //   final parts = dateString.split('-');
+  //   return "${parts[2]}-${parts[1]}-${parts[0]}"; // Convert to yyyy-mm-dd format
+  // }
 }
 
 
@@ -1164,7 +1170,7 @@ class _NavDrawerState extends State<NavDrawer> {
               onTap: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  const MyGallery()),
+                  MaterialPageRoute(builder: (context) =>  MyGallery(userId: widget.userId)),
                 )
               },
             ),

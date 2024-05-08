@@ -1,19 +1,30 @@
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gipapp/video_player.dart';
-import 'package:gipapp/view_gallery_image.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:http_parser/http_parser.dart';
+
 import 'package:image_picker/image_picker.dart';
-
-
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'home.dart';
-import 'home1.dart';
+import 'dart:typed_data';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
-class MyGallery extends StatelessWidget {
-  const MyGallery({Key? key}) : super(key: key);
 
+
+
+class MyGallery extends StatefulWidget {
+  final String? userId;
+  const MyGallery({super.key, required this.userId});
+
+  @override
+  State<MyGallery> createState() => _MyGalleryState();
+}
+
+class _MyGalleryState extends State<MyGallery> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -25,12 +36,12 @@ class MyGallery extends StatelessWidget {
           centerTitle: true,
           leading:IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: '',)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: widget.userId,)));
               },
               icon: const Icon(Icons.arrow_back)),
         ),
         body: Column(
-          children:  const [
+          children:   [
             TabBar(
                 isScrollable: true,
                 labelColor: Colors.green,
@@ -42,8 +53,8 @@ class MyGallery extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  Gallery(),
-                  Video(),
+                  Gallery(userId: widget.userId),
+                  Video(userId: widget.userId),
                 ],
               ),
             ),
@@ -54,222 +65,145 @@ class MyGallery extends StatelessWidget {
   }
 }
 
+
+
 class Gallery extends StatefulWidget {
-  const Gallery({Key? key}) : super(key: key);
+  final String? userId;
+
+  const Gallery({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<Gallery> createState() => _GalleryState();
 }
 
 class _GalleryState extends State<Gallery> {
-  DateTime date = DateTime.now();
+  Uint8List? _imageBytes;
+  final ImagePicker _imagePicker = ImagePicker();
+  List<Uint8List> _imageBytesList = [];
+  List<Map<String, dynamic>> _imageDataList = [];
+  List<bool> _isSelectedList = [];
 
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    final pickedImage = await _imagePicker.pickImage(source: source);
 
-  String? image = "";
-  String? docId = "";
+    if (pickedImage != null) {
+      final bytes = await pickedImage.readAsBytes();
 
+      setState(() {
+        _imageBytes = bytes;
+      });
 
-
-  Future<File?> CropImage({required File imageFile}) async{
-    CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
-    if(croppedImage == null) return null;
-    return File(croppedImage.path);
-  }
-  List<String> multiImages=[];
-  String imageUrl = "";
-  bool showLocalImage = false;
-
-  File? pickedimage;
-
-
- Future pickImageFromGallery() async {
-
-  }
-
-  Future<List<XFile>> multiImagePicker() async {
-    List<XFile>? _images = await ImagePicker().pickMultiImage(imageQuality: 50);
-    if(_images != null && _images.isNotEmpty){
-      return _images;
+      await _uploadImage(_imageBytes!);
     }
-    return [];
   }
-  Future<List<String>> multiImageUploader(List<XFile> list) async {
-    List<String> _path = [];
-    for(XFile _image in list) {
-     // _path.add(await uploadImage(_image));
+
+  Future<void> _uploadImage(Uint8List imageBytes) async {
+    final url =
+        'http://localhost/GIB/lib/GIBAPI/mygallery.php?userId=${widget.userId}';
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'image': base64Encode(imageBytes),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Image uploaded successfully.');
+      // Refresh the gallery after successful upload
+      _fetchImages();
+    } else {
+      print('Failed to upload image.');
     }
-    return _path;
   }
 
-  // Return Image Name
-  String getImageName(XFile image) {
-    return image.path.split("/").last;
+  Future<void> _fetchImages() async {
+    final url =
+        'http://localhost/GIB/lib/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> imageData = jsonDecode(response.body);
+
+      _imageBytesList.clear();
+      _imageDataList.clear();
+
+      for (var data in imageData) {
+        final imageUrl =
+            'http://localhost/GIB/lib/GIBAPI/${data['image_path']}';
+        final imageResponse = await http.get(Uri.parse(imageUrl));
+        if (imageResponse.statusCode == 200) {
+          Uint8List imageBytes = imageResponse.bodyBytes;
+          setState(() {
+            _imageBytesList.add(imageBytes);
+            _imageDataList.add(data);
+          });
+        }
+      }
+    } else {
+      print('Failed to fetch images.');
+    }
   }
 
+  Future<void> _deleteImage(int imageIndex) async {
+    String imageId = _imageDataList[imageIndex]['id'];
+    final url =
+        'http://localhost/GIB/lib/GIBAPI/deleteImage.php?image_id=$imageId';
+    print('url: $url');
 
-  pickImageFromCamera() async {
-    ImagePicker imagepicker = ImagePicker();
-    XFile? file = await imagepicker.pickImage(source: ImageSource.camera);
-    showLocalImage = true;
-    print('${file?.path}');
-    pickedimage = File(file!.path);
-    pickedimage = await CropImage(imageFile: pickedimage!);
-    setState(() {
+    final response = await http.delete(Uri.parse(url));
 
-    });
-    if(file == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-
+    if (response.statusCode == 200) {
+      print('Image deleted successfully.');
+      setState(() {
+        _imageBytesList.removeAt(imageIndex);
+        _imageDataList.removeAt(imageIndex);
+      });
+    } else {
+      print('Failed to delete image.');
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.green,
-          onPressed: () {
-            showModalBottomSheet(context: context, builder: (ctx){
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.camera_alt),
-                    title: const Text("With Camera"),
-                    onTap: () async {
-                      pickImageFromCamera();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>  const MyGallery()));
-                      // Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.storage),
-                    title: const Text("From Gallery"),
-                    onTap: () async {
-                     // multiImagePicker();
-                      List<XFile>? _images = await multiImagePicker();
-                      if (_images.isNotEmpty) {
-                        multiImages = await multiImageUploader(_images);
-                      }
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const MyGallery()));
-                    } )
-                ],
-              );
-
-            });
-          },
-          child: const Icon(Icons.add),
-        ),
-
-        body: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 5.0,
-                      mainAxisSpacing: 5.0,
-                    ),
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                     // String docID = streamSnapshot.data!.docs[index].id;
-                      Map thisitem = [index] as Map;
-                      return Column(
-                        children: [
-                          const SizedBox(height: 30,),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => ViewGalleryImage(thisitem['id'])));
-                            },
-                            onLongPress: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (ctx) =>
-                                  // Dialog box for register meeting and add guest
-                                  AlertDialog(
-                                    backgroundColor: Colors.grey[800],
-                                    title: const Text('Delete',
-                                        style: TextStyle(color: Colors.white)),
-                                    content: const Text("Do you want to Delete the Image?",
-                                        style: TextStyle(color: Colors.white)),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                           // _delete(thisitem['id'], thisitem['Images']);
-                                            Navigator.push(context, MaterialPageRoute(
-                                                builder: (context) => const Gallery()));
-                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                content: Text("You have Successfully Deleted a Image")));
-                                          },
-                                          child: const Text('Yes')),
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('No'))
-                                    ],
-                                  )
-                              );
-                            },
-                            child: SizedBox(
-                                width: 100,
-                                height: 100,
-                                child: Image.network('${thisitem['Images']}', fit: BoxFit.cover,)),
-
-                          ),
-                          // Text(urlDownload),
-                        ],
-                      );
-                    }
-                )
+  Future<void> _showDeleteConfirmationDialog(int imageIndex) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Image'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this image?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                _deleteImage(imageIndex);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
-}
-
-class Video extends StatefulWidget {
-  const Video({Key? key}) : super(key: key);
 
   @override
-  State<Video> createState() => _VideoState();
-}
-
-class _VideoState extends State<Video> {
-
-  playvideo(String vurl) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => VideoApp(url: vurl)));
+  void initState() {
+    super.initState();
+    _fetchImages();
   }
-
-  FilePickerResult? result;
-  File? pickedfile;
-  String urlDownload = "";
-  String? thumbfile;
-
-  String videoimage = "https://firebasestorage.googleapis.com/v0/b/giberode-9eaf1.appspot.com/o/gallery%2FIcon-video-play-green.png?alt=media&token=e556fbaa-bdcc-4b7f-9a1b-dcd8151e30db";
-
-  String videoUrl="";
-  bool showLocalVideo= false;
-  File? pickedvideo;
-
-  Future Camera()async{
-    final ImagePicker _picker = ImagePicker();
-    final XFile? file = await _picker.pickVideo(source: ImageSource.camera,maxDuration: const Duration(seconds: 30));
-    showLocalVideo = true;
-    print('${file?.path}');
-    pickedvideo = File(file!.path);
-    //pickedimage = await CropImage(imageFile: pickedimage!);
-    setState(() {
-
-    });
-    if(file == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-      }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -277,129 +211,372 @@ class _VideoState extends State<Video> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
-        onPressed: () {
-          showModalBottomSheet(context: context, builder: (ctx) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text("With Camera"),
-                  onTap: () async {
-                    Camera();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (
-                            context) => const MyGallery()));
-                    // Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.storage),
-                  title: const Text("From Gallery"),
-                  onTap: () {
-                    selectFile();
-                    // pickImageFromGallery();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (
-                            context) => const MyGallery()));
-                    // Navigator.of(context).pop();
-                  },
-                )
-              ],
+        onPressed: () async {
+          if (_imageBytesList.length < 5) {
+            showModalBottomSheet(context: context, builder: (ctx) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text("With Camera"),
+                    onTap: () async {
+                      final pickedImage = await _imagePicker.pickImage(
+                        source: ImageSource.camera,
+                      );
+
+                      if (pickedImage != null) {
+                        final bytes = await pickedImage.readAsBytes();
+
+                        setState(() {
+                          _imageBytes = bytes;
+                        });
+
+                        await _uploadImage(_imageBytes!);
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text("From Gallery"),
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      await _pickAndUploadImage(ImageSource.gallery);
+                    },
+                  ),
+                ],
+              );
+            });
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Upload Limit Reached'),
+                  content: Text('You already have 5 images uploaded.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
             );
-          });
+          }
         },
         child: const Icon(Icons.add),
       ),
       body: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 5.0,
-                    mainAxisSpacing: 5.0,
-                  ),
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                   // String docID = streamSnapshot.data!.docs[index].id;
-                    Map thisitem = [index] as Map;
-                    thumbfile = thisitem["Video Image"];
-                    return Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Container(
-                          //  child:Image.network('${thisitem['Video Image']}', fit: BoxFit.cover,)),
-                            child: InkWell(
-                              onTap: () {
-                                playvideo(thisitem["Video"]);
-                              },
-                              onLongPress: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (ctx) =>
-                                    // Dialog box for register meeting and add guest
-                                    AlertDialog(
-                                      backgroundColor: Colors.grey[800],
-                                      title: const Text('Delete',
-                                          style: TextStyle(color: Colors.white)),
-                                      content: const Text("Do you want to Delete the Video?",
-                                          style: TextStyle(color: Colors.white)),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () {
-                                            //  _delete(thisitem['id'], thisitem['Video'],thisitem['Video Image']);
-                                              Navigator.push(context, MaterialPageRoute(
-                                                  builder: (context) => const Video()));
-                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                  content: Text("You have Successfully Deleted a Video")));
-                                            },
-                                            child: const Text('Yes')),
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('No'))
-                                      ],
-                                    )
-                                );
-                              },
-
-                              child: SizedBox(
-                                  height: 100,
-                                  width: 100,
-                               //  child: VideoPlayer(playvideo(thisitem["Video"]))),
-                                  child: Image.network(thumbfile!)),
-                               // child: Image.file(thisitem["Video"]),),
-                            // child: Image.file(File(thumbfile!))),
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  }
-              )
-
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+        ),
+        itemCount: _imageBytesList.length,
+        itemBuilder: (BuildContext context, i) {
+          return Stack(
+            children: [
+              Image.memory(
+                _imageBytesList[i],
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                top: 5,
+                right: 5,
+                child: IconButton(
+                  icon: Icon(Icons.cancel),
+                  onPressed: () {
+                    _showDeleteConfirmationDialog(i);
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
+  }
+}
+
+
+
+
+  class Video extends StatefulWidget {
+    final String? userId;
+    const Video({super.key, required this.userId});
+
+    @override
+    State<Video> createState() => _VideoState();
+  }
+
+  class _VideoState extends State<Video> {
+    final ImagePicker _picker = ImagePicker();
+    List<dynamic> _videos = [];
+    @override
+    void initState() {
+      super.initState();
+      _fetchVideos();
+    }
+
+    Future<void> _pickAndUploadVideo() async {
+      final XFile? pickedVideo = await _picker.pickVideo(source: ImageSource.gallery);
+
+      if (pickedVideo != null) {
+        final Uint8List videoBytes = await pickedVideo.readAsBytes();
+        print('videoBytes: $videoBytes');
+        final url =
+            'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
+
+        print('url: $url');
+        // Make HTTP request to upload video file to server
+
+
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(url),
+        );
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'video',
+            videoBytes,
+            filename: 'video.mp4', // Provide a filename with the appropriate extension
+            contentType: MediaType('video', 'mp4'), // Adjust the content type as per your video format
+          ),
+        );
+
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          // Video uploaded successfully
+          print('Video uploaded successfully.');
+          // Optionally, you can show a success message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Video uploaded successfully.')),
+          );
+        } else {
+          // Failed to upload video
+          print('Failed to upload video.');
+          // Optionally, you can show an error message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to upload video.')),
+          );
+        }
+      }
+    }
+
+    Future<void> _fetchVideos() async {
+      final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userId}';
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        setState(() {
+          _videos = jsonDecode(response.body);
+        });
+      } else {
+        // Handle error
+        print('Failed to fetch videos');
+      }
+    }
+
+    Future<void> _deleteVideo(int videoIndex) async {
+      int videoId = _videos[videoIndex]['id'];
+      final url = 'http://localhost/GIB/lib/GIBAPI/deletevideos.php?video_id=$videoId';
+
+      final response = await http.delete(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        print('Video deleted successfully.');
+        setState(() {
+          _videos.removeAt(videoIndex);
+        });
+      } else {
+        print('Failed to delete video.');
+      }
+    }
+
+
+    Future<void> _showDeleteConfirmationDialog(int videoIndex) async {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete Image'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('Are you sure you want to delete this video?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Delete'),
+                onPressed: () {
+                  _deleteVideo(videoIndex);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
+
+
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.green,
+          onPressed: () {
+            showModalBottomSheet(context: context, builder: (ctx) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  ListTile(
+                    leading: const Icon(Icons.storage),
+                    title: const Text("From Gallery"),
+                    onTap: _pickAndUploadVideo,
+                  )
+                ],
+              );
+            });
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: ListView.builder(
+          itemCount: _videos.length,
+          itemBuilder: (context, index) {
+            final videoId = _videos[index]['id'];
+            final videoPath = _videos[index]['video_path'];
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    VideoPlayerWidget(videoUrl: videoPath),
+                  ],
+                ),
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: IconButton(
+                    icon: Icon(Icons.cancel,color: Colors.red,),
+                    onPressed: () {
+                      _showDeleteConfirmationDialog(index);
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+/*
+        body: ListView.builder(
+          itemCount: _videos.length,
+          itemBuilder: (context, index) {
+            final videoPath = _videos[index]['video_path'];
+            return VideoPlayerWidget(videoUrl: videoPath);
+          },
+        ),
+*/
+      );
+    }
   }
 
 
-  Future selectFile() async{
+class VideoPlayerScreen extends StatelessWidget {
+  final String videoPath;
 
-    result = await FilePicker.platform.pickFiles();
+  const VideoPlayerScreen({Key? key, required this.videoPath}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Video Player'),
+      ),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: 16 / 9, // Adjust aspect ratio as per your video dimensions
+          child: VideoPlayerWidget(videoUrl: videoPath),
+        ),
+      ),
+    );
+  }
+}
 
-    setState(() {
-      //pickedfile = result.files.first;
-    });
-    //final path = 'gibachievements/${pickedfile!.name}';
-    // final file = File(pickedfile!.path!);
-    print('${result?.paths}');
-    pickedfile =File(result!.files.first.path!) ;
-    if(result == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-   // String uniquename = DateTime.now().microsecond.toString();
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
 
+  const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeVideoPlayer();
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    try {
+      _controller = VideoPlayerController.network(widget.videoUrl);
+
+      await _controller.initialize();
+
+      if (mounted) {
+        setState(() {
+          _isPlaying = true;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        _errorMessage = 'Error initializing video player: $error';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_errorMessage != null) {
+      return Text(_errorMessage!);
+    }
+
+    if (!_isPlaying) {
+      return CircularProgressIndicator();
+    }
+
+    return AspectRatio(
+      aspectRatio: _controller.value.aspectRatio,
+      child: VideoPlayer(_controller),
+    );
   }
 }
 

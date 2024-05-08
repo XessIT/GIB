@@ -8,6 +8,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart'as http;
+
+
 class PersonalEdit extends StatefulWidget {
 
   final String? currentID;
@@ -31,6 +33,11 @@ class PersonalEdit extends StatefulWidget {
   final String? currentSpouseBloodGroup;
   final String? currentEducation;
   final String? currentPastExperience;
+  final String? userId;
+  final String? imageUrl;
+
+
+
 
   const PersonalEdit({Key? key,
     required this.currentID,
@@ -54,6 +61,11 @@ class PersonalEdit extends StatefulWidget {
     required this.currentSpouseBloodGroup,
     required this.currentEducation,
     required this.currentPastExperience,
+    required this.userId,
+    required this.imageUrl,
+
+
+
 
   }) : super(key: key);
 
@@ -84,13 +96,6 @@ class _PersonalEditState extends State<PersonalEdit> {
   TextEditingController chapterController = TextEditingController();
   String businesstype = "Business Type";
   String? status;
-  /*TextEditingController businesskeywordscontroller = TextEditingController();
-  TextEditingController websitecontroller = TextEditingController();
-  TextEditingController yearcontroller = TextEditingController();
-  TextEditingController companynamecontroller = TextEditingController();
-  TextEditingController companyaddresscontroller = TextEditingController();*/
-
-
 
   List<Map<String,dynamic>>data=[];
 
@@ -102,6 +107,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   bool depVisible=false;
   @override
   void initState() {
+    image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl}';
     firstnamecontroller = TextEditingController(text: widget.currentFname);
     lastnamecontroller = TextEditingController(text: widget.currentLname);
     locationcontroller = TextEditingController(text: widget.currentLocation);
@@ -136,8 +142,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   String koottam = "Koottam";
   String spousekoottam = "Spouse Father Koottam";
   String userID="";
-
-  String imageURL="";
+  String image="";
   List dynamicdata=[];
   bool guestVisibility = false;
 
@@ -156,6 +161,7 @@ class _PersonalEditState extends State<PersonalEdit> {
       final response = await http.put(
         url,
         body: jsonEncode({
+          'profile_image': widget.imageUrl,
           'first_name': firstnamecontroller.text,
           'mobile': mobilecontroller.text,
           'last_name': lastnamecontroller.text,
@@ -176,6 +182,7 @@ class _PersonalEditState extends State<PersonalEdit> {
           'past_experience': pastexpcontroller.text,
           'marital_status': status.toString(),
           'id': widget.currentID,
+
         }),
       );
       print(url);
@@ -196,35 +203,102 @@ class _PersonalEditState extends State<PersonalEdit> {
       // Handle error as needed
     }
   }
+  Future<void> Update() async {
+    setState(() {
+      if (status != "Married") {
+        spousenamecontroller.clear();
+        spousenativecontroller.clear();
+        spousekoottam = "Spouse Father Koottam";
+        spousekovilcontroller.clear();
+      }
+    });
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/personal_edit.php');
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      final response = await http.put(
+        url,
+        body: jsonEncode({
+          'imagename': imageName,
+          'imagedata': imageData,
+          'first_name': firstnamecontroller.text,
+          'mobile': mobilecontroller.text,
+          'last_name': lastnamecontroller.text,
+          'district': districtController.text,
+          'chapter': chapterController.text,
+          'place': locationcontroller.text,
+          'dob': _dobdate.text,
+          'WAD': _waddate.text,
+          'koottam': koottam.toString(),
+          'kovil': kovilcontroller.text,
+          'blood_group': blood.toString(),
+          'email': emailcontroller.text,
+          's_name': spousenamecontroller.text,
+          'native': spousenativecontroller.text,
+          's_father_koottam': spousekoottam.toString(),
+          's_father_kovil': spousekovilcontroller.text,
+          'education': educationcontroller.text,
+          'past_experience': pastexpcontroller.text,
+          'marital_status': status.toString(),
+          'id': widget.currentID,
 
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        print("Offers response: ${response.body}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Profile(userID: widget.currentID, userType: '',)),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Profile Successfully Updated")));
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
   String category = 'Business';
   var categorylist = ['Business','Service'];
-
   final _formKey = GlobalKey<FormState>();
-
   DateTime date =DateTime.now();
   late TextEditingController _dobdate = TextEditingController();
   late TextEditingController _waddate = TextEditingController();
-  Future<File?> CropImage({required File imageFile}) async{
-    CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
-    if(croppedImage == null) return null;
-    return File(croppedImage.path);
-  }
   String imageUrl = "";
-  bool showLocalImage = false;
-  File? pickedimage;
-  pickImageFromGallery() async {
-    ImagePicker imagepicker = ImagePicker();
-    XFile? file = await imagepicker.pickImage(source: ImageSource.gallery);
-    showLocalImage = true;
-    print('${file?.path}');
-    pickedimage = File(file!.path);
-    setState(() {
-    });
-    if(file == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+  File? pickedImage;
+  late String imageName;
+  late String imageData;
+  Uint8List? selectedImage;
+  Future<void> pickImageFromGallery() async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      // Verify that pickedImage is indeed an XFile
+      print('pickedImage type: ${pickedImage.runtimeType}');
 
+      // Read the image file as bytes
+      try {
+        final imageBytes = await pickedImage!.readAsBytes();
+        // Encode the bytes to base64
+        String base64ImageData = base64Encode(imageBytes);
+        setState(() {
+          selectedImage = imageBytes;
+          imageName = pickedImage!.name;
+          print('Image Name: $imageName');
+          imageData = base64ImageData;
+          print('Base64 Image Data: $imageData');
+        });
+      } catch (e) {
+        print('Error reading image file: $e');
+      }
+    }
   }
+
+
+
 
 
   String Email = "";
@@ -286,16 +360,12 @@ class _PersonalEditState extends State<PersonalEdit> {
 
   @override
   Widget build(BuildContext context) {
-//    fetchData(widget.currentID.toString());
-
     status=="Married"?
     depVisible = true :depVisible = false;
     getDistrict();
-    Uint8List decodedImage = base64Decode(imageURL);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Edit Profile')),
+        title: const Center(child: Text('Edit123 Profile')),
         centerTitle: true,
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
@@ -313,38 +383,61 @@ class _PersonalEditState extends State<PersonalEdit> {
                   style: Theme.of(context).textTheme.displayMedium,),
 
                 const SizedBox(width: 20,),
+                // InkWell(
+                //   child: CircleAvatar(
+                //     radius: 80,
+                //     backgroundImage: pickedImage != null ? FileImage(pickedImage!) : null,
+                //     backgroundColor: Colors.grey,
+                //   ),
+                //   onTap: () {
+                //     showModalBottomSheet(
+                //       context: context,
+                //       builder: (ctx) {
+                //         return Column(
+                //           mainAxisSize: MainAxisSize.min,
+                //           children: [
+                //             ListTile(
+                //               leading: Icon(Icons.storage),
+                //               title: Text("From Gallery"),
+                //               onTap: () {
+                //                 pickImageFromGallery();
+                //                 Navigator.of(context).pop();
+                //               },
+                //             ),
+                //           ],
+                //         );
+                //       },
+                //     );
+                //   },
+                // ),
+
                 InkWell(
-                  child: CircleAvatar(
-                    backgroundImage:pickedimage==null
-                        ? NetworkImage('http://localhost${Uri.encodeComponent(imageURL)}')
-                        : Image.file(pickedimage!).image,
-                    radius: 50,
+                  child: ClipOval(
+                    child: Container(
+                      width: 150,
+                      height: 150,
+                      child: selectedImage == null ? Image.network(image) : Image.memory(selectedImage!),
+                    ),
                   ),
                   onTap: () {
-                    showModalBottomSheet(context: context, builder: (ctx){
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt),
-                            title: const Text("With Camera"),
-                            onTap: () async {
-                              // pickImageFromCamera();
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.storage),
-                            title: const Text("From Gallery"),
-                            onTap: () {
-                              pickImageFromGallery();
-                              //  pickImageFromDevice();
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    });
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (ctx) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.storage),
+                              title: Text("From Gallery"),
+                              onTap: () {
+                                pickImageFromGallery();
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 SizedBox(
@@ -384,35 +477,6 @@ class _PersonalEditState extends State<PersonalEdit> {
                     ),),
                 ),
 
-                /*SizedBox(
-                  width: 300,
-                  child: TextFormField(
-                    controller: companynamecontroller,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return '* Enter your Company Name/Occupation';
-                      } else if (_alphabetPattern.hasMatch(value)) {
-                        return null;
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      String capitalizedValue = capitalizeFirstLetter(value);
-                      companynamecontroller.value = companynamecontroller.value.copyWith(
-                        text: capitalizedValue,
-                        selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                      );
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Company Name/Occupation",
-                      hintText: "Company Name/Occupation",
-                      suffixIcon: Icon(Icons.business),
-                    ),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(20),
-                    ],
-                  ),
-                ),*/
 
                 SizedBox(
                   width: 305,
@@ -1248,7 +1312,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                         onPressed: ()  {
 
                           if (_formKey.currentState!.validate()) {
-                           Edit();
+                          selectedImage == null ? Edit() : Update();
                           // updatedetails();
                             print("${firstnamecontroller.text}${mobilecontroller.text}");
 

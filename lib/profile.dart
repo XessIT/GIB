@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
@@ -46,13 +47,12 @@ class View extends StatefulWidget {
   @override
   State<View> createState() => _ViewState();
 }
-
 class _ViewState extends State<View> {
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Center(child: Text('My Profile')),
@@ -89,7 +89,7 @@ class _ViewState extends State<View> {
                 tabs: [
                   Tab(text: 'Personal',),
                   Tab(text: 'Business',),
-                  Tab(text: 'Reward',)
+                //  Tab(text: 'Reward',)
                 ]),
             Expanded(
               child: TabBarView(
@@ -99,7 +99,10 @@ class _ViewState extends State<View> {
                     userID:widget.userID,
 
                   ),
-                  BusinessTabPage(),
+                  BusinessTabPage(
+                    userType:widget.userType,
+                    userID:widget.userID,
+                  ),
                  // Reward(),
                 ],
               ),
@@ -117,18 +120,12 @@ class Personal extends StatefulWidget {
  final String userType;
   final String? userID;
 
-   Personal({
-    Key? key,
-
-    required this.userType,
-     required this. userID,
-  }) : super(key: key);
+  Personal({Key? key, required this.userType, required this. userID,}) : super(key: key);
 
 
   @override
   State<Personal> createState() => _PersonalState();
 }
-
 class _PersonalState extends State<Personal> {
 
   String? fname = "";
@@ -157,13 +154,18 @@ class _PersonalState extends State<Personal> {
   List dynamicdata=[];
   String profileImage="";
   String marital_status="";
+  String imageUrl = "";
+  String imageParameter = "";
+
 
   Future<void> fetchData(String userId) async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
-
+      print("profile url: $url");
       if (response.statusCode == 200) {
+        print("response S: ${response.statusCode}");
+        print("response B: ${response.body}");
         final responseData = json.decode(response.body);
         if (responseData is List<dynamic>) {
           setState(() {
@@ -195,7 +197,10 @@ class _PersonalState extends State<Personal> {
                 spousekovil=dynamicdata[0]["s_father_kovil"];
                 profileImage=dynamicdata[0]["profile_image"];
                 marital_status=dynamicdata[0]["marital_status"];
+                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["profile_image"]}';
+                imageParameter = dynamicdata[0]["profile_image"];
               });
+              print("Image Parameter: $imageParameter");
             }
           });
         } else {
@@ -226,22 +231,57 @@ class _PersonalState extends State<Personal> {
         child: Center(
           child: Column(
             children: [
+              SizedBox(
+                width: double.infinity,
+                height: 300,
+                child: Image.network(imageUrl, fit: BoxFit.fill,),
+              ),
 
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
-                  /* widget.userType != "Guest"?
-
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalEdit (
-                      currentID:userID.toString(),
-                    )))
-                        : Navigator.push(context, MaterialPageRoute(builder: (context)=> GuestPersonalEdit (
-                      currentID:userID.toString(),
-                    )));*/
+                    print("Pas:n$imageParameter");
+                    // Ensure that imageUrl is not empty before navigating
+                    if (imageUrl.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PersonalEdit(
+                            currentID: userID.toString(),
+                            currentFname: fname!,
+                            currentLname: lname!,
+                            currentEmail: email!,
+                            currentMobile: mobile!,
+                            currentSpouseName: spousename!,
+                            currentEducation: education!,
+                            currentPastExperience: pastexperience!,
+                            currentWad: wad!,
+                            currentKoottam: koottam!,
+                            currentKovil: kovil!,
+                            currentBloodgroup: bloodgroup!,
+                            currentSpouseKoottam: spousekoottam!,
+                            currentSpouseKovil: spousekovil!,
+                            currentSpouseBloodGroup: spousebloodgroup!,
+                            currentSpouseNative: spousenative!,
+                            currentLocation: location!,
+                            currentMaritalStatus: marital_status!,
+                            currentDistrict: district!,
+                            currentChapter: chapter!,
+                            currentDob: dob!,
+                            userId: widget.userID.toString(),
+                            imageUrl: imageParameter,
+                          ),
+                        ),
+                      );
+                    } else {
+                      // Handle the case when imageUrl is empty
+                      print('Image URL is empty');
+                    }
                   },
-                  icon: Icon(Icons.edit, color: Colors.green[800],),
+                  icon: Icon(Icons.edit, color: Colors.green[800]),
                 ),
+
               ),
               ExpansionTile(
                 leading: const Icon(Icons.info),
@@ -569,7 +609,10 @@ class _PersonalState extends State<Personal> {
 
 
 class BusinessTabPage extends StatefulWidget {
-  const BusinessTabPage({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  BusinessTabPage({Key? key, required this.userType, required this. userID,}) : super(key: key);
+
 
   @override
   State<BusinessTabPage> createState() => _BusinessTabPageState();
@@ -581,7 +624,7 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         body: Column(
           children: [
@@ -601,7 +644,7 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
               //TABBAR STARTS
               child: TabBar(
                 indicator: const BoxDecoration(
-                  color: Colors.green,
+                 // color: Colors.green,
                 ),
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
@@ -609,7 +652,7 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
                   const Tab(text: ('BusinessInfo')),
                   InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ImageAndVideo()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  ImageAndVideo(userID: widget.userID,)));
                       },
                       child: const Tab(text: ('Gallery'))),
                 ],
@@ -617,10 +660,15 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
             ),
 
             //TABBAR VIEW STARTS
-            const Expanded(
+             Expanded(
               child: TabBarView(children: [
-                BusinessInfo(),
-                // ImageAndVideo(),
+                BusinessInfo(
+                  userType:widget.userType,
+                  userID:widget.userID,
+                ),
+                 ImageAndVideo(
+                   userID:widget.userID,
+                 ),
 
               ]),
             )
@@ -632,12 +680,13 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
 }
 
 class BusinessInfo extends StatefulWidget {
-  const BusinessInfo({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  const BusinessInfo({Key? key, required this.userType, this.userID}) : super(key: key);
 
   @override
   State<BusinessInfo> createState() => _BusinessInfoState();
 }
-
 class _BusinessInfoState extends State<BusinessInfo> {
 
 
@@ -652,12 +701,64 @@ class _BusinessInfoState extends State<BusinessInfo> {
   String? website ="";
   String? ybe="";
   String documentid="";
+  List dynamicdata=[];
+  String? userID = "";
+  String imageUrl = "";
+  String imageParameter = "";
 
-    @override
-    void initState() {
-      // TODO: implement initState
-      super.initState();
+
+
+
+  Future<void> fetchData(String userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            dynamicdata = responseData.cast<Map<String, dynamic>>();
+            if (dynamicdata.isNotEmpty) {
+              setState(() {
+                businesstype = dynamicdata[0]["business_type"];
+                companyname = dynamicdata[0]["company_name"];
+                businesskeywords = dynamicdata[0]["business_keywords"];
+                address = dynamicdata[0]["company_address"];
+                mobile = dynamicdata[0]["mobile"];
+                email = dynamicdata[0]["email"];
+                website = dynamicdata[0]["website"];
+                ybe = dynamicdata[0]["b_year"];
+                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["business_image"]}';
+                imageParameter = dynamicdata[0]["business_image"];
+
+
+
+
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
     }
+  }
+
+
+  @override
+    void initState() {
+      super.initState();
+      fetchData(widget.userID.toString());
+
+  }
     @override
     Widget build(BuildContext context) {
     return Scaffold(
@@ -665,12 +766,27 @@ class _BusinessInfoState extends State<BusinessInfo> {
         child: Center(
           child: Column(
             children: [
-              SizedBox(
-                  width: double.infinity,
-                  height: 300,
-                  child: Image.network(businessimage!, fit: BoxFit.cover,)
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 300,
+              //   child: Image.asset('assets/logo.png', fit: BoxFit.cover),
+              // ),
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 300,
+              //   child: Image.network(imageUrl, fit: BoxFit.fill,),
+              // ),
+
+              Container(
+                width: double.infinity,
+                height: 300,
+                child: imageUrl.isEmpty
+                    ? Image.asset('assets/logo.png', fit: BoxFit.cover)
+                    : Image.network(imageUrl, fit: BoxFit.fill,),
               ),
-              //Image.asset('assets/profile.jpg'),
+
+
+
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
@@ -685,7 +801,9 @@ class _BusinessInfoState extends State<BusinessInfo> {
                       currentybe: ybe,
                       // documentid: documentid,
                       currentbusinesskeywords: businesskeywords,
-                      currentbusinesstype: businesstype, id: '',/* currentdimage: businessimage ,*/
+                      currentbusinesstype: businesstype, id: widget.userID,
+                      imageUrl: imageParameter,
+
                     )));
                   },
                   icon: const Icon(Icons.edit),
@@ -848,13 +966,18 @@ class _BusinessInfoState extends State<BusinessInfo> {
     );
   }
 }
+
+
+
+
+
 class ImageAndVideo extends StatefulWidget {
-  const ImageAndVideo({Key? key}) : super(key: key);
+  final String? userID;
+  const ImageAndVideo({Key? key, required this.userID}) : super(key: key);
 
   @override
   State<ImageAndVideo> createState() => _ImageAndVideoState();
 }
-
 class _ImageAndVideoState extends State<ImageAndVideo> {
   @override
   Widget build(BuildContext context) {
@@ -862,7 +985,7 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Gallery"),
+          title: const Text("Gallery",style: TextStyle(color: Colors.white),),
           centerTitle: true,
         ),
         body: Column(
@@ -895,9 +1018,9 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
             ),
 
             //TABBAR VIEW STARTS
-            const Expanded(
+             Expanded(
               child: TabBarView(children: [
-                ImageView(),
+                ImageView(userId: widget.userID,),
                 VideoView(),
               ]),
             )
@@ -909,64 +1032,86 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
 }
 
 
-
 class ImageView extends StatefulWidget {
-  const ImageView({Key? key}) : super(key: key);
+  final String? userId;
+
+  const ImageView({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ImageView> createState() => _ImageViewState();
 }
-
 class _ImageViewState extends State<ImageView> {
+  List<Uint8List> _imageBytesList = [];
+  List<Map<String, dynamic>> _imageDataList = [];
 
-  DateTime date = DateTime.now();
+  Future<void> _fetchImages() async {
+    final url =
+        'http://localhost/GIB/lib/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> imageData = jsonDecode(response.body);
+
+      _imageBytesList.clear();
+      _imageDataList.clear();
+
+      for (var data in imageData) {
+        final imageUrl =
+            'http://localhost/GIB/lib/GIBAPI/${data['image_path']}';
+        final imageResponse = await http.get(Uri.parse(imageUrl));
+        if (imageResponse.statusCode == 200) {
+          Uint8List imageBytes = imageResponse.bodyBytes;
+          setState(() {
+            _imageBytesList.add(imageBytes);
+            _imageDataList.add(data);
+          });
+        }
+      }
+    } else {
+      print('Failed to fetch images.');
+    }
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _fetchImages();
+  }
 
 
-  String? image = "";
-  String? docId = "";
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 5.0,
-            mainAxisSpacing: 5.0,
-          ),
-          itemBuilder: (context, index) {
-            return Column(
-              children: [
-                const SizedBox(height: 30,),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                        builder: (context) =>
-                            ViewGalleryImage("")));
-                  },
-                  child: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: Image.network(
-                        '', fit: BoxFit.cover,)),
-
-                ),
-                // Text(urlDownload),
-              ],
-            );
-          }
+      body:  GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+        ),
+        itemCount: _imageBytesList.length,
+        itemBuilder: (BuildContext context, i) {
+          return Image.memory(
+            _imageBytesList[i],
+            fit: BoxFit.cover,
+          );
+        },
       ),
 
     );
   }
 }
+
+
 class VideoView extends StatefulWidget {
   const VideoView({Key? key}) : super(key: key);
 
   @override
   State<VideoView> createState() => _VideoViewState();
 }
-
 class _VideoViewState extends State<VideoView> {
 
 
@@ -976,49 +1121,17 @@ class _VideoViewState extends State<VideoView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 5.0,
-            mainAxisSpacing: 5.0,
-          ),
-          itemBuilder: (context, index) {
-
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  InkWell(
-                    onTap: () {
-                    },
-                    child: SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: Image.network("Image"),
-                    ),
-                  )
-                ],
-              ),
-            );
-          }
-      ),
     );
   }
 }
 
 
-
-
-
-
-
-class Reward extends StatefulWidget {
+/*class Reward extends StatefulWidget {
   const Reward({Key? key}) : super(key: key);
 
   @override
   State<Reward> createState() => _RewardState();
 }
-
 class _RewardState extends State<Reward> {
 
   String? image = "";
@@ -1103,7 +1216,7 @@ class _RewardState extends State<Reward> {
       ),
     );
   }
-}
+}*/   /// Reward
 
 
 

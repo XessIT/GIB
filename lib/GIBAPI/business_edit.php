@@ -65,6 +65,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $data = json_decode(file_get_contents("php://input"));
+
+       if (isset($data->business_image))
+       {
+        $business_image = mysqli_real_escape_string($conn, $data->business_image);
+
         $company_name = mysqli_real_escape_string($conn, $data->company_name);
         $mobile = mysqli_real_escape_string($conn, $data->mobile);
         $id = mysqli_real_escape_string($conn, $data->id);
@@ -76,6 +81,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $business_type = mysqli_real_escape_string($conn, $data->business_type);
 
         $updateOfferQuery = "UPDATE `registration` SET
+        `business_image`='$business_image',
+
         `company_name`='$company_name',
         `mobile`='$mobile',
         `email`='$email',
@@ -87,14 +94,52 @@ else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
          WHERE `id`='$id'";
         $updateOfferResult = mysqli_query($conn, $updateOfferQuery);
 
+        // Modify your PHP code to respond with JSON
         if ($updateOfferResult) {
-            echo "Profile updated successfully";
+            echo json_encode(array("message" => "Profile updated successfully"));
         } else {
-            echo "Error: " . mysqli_error($conn);
+            echo json_encode(array("error" => "Error updating profile"));
+        }}
+
+        else{
+         $imagename = mysqli_real_escape_string($conn, $data->imagename);
+         $imagedata = mysqli_real_escape_string($conn, $data->imagedata);
+
+        $company_name = mysqli_real_escape_string($conn, $data->company_name);
+        $mobile = mysqli_real_escape_string($conn, $data->mobile);
+        $id = mysqli_real_escape_string($conn, $data->id);
+        $email = mysqli_real_escape_string($conn, $data->email);
+        $company_address = mysqli_real_escape_string($conn, $data->company_address);
+        $website = mysqli_real_escape_string($conn, $data->website);
+        $b_year = mysqli_real_escape_string($conn, $data->b_year);
+        $business_keywords = mysqli_real_escape_string($conn, $data->business_keywords);
+        $business_type = mysqli_real_escape_string($conn, $data->business_type);
+        $path = "upload/$imagename";
+
+        $updateOfferQuery = "UPDATE `registration` SET
+        `business_image` = '$path',
+
+        `company_name`='$company_name',
+        `mobile`='$mobile',
+        `email`='$email',
+        `company_address`='$company_address',
+        `website`='$website',
+        `b_year`='$b_year',
+        `business_keywords`='$business_keywords',
+        `business_type`='$business_type'
+         WHERE `id`='$id'";
+        file_put_contents($path, base64_decode($imagedata));
+
+        $updateOfferResult = mysqli_query($conn, $updateOfferQuery);
+
+        // Modify your PHP code to respond with JSON
+        if ($updateOfferResult) {
+            echo json_encode(array("message" => "Profile updated successfully"));
+        } else {
+            echo json_encode(array("error" => "Error updating profile"));
         }
-
+        }
 }
-
 else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $ID = isset($_GET['ID']) ? $_GET['ID'] : null;
 
