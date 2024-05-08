@@ -403,7 +403,7 @@ class _GalleryState extends State<Gallery> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Delete Image'),
+            title: Text('Delete Video'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -441,20 +441,42 @@ class _GalleryState extends State<Gallery> {
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.green,
-          onPressed: () {
-            showModalBottomSheet(context: context, builder: (ctx) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-
-                  ListTile(
-                    leading: const Icon(Icons.storage),
-                    title: const Text("From Gallery"),
-                    onTap: _pickAndUploadVideo,
-                  )
-                ],
+          onPressed: () async {
+            // Check if there is already a video stored
+            if (_videos.isEmpty) {
+              // Allow picking and uploading a video
+              showModalBottomSheet(context: context, builder: (ctx) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.storage),
+                      title: const Text("From Gallery"),
+                      onTap: _pickAndUploadVideo,
+                    )
+                  ],
+                );
+              });
+            } else {
+              // Show error message if a video is already stored
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Video Already Stored'),
+                    content: Text('You already have a video stored.'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
               );
-            });
+            }
           },
           child: const Icon(Icons.add),
         ),

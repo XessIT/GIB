@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:gipapp/personal_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
+import 'package:video_player/video_player.dart';
 import 'business_edit.dart';
 import 'Non_exe_pages/non_exe_home.dart';
 import 'package:http/http.dart'as http;
@@ -1022,7 +1023,7 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
              Expanded(
               child: TabBarView(children: [
                 ImageView(userId: widget.userID,),
-                VideoView(),
+                VideoView(userID: widget.userID),
               ]),
             )
           ],
@@ -1079,6 +1080,7 @@ class _ImageViewState extends State<ImageView> {
   initState() {
     super.initState();
     _fetchImages();
+    print('_fetchimage:$_fetchImages');
   }
 
 
@@ -1109,12 +1111,37 @@ class _ImageViewState extends State<ImageView> {
 
 
 class VideoView extends StatefulWidget {
-  const VideoView({super.key});
+  final String? userID;
+  const VideoView({super.key,
+    required this.userID
+  });
 
   @override
   State<VideoView> createState() => _VideoViewState();
 }
 class _VideoViewState extends State<VideoView> {
+  List<dynamic> _videos = [];
+  @override
+  void initState() {
+    super.initState();
+    _fetchVideos();
+  }
+
+  Future<void> _fetchVideos() async {
+    final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userID}';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      setState(() {
+        _videos = jsonDecode(response.body);
+      });
+    } else {
+      // Handle error
+      print('Failed to fetch videos');
+    }
+  }
+
+
 
 
 
@@ -1123,9 +1150,109 @@ class _VideoViewState extends State<VideoView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: ListView.builder(
+        itemCount: _videos.length,
+        itemBuilder: (context, index) {
+          final videoId = _videos[index]['id'];
+          final videoPath = _videos[index]['video_path'];
+          return Stack(
+            children: [
+              Column(
+                children: [
+                  VideoPlayerWidget(videoUrl: videoPath),
+                ],
+              ),
+
+            ],
+          );
+        },
+      ),
     );
   }
 }
+
+class VideoPlayerScreen extends StatelessWidget {
+  final String videoPath;
+
+  const VideoPlayerScreen({Key? key, required this.videoPath}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Video Player'),
+      ),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: 16 / 9, // Adjust aspect ratio as per your video dimensions
+          child: VideoPlayerWidget(videoUrl: videoPath),
+        ),
+      ),
+    );
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeVideoPlayer();
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    try {
+      _controller = VideoPlayerController.network(widget.videoUrl);
+
+      await _controller.initialize();
+
+      if (mounted) {
+        setState(() {
+          _isPlaying = true;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        _errorMessage = 'Error initializing video player: $error';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_errorMessage != null) {
+      return Text(_errorMessage!);
+    }
+
+    if (!_isPlaying) {
+      return CircularProgressIndicator();
+    }
+
+    return AspectRatio(
+      aspectRatio: _controller.value.aspectRatio,
+      child: VideoPlayer(_controller),
+    );
+  }
+}
+
 
 
 /*class Reward extends StatefulWidget {
