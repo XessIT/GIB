@@ -53,8 +53,7 @@ dependencies:
   http_parser: ^4.0.2
   chewie: ^1.2.2
   video_player: ^2.2.14
-
-
+  awesome_dialog: ^3.2.1
 
 
 dev_dependencies:

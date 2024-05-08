@@ -163,46 +163,47 @@ class _PendingViewState extends State<PendingView> {
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
               if (mobile.isNotEmpty) {
-                return Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 5,),
-                      Container(
-                        width: 350,
-                        height: 80,
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                                color: Colors.orange, width: 1),
-                          ),
-                        ),
-                        child: ListTile(
-                          leading:
-                          SizedBox(
-                            height: 80,
-                            child: CircleAvatar(
-                            ),
-                          ),
-                          title: Text('${AdminRightsdata[i]['first_name']} ${AdminRightsdata[i]['last_name']}'),
-                          subtitle: Text(
-                              '${AdminRightsdata[i]['company_name']}'),
-                          trailing: IconButton(
-                              onPressed: () async {
-                                final call = Uri.parse(
-                                    "tel://${AdminRightsdata[i]['mobile']}");
-                                if (await canLaunchUrl(call)) {
-                                  launchUrl(call);
-                                } else {
-                                  throw 'Could not launch $call';
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.call, color: Colors.green,)),
+                return  Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const CircleAvatar(
+                                    backgroundImage: AssetImage("assets/pro1.jpg"),
+                                    radius: 35,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text('${AdminRightsdata[i]['first_name']}'),
+                                        Text('${AdminRightsdata[i]['company_name']}'),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () async {
+                                        final call = Uri.parse(
+                                            "tel://${AdminRightsdata[i]['mobile']}");
+                                        if (await canLaunchUrl(call)) {
+                                          launchUrl(call);
+                                        } else {
+                                          throw 'Could not launch $call';
+                                        }
+                                      },
+                                      icon: Icon(
+                                        Icons.call, color: Colors.green[900],)),
+                                ],
+                              ),
+                            ]
                         ),
                       ),
-
-                    ],
+                    ),
                   ),
                 );
               }

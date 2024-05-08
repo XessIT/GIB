@@ -1,22 +1,23 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:gipapp/personal_edit.dart';
 import 'package:gipapp/view_gallery_image.dart';
 import 'business_edit.dart';
 import 'Non_exe_pages/non_exe_home.dart';
 import 'package:http/http.dart'as http;
-import 'personal_edit.dart';
+import 'edit_profile.dart';
 import 'guest_home.dart';
 import 'home.dart';
 
 class Profile extends StatelessWidget {
   final String userType;
   final String? userID;
-   Profile({
-    Key? key,
+   const Profile({
+    super.key,
     required this.userType,
     required this. userID,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +36,9 @@ class View extends StatefulWidget {
 
  final String? userID;
 
-
       const View({
     super.key,
-
     required this.userType,
-
     required this. userID,
   });
 
@@ -59,37 +57,40 @@ class _ViewState extends State<View> {
           centerTitle: true,
 
     leading: IconButton(onPressed: (){
-      if(widget.userType =="Non-Executive")
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>NonExecutiveHome(
+      if(widget.userType =="Non-Executive") {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NonExecutiveHome(
     userType:widget.userType.toString(),
     userID: widget.userID.toString(),
 
     )));
+      }
      if(widget.userType =="Executive") {
     Navigator.push(context, MaterialPageRoute(builder: (context)=>Home(
       userType:widget.userType.toString(),
       userId: widget.userID.toString(),
     )));
      }
-    if(widget.userType =="Guest")
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHomePage(
+    if(widget.userType =="Guest") {
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHomePage(
       userType:widget.userType.toString(),
 
       userId: widget.userID.toString(),
     )));
+    }
 
-    },icon: Icon(Icons.arrow_back),
+    },icon: const Icon(Icons.arrow_back),
     ),),
         body: Column(
           children:  [
-            TabBar(
+            const TabBar(
                 isScrollable: true,
                 labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
                 tabs: [
                   Tab(text: 'Personal',),
                   Tab(text: 'Business',),
-                //  Tab(text: 'Reward',)
+
+                 // Tab(text: 'Reward',)
                 ]),
             Expanded(
               child: TabBarView(
@@ -103,6 +104,7 @@ class _ViewState extends State<View> {
                     userType:widget.userType,
                     userID:widget.userID,
                   ),
+
                  // Reward(),
                 ],
               ),
@@ -115,12 +117,14 @@ class _ViewState extends State<View> {
 }
 
 class Personal extends StatefulWidget {
-
-
  final String userType;
   final String? userID;
 
-  Personal({Key? key, required this.userType, required this. userID,}) : super(key: key);
+   const Personal({
+    super.key,
+    required this.userType,
+     required this. userID,
+  });
 
 
   @override
@@ -162,7 +166,6 @@ class _PersonalState extends State<Personal> {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
-      print("profile url: $url");
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
         print("response B: ${response.body}");
@@ -236,8 +239,7 @@ class _PersonalState extends State<Personal> {
                 height: 300,
                 child: Image.network(imageUrl, fit: BoxFit.fill,),
               ),
-
-              Align(
+             Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
@@ -290,8 +292,8 @@ class _PersonalState extends State<Personal> {
                   Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Name'),
                       ),
                       Padding(
@@ -308,8 +310,8 @@ class _PersonalState extends State<Personal> {
                     Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('District'),
                       ),
                       Padding(
@@ -326,8 +328,8 @@ class _PersonalState extends State<Personal> {
                     Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Chapter'),
                       ),
                       Padding(
@@ -342,7 +344,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Native'),
                       ),
                       Padding(
@@ -360,7 +362,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('DOB'),
                       ),
                       Padding(
@@ -375,7 +377,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Koottam'),
                       ),
                       Padding(
@@ -392,7 +394,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Kovil'),
                       ),
                       Padding(
@@ -406,7 +408,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Member'),
                       ),
                       Padding(
@@ -420,7 +422,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Blood Group'),
                       ),
                       Padding(
@@ -441,7 +443,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Spouse Name'),
                       ),
                       Padding(
@@ -456,7 +458,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('WAD'),
                       ),
                       Padding(
@@ -470,7 +472,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Spouse Blood Group'),
                       ),
                       Padding(
@@ -484,7 +486,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Spouse Native'),
                       ),
                       Padding(
@@ -499,7 +501,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Spouse Father Koottam'),
                       ),
                       Padding(
@@ -514,7 +516,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Spouse Father Kovil'),
                       ),
                       Padding(
@@ -534,7 +536,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Mobile Number'),
                       ),
                       Padding(
@@ -548,7 +550,7 @@ class _PersonalState extends State<Personal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Email'),
                       ),
                       Padding(
@@ -569,7 +571,7 @@ class _PersonalState extends State<Personal> {
 
                     children: [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Education'),
                       ),
                       Padding(
@@ -588,7 +590,7 @@ class _PersonalState extends State<Personal> {
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:  [
                       const Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Past Experience'),
                       ),
                       Padding(
@@ -612,7 +614,6 @@ class BusinessTabPage extends StatefulWidget {
   final String userType;
   final String? userID;
   BusinessTabPage({Key? key, required this.userType, required this. userID,}) : super(key: key);
-
 
   @override
   State<BusinessTabPage> createState() => _BusinessTabPageState();
@@ -1037,6 +1038,7 @@ class ImageView extends StatefulWidget {
 
   const ImageView({Key? key, required this.userId}) : super(key: key);
 
+
   @override
   State<ImageView> createState() => _ImageViewState();
 }
@@ -1107,7 +1109,7 @@ class _ImageViewState extends State<ImageView> {
 
 
 class VideoView extends StatefulWidget {
-  const VideoView({Key? key}) : super(key: key);
+  const VideoView({super.key});
 
   @override
   State<VideoView> createState() => _VideoViewState();
@@ -1128,6 +1130,15 @@ class _VideoViewState extends State<VideoView> {
 
 /*class Reward extends StatefulWidget {
   const Reward({Key? key}) : super(key: key);
+=======
+
+
+
+
+
+class Reward extends StatefulWidget {
+  const Reward({super.key});
+>>>>>>> 4f5114d4d814e06af93be023c7959ff6ebdf055b
 
   @override
   State<Reward> createState() => _RewardState();
@@ -1145,7 +1156,7 @@ class _RewardState extends State<Reward> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return const DefaultTabController(
       length: 3,
       child: Scaffold(
         body: SingleChildScrollView(
@@ -1153,9 +1164,9 @@ class _RewardState extends State<Reward> {
             child: Column(
               children: [
 
-                const SizedBox(height: 20,),
+                SizedBox(height: 20,),
                 Row(
-                  children: const [
+                  children: [
                     Padding(
                       padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                       child: Icon(Icons.person_add,size: 30,),
@@ -1170,11 +1181,11 @@ class _RewardState extends State<Reward> {
                     ),
                   ],
                 ),
-                const Divider(color: Colors.grey,),
+                Divider(color: Colors.grey,),
 
-                const SizedBox(height: 10,),
+                SizedBox(height: 10,),
                 Row(
-                  children: const [
+                  children: [
                     Padding(
                       padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                       child: Icon(Icons.card_giftcard_sharp,size: 30,),
@@ -1189,11 +1200,11 @@ class _RewardState extends State<Reward> {
                     ),
                   ],
                 ),
-                const Divider(color: Colors.grey,),
+                Divider(color: Colors.grey,),
 
-                const SizedBox(height: 10,),
+                SizedBox(height: 10,),
                 Row(
-                  children: const [
+                  children: [
                     Padding(
                       padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                       child: Icon(Icons.emoji_events,size: 30,),
@@ -1208,7 +1219,7 @@ class _RewardState extends State<Reward> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30,),
+                SizedBox(height: 30,),
               ],
             ),
           ),

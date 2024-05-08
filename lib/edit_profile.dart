@@ -10,11 +10,11 @@ import 'package:http/http.dart'as http;
 
 import 'login.dart';
 
-class PersonalEdit extends StatefulWidget {
+class PersonalEditold extends StatefulWidget {
 
   final String? currentID;
 
-  const PersonalEdit({Key? key,
+  const PersonalEditold({Key? key,
     required this.currentID,
 
   }) : super(key: key);
@@ -22,10 +22,10 @@ class PersonalEdit extends StatefulWidget {
 
 
   @override
-  State<PersonalEdit> createState() => _PersonalEditState();
+  State<PersonalEditold> createState() => _PersonalEditoldState();
 }
 
-class _PersonalEditState extends State<PersonalEdit> {
+class _PersonalEditoldState extends State<PersonalEditold> {
 
   static final RegExp nameRegExp = RegExp('[a-zA-Z]');
 

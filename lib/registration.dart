@@ -82,8 +82,6 @@ class _GuestState extends State<Guest> {
   TextEditingController districtController = TextEditingController();
   TextEditingController chapterController = TextEditingController();
 
-
-
   ///timer code for otp
   bool otpVisible = false;
   bool isButtonDisabled = false;
@@ -221,9 +219,8 @@ class _GuestState extends State<Guest> {
   }
 
   String blockStatus ="Block";
-  String adminRights ="Pending";
-  Future<void> uploadImage() async {
-
+  String adminRights ="Waiting";
+  Future<void> uploadImage(Uint8List imageBytes) async {
       if(membertype=="Member Type") {
         setState(() {
           membertype = "Guest";
@@ -235,50 +232,50 @@ class _GuestState extends State<Guest> {
       }
     try {
       String uri = "http://localhost/GIB/lib/GIBAPI/registration.php";
+      print("registration URL: $uri");
      // String uri = "http://localhost/GIB/lib/GIBAPI/save_image.php";
       print("ImageName: $imagename");
-      var res = await http.post(Uri.parse(uri), body: jsonEncode( {
-        // "caption":caption.text,
-        "imagedata": imagedata,
-        "imagename": imagename,
+      var res = await http.post(Uri.parse(uri),
+          body: jsonEncode({
+        "image": base64Encode(imageBytes),
         "mobile": mobilecontroller.text.trim(),
-        "password":confirmpasswordcontroller.text.trim(),
-        "member_type":membertype.toString(),
-        "first_name":firstnamecontroller.text.trim(),
-        "last_name":lastnamecontroller.text.trim(),
-        "company_name":companynamecontroller.text.trim(),
-        "email":emailcontroller.text.trim(),
-        "blood_group":blood.toString(),
-        "place":locationcontroller.text.trim(),
-        "pin":passwordcontroller.text.trim(),
-        "referrer_mobile":referrermobilecontroller.text.trim(),
-        "OTP":databaseOTP.toString(),
-        "block_status":blockStatus.toString(),
-        "admin_rights":adminRights.toString(),
-        "type":type.toString(),
-        "district":districtController.text,
-        "chapter":chapterController.text,
-        "dob":_dobdate.text.trim(),
-        "koottam":koottam.toString(),
-        "marital_status":status.toString(),
-        "business_type":businesstype.toString(),
-        "company_address":companynamecontroller.text.trim(),
-        "business_keywords":businesskeywordscontroller.text.trim(),
-        "education":educationcontroller.text.trim(),
-        "native":spousenativecontroller.text.trim(),
-        "kovil":kovilcontroller.text.trim(),
-        "s_name":spousenamecontroller.text.trim(),
-        "WAD":_waddate.text.trim(),
-        "s_blood":spouseblood.toString(),
-        "s_father_koottam":spousekoottam.toString(),
-        "s_father_kovil":spousekovilcontroller.text.trim(),
-        "past_experience":pastexpcontroller.text.trim(),
-        "website":websitecontroller.text.trim(),
-        "b_year":yearcontroller.text.trim(),
-        "referrer_id":referreridcotroller.text.trim(),
+        "password": confirmpasswordcontroller.text.trim(),
+        "member_type": membertype.toString(),
+        "first_name": firstnamecontroller.text.trim(),
+        "last_name": lastnamecontroller.text.trim(),
+        "company_name": companynamecontroller.text.trim(),
+        "email": emailcontroller.text.trim(),
+        "blood_group": blood.toString(),
+        "place": locationcontroller.text.trim(),
+        "pin": passwordcontroller.text.trim(),
+        "referrer_mobile": referrermobilecontroller.text.trim(),
+        "OTP": databaseOTP.toString(),
+        "block_status": blockStatus.toString(),
+        "admin_rights": adminRights.toString(),
+        "type": type.toString(),
+        "district": districtController.text,
+        "chapter": chapterController.text,
+        "dob": _dobdate.text.trim(),
+        "koottam": koottam.toString(),
+        "marital_status": status.toString(),
+        "business_type": businesstype.toString(),
+        "company_address": companynamecontroller.text.trim(),
+        "business_keywords": businesskeywordscontroller.text.trim(),
+        "education": educationcontroller.text.trim(),
+        "native": spousenativecontroller.text.trim(),
+        "kovil": kovilcontroller.text.trim(),
+        "s_name": spousenamecontroller.text.trim(),
+        "WAD": _waddate.text.trim(),
+        "s_blood": spouseblood.toString(),
+        "s_father_koottam": spousekoottam.toString(),
+        "s_father_kovil": spousekovilcontroller.text.trim(),
+        "past_experience": pastexpcontroller.text.trim(),
+        "website": websitecontroller.text.trim(),
+        "b_year": yearcontroller.text.trim(),
+        "referrer_id": referreridcotroller.text.trim(),
       }));
 
-      if (res.statusCode == 200) {
+      /*if (res.statusCode == 200) {
         print(uri);
         print("Response Status: ${res.statusCode}");
         print("Response Body: ${res.body}");
@@ -295,7 +292,27 @@ class _GuestState extends State<Guest> {
         }
       } else {
         print("Failed to upload image. Server returned status code: ${res.statusCode}");
+      }*/
+      if (res.statusCode == 200) {
+        print(uri);
+        print("Response Status: ${res.statusCode}");
+        print("Response Body: ${res.body}");
+
+        // Check if response body is empty
+        if (res.body.isNotEmpty) {
+          var response = jsonDecode(res.body);
+          if (response["success"] == "true") {
+            // Handle success
+          } else {
+            // Handle failure
+          }
+        } else {
+          // Handle empty response body
+        }
+      } else {
+        print("Failed to upload image. Server returned status code: ${res.statusCode}");
       }
+
     } catch (e) {
       print("Error uploading image: $e");
     }
@@ -311,19 +328,21 @@ class _GuestState extends State<Guest> {
   String? imagename;
   String? imagedata;
   bool showLocalImage = false;
-  XFile? pickedImage;
+ // XFile? pickedImage;
 
   pickImageFromGallery() async {
-    ImagePicker imagePicker = ImagePicker();
-    pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
     if (pickedImage != null) {
-      List<int> imageBytes = await pickedImage!.readAsBytes();
+      final imageBytes = await pickedImage!.readAsBytes();
       setState(() {
-        imagename = pickedImage!.name;
+        selectedImage = imageBytes;
+        print('Image pick: $selectedImage');
+        /*imagename = pickedImage!.name;
         print('Image Name: $imagename');
         imagedata = base64Encode(imageBytes);
-        print('Image Data: $imagedata');
+        print('Image Data: $imagedata');*/
       });
     }
   }
@@ -457,11 +476,19 @@ class _GuestState extends State<Guest> {
                     const SizedBox(width: 20,),
 
                     InkWell(
-                      child:  CircleAvatar(
-                        radius: 60,
-                        /*backgroundImage: selectedImage != null
-                            ? Image.memory(selectedImage!).image
-                            : const AssetImage('assets/img.png'),*/
+                      child:  Container(
+                        height: 150,
+                        width: 150,
+                        child: FittedBox(
+                          fit: BoxFit.fill,
+                          child: ClipOval(
+                            child: selectedImage != null
+                                ? Image.memory(
+                              selectedImage!,
+                            )
+                                : Icon(Icons.person),
+                          ),
+                        ),
                       ),
                       onTap: () {
                         showModalBottomSheet(context: context, builder: (ctx) {
@@ -472,7 +499,7 @@ class _GuestState extends State<Guest> {
                                 leading: const Icon(Icons.storage),
                                 title: const Text("From Gallery"),
                                 onTap: () {
-                                 // pickImageFromGallery();
+                                  pickImageFromGallery();
                                 //  getImage();
                                   Navigator.of(context).pop();
                                 },
@@ -2159,14 +2186,12 @@ class _GuestState extends State<Guest> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5.0)),
                             onPressed: () {
-                              //   signUp();
-                              uploadImage();
+                              //signUp();
+                              uploadImage(selectedImage!);
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>const Login()));
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please wait for Admin Approval")));
-
-
                             },
-                            child: const Text('save',
+                            child: const Text('Save',
                               style: TextStyle(color: Colors.white),)),
                         // Sign up button ends
                       ],

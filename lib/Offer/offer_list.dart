@@ -283,7 +283,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
               children:  [
                 const SizedBox(height: 20,),
                 InkWell(
-                  child: ClipOval(
+                 child: ClipOval(
                     child: selectedImage != null
                         ? Image.memory(
                       selectedImage!,
@@ -491,7 +491,6 @@ class _RunningPageState extends State<RunningPage> {
   @override
   void initState() {
     getData();
-    // _fetchImages();
     // TODO: implement initState
     super.initState();
   }
@@ -681,7 +680,7 @@ class _RunningPageState extends State<RunningPage> {
         ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+             String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
               String dateString = data[i]['validity']; // This will print the properly encoded URL
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
               return Center(
@@ -695,12 +694,13 @@ class _RunningPageState extends State<RunningPage> {
                           width:40,
                           height: 40,
                           child: Image.network(
-                            imageUrl, // Assuming data[i]["offer_image"] contains the asset path
-                            width: 40,
-                            height: 40,
-                          ),
+
+                    imageUrl, // Assuming data[i]["offer_image"] contains the asset path
+                    width: 40,
+                    height: 40,
+                  ),
                         ),
-                        /* //CIRCLEAVATAR STARTS
+                       /* //CIRCLEAVATAR STARTS
                          CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.cyan,
@@ -727,10 +727,10 @@ class _RunningPageState extends State<RunningPage> {
                           children: [
                             //START TEXTS
                             Text('${data[i]['company_name']}',
-                              //Text style starts
-                              style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 15),),
+                                      //Text style starts
+                                      style: const TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 15),),
                             const SizedBox(height: 10,),
                             //start texts
                             Text('${data[i]['offer_type']} - ${data[i]['name']}',
