@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:gipapp/about_view.dart';
@@ -1297,19 +1298,63 @@ class _NavDrawerState extends State<NavDrawer> {
             ),
 
             ListTile(
-              leading: IconButton(
-                icon: Icon(Icons.logout),
-                onPressed: () async {
-                  // Clear the authentication status when logging out
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('isLoggedIn', false);
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
+              leading: Icon(
+                Icons.logout,
+                color: Colors.red,
               ),
+              title: Text(
+                'Log Out',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              onTap: () {
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.noHeader,
+                  width: 350,
+                  body: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Container(
+                          padding: EdgeInsets.all(20),
+                          child: Text("Are you sure want to Log out"));
+                    },
+                  ),
+                  btnOk: ElevatedButton(
+                    onPressed: () async {
+                      SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                      await prefs.setBool('isLoggedIn', false);
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
+                      // Handle OK button press
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.green),
+                    ),
+                    child: Text(
+                      'Yes',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  btnCancel: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.red),
+                    ),
+                    child: Text(
+                      'No',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ).show();
+                // Update UI based on item 2
+              },
             ),
           ],
         )

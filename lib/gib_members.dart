@@ -367,6 +367,7 @@ class _MembersState extends State<Members> {
                   child: ListView.builder(
                            itemCount: data.length,
                            itemBuilder: (context, i) {
+                             String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
                               if (data[i]['first_name']
                                    .toString()
                                    .toLowerCase().startsWith(name.toLowerCase()) ||
@@ -379,15 +380,8 @@ class _MembersState extends State<Members> {
                                        child: InkWell(
                                          onTap: () {
                                          },
-                                         child: Container(
-                                           width: 300,
-                                           height: 100,
-                                           padding: const EdgeInsets.all(10.0),
-                                           decoration: BoxDecoration(
-                                               border: Border.all(
-                                                   color: Colors.green, width: 1),
-                                               borderRadius: BorderRadius.circular(10.0)
-                                           ),
+                                         child: Card(
+
                                           /* width: 350,
                                            height: 80,
                                            padding: const EdgeInsets.all(5.0),
@@ -399,9 +393,10 @@ class _MembersState extends State<Members> {
                                              // borderRadius: BorderRadius.circular(10.0)
                                            ),*/
                                            child: ListTile(
-                                             leading: SizedBox(
-                                               height: 80.0,
-                                               width: 80.0,),
+                                             leading: CircleAvatar(
+                                               radius: 40, // adjust the radius as per your requirement
+                                               backgroundImage: NetworkImage(imageUrl),
+                                             ),
                                              title: Text('${data[i]['first_name']}'),
                                              subtitle: Text(
                                                  '${data[i]['company_name']}'),
@@ -415,8 +410,8 @@ class _MembersState extends State<Members> {
                                                      throw 'Could not launch $call';
                                                    }
                                                  },
-                                                 icon: const Icon(
-                                                   Icons.call, color: Colors.green,)),
+                                                 icon: Icon(
+                                                   Icons.call, color: Colors.green[800],)),
                                            ),
                                          ),
                                        ),
@@ -432,8 +427,6 @@ class _MembersState extends State<Members> {
                   child: ListView.builder(
                       itemCount: districtAndChapterData.length,
                       itemBuilder: (context, i) {
-            
-            
                         if (districtAndChapterData[i]['first_name']
                             .toString()
                             .toLowerCase().startsWith(name.toLowerCase()) ||

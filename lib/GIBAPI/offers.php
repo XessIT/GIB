@@ -14,7 +14,7 @@
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    $table = isset($_GET['table']) ? $_GET['table'] : "";
-    if ($table == "offers") {
+    if ($table == "UnblockOffers") {
             $offerlist = "SELECT * FROM offers where block_status='Unblock'";
             $offerResult = mysqli_query($conn, $offerlist);
             if ($offerResult && mysqli_num_rows($offerResult) > 0) {
@@ -30,7 +30,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             } else {
                 echo json_encode(array("message" => "No offers found"));
             }
-    } elseif ($table == "registration") {
+    }
+    elseif ($table == "BlockOffers") {
+                $offerlist = "SELECT * FROM offers where block_status='Block'";
+                $offerResult = mysqli_query($conn, $offerlist);
+                if ($offerResult && mysqli_num_rows($offerResult) > 0) {
+                    $offers = array();
+                    while ($row = mysqli_fetch_assoc($offerResult)) {
+                        $offers[] = $row;
+                      /*    while ($row = mysqli_fetch_assoc($offerResult)) {
+                                        $row['offer_image'] = base64_encode(file_get_contents($row['offer_image'])); // Encode image data to base64
+                                        $offers[] = $row;
+                                    } */
+                    }
+                    echo json_encode($offers);
+                } else {
+                    echo json_encode(array("message" => "No offers found"));
+                }
+        }
+    elseif ($table == "registration") {
     $id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : "";
                  // Fetch data from the registration table
                         $registrationlist = "SELECT * FROM registration where id='$id'";
@@ -54,7 +72,6 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle the insert/update/delete actions
    $data = json_decode(file_get_contents("php://input"));
    $imagename = mysqli_real_escape_string($conn, $data->imagename);
-    echo "Imagename: $imagename";
    $imagedata = mysqli_real_escape_string($conn, $data->imagedata);
    $name = mysqli_real_escape_string($conn, $data->name);
    $discount = mysqli_real_escape_string($conn, $data->discount);
@@ -97,17 +114,42 @@ else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         } else {
             echo "Error: " . mysqli_error($conn);
         }
-    } else {
+    }
+    elseif(isset($data->offer_image)) {
+                 $offer_image = mysqli_real_escape_string($conn, $data->offer_image);
+                 $name = mysqli_real_escape_string($conn, $data->name);
+                 $discount = mysqli_real_escape_string($conn, $data->discount);
+                 $ID = mysqli_real_escape_string($conn, $data->ID);
+                 $offer_type = mysqli_real_escape_string($conn, $data->offer_type);
+                 $validity = mysqli_real_escape_string($conn, $data->validity);
+
+                $updateOfferQuery = "UPDATE `offers` SET
+                `offer_type`='$offer_type',
+                `name`='$name',
+                `discount`='$discount',
+                `validity`='$validity',
+                `offer_image`='$offer_image' WHERE `ID`='$ID'";
+                $updateBlockStatusResult = mysqli_query($conn, $updateOfferQuery);
+
+                if ($updateBlockStatusResult) {
+                    echo "Offer blocked/unblocked successfully";
+                } else {
+                    echo "Error: " . mysqli_error($conn);
+                }
+            }
+    else {
         // Handle the insert/update actions for editing an offer
+        $imagename = mysqli_real_escape_string($conn, $data->imagename);
+        $imagedata = mysqli_real_escape_string($conn, $data->imagedata);
         $name = mysqli_real_escape_string($conn, $data->name);
         $discount = mysqli_real_escape_string($conn, $data->discount);
         $ID = mysqli_real_escape_string($conn, $data->ID);
         $offer_type = mysqli_real_escape_string($conn, $data->offer_type);
         $validity = mysqli_real_escape_string($conn, $data->validity);
-
-        $updateOfferQuery = "UPDATE `offers` SET `offer_type`='$offer_type', `name`='$name', `discount`='$discount', `validity`='$validity' WHERE `ID`='$ID'";
+        $path = "offers/$imagename";
+        $updateOfferQuery = "UPDATE `offers` SET `offer_type`='$offer_type', `name`='$name', `discount`='$discount', `validity`='$validity', `offer_image`='$path' WHERE `ID`='$ID'";
+        file_put_contents($path, base64_decode($imagedata));
         $updateOfferResult = mysqli_query($conn, $updateOfferQuery);
-
         if ($updateOfferResult) {
             echo "Offer updated successfully";
         } else {

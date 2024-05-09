@@ -91,7 +91,7 @@ class AddOfferPage extends StatefulWidget {
 class _AddOfferPageState extends State<AddOfferPage> {
   XFile? pickedImage;
   final _formKey = GlobalKey<FormState>();
-  DateTime date =DateTime.now();
+  DateTime date = DateTime.now();
   final TextEditingController _date = TextEditingController();
   TextEditingController namecontroller = TextEditingController();
   TextEditingController discountcontroller = TextEditingController();
@@ -146,7 +146,6 @@ class _AddOfferPageState extends State<AddOfferPage> {
     ImagePicker imagePicker = ImagePicker();
     XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
-
     if (pickedImage != null) {
       // Verify that pickedImage is indeed an XFile
       print('pickedImage type: ${pickedImage.runtimeType}');
@@ -154,13 +153,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
       // Read the image file as bytes
       try {
         final imageBytes = await pickedImage!.readAsBytes();
-
-        // Verify that imageBytes contains the raw image data
-        print('imageBytes length: ${imageBytes.length}');
-
         // Encode the bytes to base64
         String base64ImageData = base64Encode(imageBytes);
-
         setState(() {
           selectedImage = imageBytes;
           imageName = pickedImage!.name;
@@ -283,13 +277,15 @@ class _AddOfferPageState extends State<AddOfferPage> {
               children:  [
                 const SizedBox(height: 20,),
                 InkWell(
-                 child: ClipOval(
-                    child: selectedImage != null
-                        ? Image.memory(
-                      selectedImage!,
-                    )
-                        : Icon(Icons.person),
-                  ),
+                 child: Container(
+                   child: ClipOval(
+                      child: selectedImage != null
+                          ? Image.memory(
+                        selectedImage!,
+                      )
+                          : Image.asset("assets/add_offer.png"),
+                    ),
+                 ),
                   onTap: () {
                     showModalBottomSheet(context: context, builder: (ctx){
                       return Column(
@@ -401,7 +397,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
                           DateTime? pickDate = await showDatePicker(
                               context: context,
                               initialDate: date,
-                              firstDate: DateTime(1900),
+                              firstDate: date,
                               lastDate: DateTime(2100));
                           print("Picked date: $pickDate");
                           if(pickDate != null) {
@@ -425,7 +421,16 @@ class _AddOfferPageState extends State<AddOfferPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Login button starts
+                    MaterialButton(
+                        minWidth: 130,
+                        height: 50,
+                        color: Colors.orangeAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel',
+                          style: TextStyle(color: Colors.white),)),
                     MaterialButton(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
                         minWidth: 130,
@@ -436,10 +441,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Type")));
                           }
-                          /*else if(pickedImage == null){
+                          else if(selectedImage == null){
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Image")));
-                          }*/
+                          }
                           else if (_formKey.currentState!.validate()) {
                             print("_date.text before sending request: ${_date.text}");
                             offers(_date.text);
@@ -451,23 +456,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
                         },
                         child: const Text('Register',
                           style: TextStyle(color: Colors.white),)),
-                    // Login button ends
-
-                    // Sign up button starts
-                    MaterialButton(
-                        minWidth: 130,
-                        height: 50,
-                        color: Colors.orangeAccent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancel',
-                          style: TextStyle(color: Colors.white),)),
-                    // Sign up button ends
                   ],
-                ),
 
+                ),
+               const SizedBox(height: 20,),
               ],
             ),
           ),
@@ -495,11 +487,10 @@ class _RunningPageState extends State<RunningPage> {
     super.initState();
   }
   List<Map<String, dynamic>> data=[];
-
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -523,7 +514,7 @@ class _RunningPageState extends State<RunningPage> {
           print('Item User ID: ${item['user_id']}');
           print('Validity Date: $validityDate');
           print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter = item['user_id'] == widget.userId && validityDate.isAfter(DateTime.now()) && item['block_status'] == "Unblock";
+          bool satisfiesFilter = item['user_id'] == widget.userId && validityDate.isAfter(DateTime.now());
           print("Item block status: ${item['block_status']}");
           print('Satisfies Filter: $satisfiesFilter');
           return satisfiesFilter;
@@ -568,7 +559,6 @@ class _RunningPageState extends State<RunningPage> {
       if (response.statusCode == 200) {
         // Success handling, e.g., show a success message
         print("Delete Response: ${response.body}");
-        Navigator.pop(context);
         print('ID: $ID');
         print('Offer Deleted successfully');
       }
@@ -604,243 +594,157 @@ class _RunningPageState extends State<RunningPage> {
     }
   }
 
-  /// 6-5-24 FETCH IMAGE
-  /*Future<void> _fetchImage() async {
-    final url = 'http://localhost/GIB/lib/GIBAPI/image_fetch_offers.php?id=${widget.userId}';
-    print('0000000000000000000000000000');
-    print('gowtham: $url');
-    print('0000000000000000000000000000');
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      setState(() {
-        _imageBytes = response.bodyBytes;
-      });
-      print('1111111111111111111111');
-
-      print('gowtham: $_imageBytes');
-      print('111111111111111111111111111');
-
-    } else {
-      print('Failed to fetch image.');
-    }
-  }*/
-  List<Uint8List> _imageBytesList = [];
-  List<Map<String, dynamic>> _imageDataList = [];
-  Future<void> _fetchImages() async {
-    final url = 'http://localhost/GIB/lib/GIBAPI/image_fetch_offers.php?id=${widget.userId}';
-
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      List<dynamic> imageData = jsonDecode(response.body);
-
-      _imageBytesList.clear();
-      _imageDataList.clear();
-
-      for (var data in imageData) {
-        final imageUrl =
-            'http://localhost/GIB/lib/GIBAPI/${data['offer_image']}';
-        final imageResponse = await http.get(Uri.parse(imageUrl));
-        if (imageResponse.statusCode == 200) {
-          Uint8List imageBytes = imageResponse.bodyBytes;
-          setState(() {
-            _imageBytesList.add(imageBytes);
-            _imageDataList.add(data);
-          });
-        }
-      }
-    } else {
-      print('Failed to fetch images.');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: /*ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, i) {
-            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
-            return Center(
-              child: Column(
-                children: [
-                  // Display image
-                  Image.network(
-                    imageUrl, // Assuming data[i]["offer_image"] contains the asset path
-                    width: 40,
-                    height: 40,
-                  ),
-                  // Your other UI elements
-                ],
-              ),
-            );
-          },
-        )
-    );*/
-        ListView.builder(
+        body: ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
               String dateString = data[i]['validity']; // This will print the properly encoded URL
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
               return Center(
-                child: Column(
-                  children: [
-                    //MAIN ROW STARTS
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:  [
-                        Container(
-                          width:40,
-                          height: 40,
-                          child: Image.network(
+                child: Card(
+                  child: Column(
+                    children: [
+                      //MAIN ROW STARTS
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children:  [
+                          //CIRCLEAVATAR STARTS
+                           CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.cyan,
+                             backgroundImage: NetworkImage(imageUrl),
+                                    //IMAGE STARTS CIRCLEAVATAR
+                                  //  Image.network('${data[i]['offer_image']}').image,
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  //STARTS CIRCLE AVATAR OFFER
+                                  child: CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: Colors.green[900],
+                                      child: Text('${data[i]['discount']}%',
+                                          style: Theme.of(context).textTheme.titleLarge)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //END CIRCLEAVATAR
 
-                    imageUrl, // Assuming data[i]["offer_image"] contains the asset path
-                    width: 40,
-                    height: 40,
-                  ),
-                        ),
-                       /* //CIRCLEAVATAR STARTS
-                         CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.cyan,
-                           backgroundImage: Image.network(imageUrl),
-                                  //IMAGE STARTS CIRCLEAVATAR
-                                //  Image.network('${data[i]['offer_image']}').image,
-                          child: Stack(
+                          Column(
                             children: [
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                //STARTS CIRCLE AVATAR OFFER
-                                child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.green[900],
-                                    child: Text('${data[i]['discount']}%',
-                                        style: Theme.of(context).textTheme.titleLarge)),
-                              ),
+                              //START TEXTS
+                              Text('${data[i]['company_name']}',
+                                        //Text style starts
+                                        style: const TextStyle(
+                                            color: Colors.green,
+                                            fontSize: 15),),
+                              const SizedBox(height: 10,),
+                              //start texts
+                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                                //Text style starts
+                                style: const TextStyle(fontSize: 11,
+                                    fontWeight: FontWeight.bold
+                                ),),
+                              //Text starts
+                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
                             ],
                           ),
-                        ),
-                        //END CIRCLEAVATAR*/
+                          //IconButton starts
 
-                        Column(
-                          children: [
-                            //START TEXTS
-                            Text('${data[i]['company_name']}',
-                                      //Text style starts
-                                      style: const TextStyle(
-                                          color: Colors.green,
-                                          fontSize: 15),),
-                            const SizedBox(height: 10,),
-                            //start texts
-                            Text('${data[i]['offer_type']} - ${data[i]['name']}',
-                              //Text style starts
-                              style: const TextStyle(fontSize: 11,
-                                  fontWeight: FontWeight.bold
-                              ),),
-                            //Text starts
-                            Text(DateFormat('dd-MM-yyyy').format(dateTime)),
-                          ],
-                        ),
-                        //IconButton starts
-
-                        //IconButton starts
-                        Row(
-                          children: [
-                            IconButton(onPressed: (){
-                              showDialog(
-                                  context: context,
-                                  builder: (context)=>
-                                      AlertDialog(
-                                        backgroundColor: Colors.white,
-                                        title: const Text(
-                                          "Confirmation!",
-                                          style: TextStyle(color:Colors.black),
-                                        ),
-                                        content: const Text("Do you want to Block this Offer?",
-                                          style: TextStyle(color: Colors.black),),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text("Yes"),
-                                            onPressed: (){
-                                              blocked(int.parse(data[i]["ID"]));
-                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Your Offer Blocked Successfully")));
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId)));
-                                            }, ),
-                                          TextButton(
+                          //IconButton starts
+                          Row(
+                            children: [
+                              IconButton(onPressed: (){
+                                showDialog(
+                                    context: context,
+                                    builder: (context)=>
+                                        AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          title: const Text(
+                                            "Confirmation!",
+                                            style: TextStyle(color:Colors.black),
+                                          ),
+                                          content: const Text("Do you want to Block this Offer?",
+                                            style: TextStyle(color: Colors.black),),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: const Text("Yes"),
                                               onPressed: (){
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text("No"))
-                                        ],
-                                      )
-                              );
-                            },
-                                icon: const Icon(Icons.block_sharp,
-                                  color: Colors.red,)),
-                            IconButton(onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> EditOffer(
-                                Id: data[i]['ID'],
-                                // currentimage: thisitem['Image'],
-                                currenttype: data[i]['offer_type'],
-                                currentproductname: data[i]['name'],
-                                currentDiscount: data[i]['discount'],
-                                currentvalidity: data[i]['validity'],
-                                user_id: data[i]['user_id'],
-                              ))
-                              );
-                            },
-                                icon: Icon(Icons.edit_outlined,
-                                  color: Colors.green[900],)),
-
-                            IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context)=>
-                                          AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text(
-                                              "Confirmation!",
-                                              style: TextStyle(color:Colors.black),
-                                            ),
-                                            content: const Text("Do you want to delete this offer?",
-                                              style: TextStyle(color: Colors.black),),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text("Yes"),
+                                                blocked(int.parse(data[i]["ID"]));
+                                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Your Offer Blocked Successfully")));
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId)));
+                                              }, ),
+                                            TextButton(
                                                 onPressed: (){
-                                                  delete(data[i]['ID']);
-                                                  // _delete(thisitem['id'], thisitem['Image']);
-                                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                      content: Text("You have Successfully Deleted a Offer Item")));
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId)));
+                                                Navigator.pop(context);
                                                 },
-                                              ),
-                                              TextButton(
-                                                  onPressed: (){
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("No"))
-                                            ],
-                                          )
-                                  );
+                                                child: const Text("No"))
+                                          ],
+                                        )
+                                );
+                              },
+                                  icon: const Icon(Icons.block_sharp,
+                                    color: Colors.red,)),
+                              IconButton(onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=> EditOffer(
+                                  Id: data[i]['ID'],
+                                  currentimage: data[i]['offer_image'],
+                                  currenttype: data[i]['offer_type'],
+                                  currentproductname: data[i]['name'],
+                                  currentDiscount: data[i]['discount'],
+                                  currentvalidity: data[i]['validity'],
+                                  user_id: data[i]['user_id'],
+                                ))
+                                );
+                              },
+                                  icon: Icon(Icons.edit_outlined,
+                                    color: Colors.green[900],)),
 
-                                },
-                                icon: Icon(Icons.delete,color: Colors.green[900],))
-                          ],
-                        ),
-                      ],
-                    ),
-                    //Divider starts
-                    const Divider(
-                      color: Colors.grey,
-                      thickness:1,
-                      height: 30,
-                    ),
-                    // Text("Id: $id"),
-                    // Text("Uid: ${thisitem["Uid"]}"),
-                  ],
+                              IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context)=>
+                                            AlertDialog(
+                                              backgroundColor: Colors.white,
+                                              title: const Text(
+                                                "Confirmation!",
+                                                style: TextStyle(color:Colors.black),
+                                              ),
+                                              content: const Text("Do you want to delete this offer?",
+                                                style: TextStyle(color: Colors.black),),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: const Text("Yes"),
+                                                  onPressed: (){
+                                                    delete(data[i]['ID']);
+                                                    // _delete(thisitem['id'], thisitem['Image']);
+                                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                        content: Text("You have Successfully Deleted a Offer Item")));
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId)));
+                                                  },
+                                                ),
+                                                TextButton(
+                                                    onPressed: (){
+                                                     Navigator.pop(context);
+                                                    },
+                                                    child: const Text("No"))
+                                              ],
+                                            )
+                                    );
+
+                                  },
+                                  icon: Icon(Icons.delete,color: Colors.green[900],))
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -868,7 +772,7 @@ class _CompletedPageState extends State<CompletedPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -915,65 +819,63 @@ class _CompletedPageState extends State<CompletedPage> {
             itemBuilder: (context, i) {
               String dateString = data[i]['validity'];
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
               return Center(
-                child: Column(
-                  children: [
-                    //MAIN ROW STARTS
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:  [
-                        //CIRCLEAVATAR STARTS
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.cyan,
-                          /*backgroundImage:
-                          //IMAGE STARTS CIRCLEAVATAR
-                          Image.network('${thisitem['Image']}').image,*/
-                          child: Stack(
+                child: Card(
+                  child: Column(
+                    children: [
+                      //MAIN ROW STARTS
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children:  [
+                          //CIRCLEAVATAR STARTS
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.cyan,
+                            backgroundImage:
+                            //IMAGE STARTS CIRCLEAVATAR
+                            NetworkImage(imageUrl),
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  //STARTS CIRCLE AVATAR OFFER
+                                  child: CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: Colors.green[900],
+                                      child: Text('${data[i]['discount']}%',
+                                          style: Theme.of(context).textTheme.titleLarge)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //END CIRCLEAVATAR
+
+                          Column(
                             children: [
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                //STARTS CIRCLE AVATAR OFFER
-                                child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.green[900],
-                                    child: Text('${data[i]['discount']}%',
-                                        style: Theme.of(context).textTheme.titleLarge)),
-                              ),
+                              //START TEXTS
+                              /*Text('${data[i]['company_name']}',
+                                //Text style starts
+                                style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 15),),*/
+                              const SizedBox(height: 10,),
+                              //start texts
+                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                                //Text style starts
+                                style: const TextStyle(fontSize: 11,
+                                    fontWeight: FontWeight.bold
+                                ),),
+                              //Text starts
+                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
+
                             ],
                           ),
-                        ),
-                        //END CIRCLEAVATAR
+                        ],
+                      ),
 
-                        Column(
-                          children: [
-                            //START TEXTS
-                            /*Text('${data[i]['company_name']}',
-                              //Text style starts
-                              style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 15),),*/
-                            const SizedBox(height: 10,),
-                            //start texts
-                            Text('${data[i]['offer_type']} - ${data[i]['name']}',
-                              //Text style starts
-                              style: const TextStyle(fontSize: 11,
-                                  fontWeight: FontWeight.bold
-                              ),),
-                            //Text starts
-                            Text(DateFormat('dd-MM-yyyy').format(dateTime)),
-
-                          ],
-                        ),
-                      ],
-                    ),
-                    //Divider starts
-                    const Divider(
-                      color: Colors.grey,
-                      thickness:1,
-                      height: 30,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }
@@ -997,11 +899,12 @@ class _BlockPageState extends State<BlockPage> {
     getData();
     super.initState();
   }
-  List<Map<String, dynamic>> data=[];
+  List<Map<String, dynamic>> data = [];
+
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=BlockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -1010,41 +913,43 @@ class _BlockPageState extends State<BlockPage> {
         final responseData = json.decode(response.body);
         print("ResponseData: $responseData");
         final List<dynamic> itemGroups = responseData;
-        setState(() {});
-        // data = itemGroups.cast<Map<String, dynamic>>();
+
         // Filter data based on user_id and validity date
-        List<dynamic> filteredData = itemGroups.where((item) {
+        List<Map<String, dynamic>> filteredData = [];
+        for (var item in itemGroups) {
           DateTime validityDate;
           try {
             validityDate = DateTime.parse(item['validity']);
           } catch (e) {
             print('Error parsing validity date: $e');
-            return false;
+            continue; // Skip this item if validity date parsing fails
           }
-          print('Widget User ID: ${widget.userId}');
-          print('Item User ID: ${item['user_id']}');
-          print('Validity Date: $validityDate');
-          print('Current Date: ${DateTime.now()}');
-          bool satisfiesFilter = item['user_id'] == widget.userId && validityDate.isAfter(DateTime.now()) && item['block_status'] == "Block";
-          print('Satisfies Filter: $satisfiesFilter');
-          return satisfiesFilter;
-        }).toList();
-        // Call setState() after updating data
+
+          bool satisfiesFilter = item['user_id'] == widget.userId &&
+              validityDate.isAfter(DateTime.now()) &&
+              item['block_status'] == "Block";
+          if (satisfiesFilter) {
+            filteredData.add(item); // Add item to filteredData if it satisfies the filter
+          }
+        }
+
         setState(() {
-          // Cast the filtered data to the correct type
-          data = filteredData.cast<Map<String, dynamic>>();
+          data = filteredData;
         });
         print('Data: $data');
       } else {
         print('Error: ${response.statusCode}');
+        // Handle HTTP error gracefully
+        // For example, you could show a snackbar or toast to notify the user
       }
       print('HTTP request completed. Status code: ${response.statusCode}');
     } catch (e) {
       print('Error making HTTP request: $e');
-      throw e; // rethrow the error if needed
+      // Handle HTTP request error gracefully
+      // For example, you could show a snackbar or toast to notify the user
     }
-
   }
+
   Future<void> unblock(int ID) async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
@@ -1096,150 +1001,144 @@ class _BlockPageState extends State<BlockPage> {
             itemBuilder: (context, i) {
               String dateString = data[i]['validity'];
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
               return Center(
-                child: Column(
-                  children: [
-                    //MAIN ROW STARTS
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:  [
-                        //CIRCLEAVATAR STARTS
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.cyan,
-                          /* backgroundImage:
-                                  //IMAGE STARTS CIRCLEAVATAR
-                                  Image.network('${data[i]['Image']}').image,*/
-                          child: Stack(
+                child: Card(
+                  child: Column(
+                    children: [
+                      //MAIN ROW STARTS
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children:  [
+                          //CIRCLEAVATAR STARTS
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.cyan,
+                             backgroundImage: NetworkImage(imageUrl),
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  //STARTS CIRCLE AVATAR OFFER
+                                  child: CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: Colors.green[900],
+                                      child: Text('${data[i]['discount']}%',
+                                          style: Theme.of(context).textTheme.titleLarge)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //END CIRCLEAVATAR
+
+                          Column(
                             children: [
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                //STARTS CIRCLE AVATAR OFFER
-                                child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.green[900],
-                                    child: Text('${data[i]['discount']}%',
-                                        style: Theme.of(context).textTheme.titleLarge)),
-                              ),
+                              //START TEXTS
+                              /* Text('${data[i]['company_name']}',
+                                //Text style starts
+                                style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 15),),*/
+                              const SizedBox(height: 10,),
+                              //start texts
+                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                                //Text style starts
+                                style: const TextStyle(fontSize: 11,
+                                    fontWeight: FontWeight.bold
+                                ),),
+                              //Text starts
+                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
                             ],
                           ),
-                        ),
-                        //END CIRCLEAVATAR
+                          //IconButton starts
 
-                        Column(
-                          children: [
-                            //START TEXTS
-                            /* Text('${data[i]['company_name']}',
-                              //Text style starts
-                              style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 15),),*/
-                            const SizedBox(height: 10,),
-                            //start texts
-                            Text('${data[i]['offer_type']} - ${data[i]['name']}',
-                              //Text style starts
-                              style: const TextStyle(fontSize: 11,
-                                  fontWeight: FontWeight.bold
-                              ),),
-                            //Text starts
-                            Text(DateFormat('dd-MM-yyyy').format(dateTime)),
-                          ],
-                        ),
-                        //IconButton starts
-
-                        //IconButton starts
-                        Row(
-                          children: [
-                            IconButton(onPressed: (){
-                              showDialog(
-                                  context: context,
-                                  builder: (context)=>
-                                      AlertDialog(
-                                        backgroundColor: Colors.white,
-                                        title: const Text(
-                                          "Confirmation!",
-                                          style: TextStyle(color:Colors.black),
-                                        ),
-                                        content: const Text("Do you want to Unblock this offer?",
-                                          style: TextStyle(color: Colors.black),),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text("Yes"),
-                                            onPressed: (){
-                                              unblock(int.parse(data[i]["ID"]));
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=> EditOffer(
-                                                Id: data[i]['ID'],
-                                                // currentimage: thisitem['Image'],
-                                                currenttype: data[i]['offer_type'],
-                                                currentproductname: data[i]['name'],
-                                                currentDiscount: data[i]['discount'],
-                                                currentvalidity: data[i]['validity'],
-                                                user_id: data[i]['user_id'],
-                                              ))
-                                              );
-                                              // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Your offer Unblocked Successfully")));
-                                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId,)));
-                                            }, ),
-                                          TextButton(
+                          //IconButton starts
+                          Row(
+                            children: [
+                              IconButton(onPressed: (){
+                                showDialog(
+                                    context: context,
+                                    builder: (context)=>
+                                        AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          title: const Text(
+                                            "Confirmation!",
+                                            style: TextStyle(color:Colors.black),
+                                          ),
+                                          content: const Text("Do you want to Unblock this offer?",
+                                            style: TextStyle(color: Colors.black),),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: const Text("Yes"),
                                               onPressed: (){
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text("No"))
-                                        ],
-                                      )
-                              );
-                            },
-                                icon: Icon(Icons.check_circle,
-                                  color: Colors.green[900],)),
-
-                            IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context)=>
-                                          AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            title: const Text(
-                                              "Confirmation!",
-                                              style: TextStyle(color:Colors.black),
-                                            ),
-                                            content: const Text("Do you want to Delete this Offer?",
-                                              style: TextStyle(color: Colors.black),),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text("Yes"),
+                                                unblock(int.parse(data[i]["ID"]));
+                                                /*Navigator.push(context, MaterialPageRoute(builder: (context)=> EditOffer(
+                                                  Id: data[i]['ID'],
+                                                  // currentimage: thisitem['Image'],
+                                                  currenttype: data[i]['offer_type'],
+                                                  currentproductname: data[i]['name'],
+                                                  currentDiscount: data[i]['discount'],
+                                                  currentvalidity: data[i]['validity'],
+                                                  user_id: data[i]['user_id'],
+                                                ))
+                                                );*/
+                                                // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Your offer Unblocked Successfully")));
+                                                 Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId,)));
+                                              }, ),
+                                            TextButton(
                                                 onPressed: (){
-                                                  delete(data[i]['ID']);
-                                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                      content: Text("You have Successfully Deleted a Offer Item")));
-                                                  //  Navigator.of(context).pop();
                                                   Navigator.pop(context);
                                                 },
-                                              ),
-                                              TextButton(
-                                                  onPressed: (){
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("No"))
-                                            ],
-                                          )
-                                  );
+                                                child: const Text("No"))
+                                          ],
+                                        )
+                                );
+                              },
+                                  icon: Icon(Icons.check_circle,
+                                    color: Colors.green[900],)),
 
-                                },
-                                icon: Icon(Icons.delete,color: Colors.green[900],))
-                          ],
-                        ),
-                      ],
-                    ),
-                    //Divider starts
-                    const Divider(
-                      color: Colors.grey,
-                      thickness:1,
-                      height: 30,
-                    ),
-                    // Text("Id: $id"),
-                    // Text("Uid: ${thisitem["Uid"]}"),
-                  ],
+                              IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context)=>
+                                            AlertDialog(
+                                              backgroundColor: Colors.white,
+                                              title: const Text(
+                                                "Confirmation!",
+                                                style: TextStyle(color:Colors.black),
+                                              ),
+                                              content: const Text("Do you want to Delete this Offer?",
+                                                style: TextStyle(color: Colors.black),),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: const Text("Yes"),
+                                                  onPressed: (){
+                                                    delete(data[i]['ID']);
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=> OfferList(userId: widget.userId,)));
+                                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                        content: Text("You have Successfully Deleted a Offer Item")));
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                TextButton(
+                                                    onPressed: (){
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text("No"))
+                                              ],
+                                            )
+                                    );
+
+                                  },
+                                  icon: Icon(Icons.delete,color: Colors.green[900],))
+                            ],
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
                 ),
               );
             }
