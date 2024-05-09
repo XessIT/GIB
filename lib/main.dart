@@ -94,7 +94,7 @@ void main() {
                     ); // Pass firstName to Homepage
                 //   return NonExecutiveHome();
                   case "Guest":
-                    return GuestHomePage(
+                    return GuestHome(
                       userType: userType ,
                       userId: id,
                     );

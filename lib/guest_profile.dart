@@ -13,6 +13,11 @@ class GuestProfile extends StatefulWidget {
 
 class _GuestProfileState extends State<GuestProfile> {
 
+  String imageUrl = "";
+  String imageParameter = "";
+
+
+
   List<Map<String, dynamic>> data=[];
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
@@ -25,19 +30,37 @@ class _GuestProfileState extends State<GuestProfile> {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print("ResponseData: $responseData");
+        print('-----------------------------------');
+
+        print('Image URL: $imageUrl');
+        print('-----------------------------------');
         if (responseData is List) {
           // If responseData is a List (multiple records)
           final List<dynamic> itemGroups = responseData;
           setState(() {
             data = itemGroups.cast<Map<String, dynamic>>();
+            imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[0]["profile_image"]}';
+            imageParameter = data[0]["profile_image"];
+
+
           });
           print('Data: $data');
+          print('-----------------------------------');
+
+          print('Image URL: $imageUrl');
+          print('-----------------------------------');
+
         } else if (responseData is Map<String, dynamic>) {
           // If responseData is a Map (single record)
           setState(() {
             data = [responseData];
+            imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[0]["profile_image"]}';
+            imageParameter = data[0]["profile_image"];
+
+
           });
           print('Data: $data');
+
         }
       } else {
         print('Error: ${response.statusCode}');
@@ -56,13 +79,15 @@ class _GuestProfileState extends State<GuestProfile> {
     print("USER ID---${widget.userID}");
     // TODO: implement initState
     super.initState();
+
+    print('Image URL 45454545454: $imageParameter');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Profile', style: TextStyle(color: Colors.white))),
+        title: const Center(child: Text('Profile123', style: TextStyle(color: Colors.white))),
         centerTitle: true,
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
@@ -78,7 +103,8 @@ class _GuestProfileState extends State<GuestProfile> {
                   currentEmail: data[0]["email"],
                   currentLocation: data[0]["place"],
                   currentBloodGroup: data[0]["blood_group"],
-                  id: widget.userID
+                  imageUrl20: imageParameter,
+                  id: widget.userID,
                 )));
           },
               icon: const Icon(Icons.edit)),
@@ -88,15 +114,23 @@ class _GuestProfileState extends State<GuestProfile> {
         child: Center(
           child: Column(
             children: [
+              //imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["profile_image"]}';
               const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.only(left:8.0),
-                child: CircleAvatar(
-                  backgroundImage: AssetImage("assets/pro1.jpg"),
-                  radius: 45,
+              Container(
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle, // This makes the container circular
+                  // Optionally, you can add other decorations like border or background color here
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover, // You might want to use cover to fill the circle completely
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+
+               SizedBox(height: 20),
               Container(
                 width: 400,
                 height: 230,

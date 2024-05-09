@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 import 'guest_profile.dart';
 
@@ -14,6 +15,7 @@ class GuestProfileEdit extends StatefulWidget {
   final String? currentLocation;
   final String? currentBloodGroup;
   final String? id;
+  final String? imageUrl20;
   const GuestProfileEdit({super.key,
     required this.currentFirstName,
     required this.currentLastName,
@@ -22,7 +24,9 @@ class GuestProfileEdit extends StatefulWidget {
     required this.currentEmail,
     required this.currentLocation,
     required this.currentBloodGroup,
-    required this.id});
+    required this.id,
+    required this.imageUrl20
+  });
 
   @override
   State<GuestProfileEdit> createState() => _GuestProfileEditState();
@@ -44,6 +48,7 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
     if (text.isEmpty) return text;
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
+  String image = "";
   @override
   void initState() {
     firstnamecontroller = TextEditingController(text: widget.currentFirstName);
@@ -53,9 +58,40 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
     emailcontroller = TextEditingController(text: widget.currentEmail);
     companynamecontroller = TextEditingController(text: widget.currentCompanyName);
     blood = widget.currentBloodGroup!;
+    print("widget image: ${widget.imageUrl20}");
+    setState(() {
+      image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl20}';
+    });
+    print("image edit: $image");
     super.initState();
   }
+  late String imageName;
+  late String imageData;
+  Uint8List? selectedImage;
+  Future<void> pickImageFromGallery() async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      // Verify that pickedImage is indeed an XFile
+      print('pickedImage type: ${pickedImage.runtimeType}');
 
+      // Read the image file as bytes
+      try {
+        final imageBytes = await pickedImage!.readAsBytes();
+        // Encode the bytes to base64
+        String base64ImageData = base64Encode(imageBytes);
+        setState(() {
+          selectedImage = imageBytes;
+          imageName = pickedImage!.name;
+          print('Image Name: $imageName');
+          imageData = base64ImageData;
+          print('Base64 Image Data: $imageData');
+        });
+      } catch (e) {
+        print('Error reading image file: $e');
+      }
+    }
+  }
   Future<void> Edit() async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/guest_profile.php');
@@ -63,6 +99,7 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
       final response = await http.put(
         url,
         body: jsonEncode({
+          'profile_image': widget.imageUrl20,
           "first_name": firstnamecontroller.text,
           "last_name": lastnamecontroller.text,
           "company_name": companynamecontroller.text,
@@ -90,6 +127,45 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
     }
   }
 
+  Future<void> Update() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/guest_profile.php');
+      // final url = Uri.parse('http://192.168.29.129/API/offers.php');
+      final response = await http.put(
+        url,
+        body: jsonEncode({
+          'imagename': imageName,
+          'imagedata': imageData,
+          "first_name": firstnamecontroller.text,
+          "last_name": lastnamecontroller.text,
+          "company_name": companynamecontroller.text,
+          "place": locationcontroller.text,
+          "mobile": mobilecontroller.text,
+          "email": emailcontroller.text,
+          "blood_group": blood,
+          "id": widget.id
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        print("Offers response: ${response.body}");
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context)=> GuestProfile(userID: widget.id)),);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Profile Successfully Updated")));
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,36 +185,32 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
               children:  [
                 const SizedBox(height: 20,),
                 InkWell(
-                  child: CircleAvatar(
-                    /*backgroundImage: pickedimage == null ? NetworkImage(imageUrl!)
-                        : Image.file(pickedimage!).image,*/
-                    radius: 50,
+                  child: ClipOval(
+                    child: Container(
+                      width: 150,
+                      height: 150,
+                      child: selectedImage == null ? Image.network(image) : Image.memory(selectedImage!),
+                    ),
                   ),
                   onTap: () {
-                    showModalBottomSheet(context: context, builder: (ctx){
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt),
-                            title: const Text("With Camera"),
-                            onTap: () async {
-                            //  pickImageFromCamera();
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.storage),
-                            title: const Text("From Gallery"),
-                            onTap: () {
-                             // pickImageFromGallery();
-                              //  pickImageFromDevice();
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    });
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (ctx) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.storage),
+                              title: Text("From Gallery"),
+                              onTap: () {
+                                pickImageFromGallery();
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
 
@@ -387,16 +459,27 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Login button starts
+
+                    MaterialButton(
+                        minWidth: 130,
+                        height: 50,
+                        color: Colors.orange,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel',
+                          style: TextStyle(color: Colors.white),)),
+
                     MaterialButton(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
                         minWidth: 130,
                         height: 50,
                         color: Colors.green[800],
                         onPressed: (){
-                           if (_formKey.currentState!.validate()) {
-                             Edit();
-                            }
+                          if (_formKey.currentState!.validate()) {
+                            selectedImage == null ? Edit() : Update();
+                          }
                           /*if(type == null){
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text("Please Select the Type")));
@@ -410,19 +493,6 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
                           }*/
                         },
                         child: const Text('Update',
-                          style: TextStyle(color: Colors.white),)),
-                    // Update button ends
-
-                    // Cancel button starts
-                    MaterialButton(
-                        minWidth: 130,
-                        height: 50,
-                        color: Colors.orange,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancel',
                           style: TextStyle(color: Colors.white),)),
                     // Cancel button ends
                   ],
