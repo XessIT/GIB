@@ -69,7 +69,7 @@ class _ReferralPageState extends State<ReferralPage> {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
         final response = await http.post(
           url,
-          body: jsonEncode({
+       /*   body: jsonEncode({
             "type": data[0]["id"],
             "Toname": namecontroller.text,
             "Tomobile": discountcontroller.text,
@@ -80,7 +80,7 @@ class _ReferralPageState extends State<ReferralPage> {
             "mobile": data[0]["mobile"],
             "company_name": data[0]["company_name"],
             "block_status": "Unblock"
-          }),
+          }),*/
         );
         print(url);
         print("ResponseStatus: ${response.statusCode}");
