@@ -1118,7 +1118,7 @@ class _NavDrawerState extends State<NavDrawer> {
               onTap: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  const Business()),
+                  MaterialPageRoute(builder: (context) => BusinessPage(userType: widget.userType, userId: widget.userId,)),
                 )
               },
             ),

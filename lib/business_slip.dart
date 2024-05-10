@@ -1,22 +1,13 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-
 import 'business_slip_history.dart';
 
-class Referral extends StatelessWidget {
-  const Referral({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: ReferralPage(),
-
-    );
-  }
-}
 class ReferralPage extends StatefulWidget {
-  const ReferralPage({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const ReferralPage({super.key, required this.userType, required this.userId});
 
   @override
   State<ReferralPage> createState() => _ReferralPageState();
@@ -35,24 +26,83 @@ class _ReferralPageState extends State<ReferralPage> {
   TextEditingController businessmobile = TextEditingController();
   TextEditingController purpose = TextEditingController();
 
-
-
+  String? fname = "";
+  String? lname = "";
+  String? mobile = "";
+  String? companyname = "";
+  List dynamicdata=[];
+  Future<void> fetchData(String userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        print("response S: ${response.statusCode}");
+        print("response B: ${response.body}");
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            dynamicdata = responseData.cast<Map<String, dynamic>>();
+            if (dynamicdata.isNotEmpty) {
+              setState(() {
+                fname = dynamicdata[0]["first_name"];
+                lname= dynamicdata[0]['last_name'];
+                mobile=dynamicdata[0]["mobile"];
+                companyname=dynamicdata[0]["company_name"];
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  Future<void> InsertBusinessSlip() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+        final response = await http.post(
+          url,
+          body: jsonEncode({
+            "type": data[0]["id"],
+            "Toname": namecontroller.text,
+            "Tomobile": discountcontroller.text,
+            "Tocompanyname": formattedDate,
+            "purpose": type,
+            "first_name": data[0]["first_name"],
+            "last_name": data[0]["last_name"],
+            "mobile": data[0]["mobile"],
+            "company_name": data[0]["company_name"],
+            "block_status": "Unblock"
+          }),
+        );
+        print(url);
+        print("ResponseStatus: ${response.statusCode}");
+        if (response.statusCode == 200) {
+          print("Offers response: ${response.body}");
+        } else {
+          print("Error: ${response.statusCode}");
+        }
+      } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
   @override
   void initState() {
+    fetchData(widget.userId.toString());
     // TODO: implement initState
     super.initState();
   }
-  String uid = "";
-  String mobile ="";
-  String firstname ="";
-  String district="";
-  String chapter="";
 
   String successfulreason ="";
   String unsuccessfulreason ="";
-
-
-
   String holdreason ="";
   String status = "Pending";
   String capitalizeFirstLetter(String text) {
@@ -63,9 +113,11 @@ class _ReferralPageState extends State<ReferralPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(iconTheme: IconThemeData(color: Colors.white),
+      appBar: AppBar(
+        title: Text('BUSINESS SLIP', style: Theme.of(context).textTheme.bodySmall),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-
           IconButton(onPressed:(){
             Navigator.push(context, MaterialPageRoute(builder: (context) => const SlipHistory())); },
               icon: const Icon(Icons.more_vert)),
@@ -87,11 +139,11 @@ class _ReferralPageState extends State<ReferralPage> {
                   ),
                   child: Column(
                     children: [
-                      const SizedBox(height: 10,),
-                      const   Text('Business Slip',
+                      /*const SizedBox(height: 10,),
+                      Text('Business Slip',
                         style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 20),),
+                            color: Colors.green[800],
+                            fontSize: 20),),*/
                       const SizedBox(height: 20,),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -327,6 +379,17 @@ class _ReferralPageState extends State<ReferralPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+                          // Cancel button starts
+                          MaterialButton(
+                              minWidth: 100,
+                              height: 50,
+                              color: Colors.orangeAccent,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                              onPressed: (){
+                              },
+                              child: const Text('Cancel',
+                                style: TextStyle(color: Colors.white),)),
+                          // Cancel button ends
                           // Submit button starts
                           MaterialButton(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
@@ -344,17 +407,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                 style: TextStyle(color: Colors.white),)),
                           // Submit button ends
 
-                          // Cancel button starts
-                          MaterialButton(
-                              minWidth: 100,
-                              height: 50,
-                              color: Colors.orangeAccent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                              onPressed: (){
-                              },
-                              child: const Text('Cancel',
-                                style: TextStyle(color: Colors.white),)),
-                          // Cancel button ends
+
                         ],
                       ),
                       const SizedBox(height: 20,),
