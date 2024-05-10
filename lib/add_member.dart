@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import'package:http/http.dart'as http;
 
 import 'add_member_view.dart';
+import 'home.dart';
 
 
 
@@ -371,7 +372,7 @@ class _GuestState extends State<Guest> {
               setState(() {
 
                 referrermobilecontroller.text=dynamicdata[0]["mobile"];
-                referreridcotroller.text = dynamicdata[0]["referrer_id"];
+                referrerId = dynamicdata[0]["member_id"];
             //    print("referrer Details Fetch : ${referrermobilecontroller.text},${ referreridcotroller.text}");
 
               });
@@ -428,7 +429,7 @@ class _GuestState extends State<Guest> {
                 child: Column(
                   children: [
                     const SizedBox(width: 20,),
-                    InkWell(
+                    /*InkWell(
                       child:  ClipOval(
                         child: selectedImage != null
                             ? Image.memory(
@@ -453,7 +454,7 @@ class _GuestState extends State<Guest> {
                           );
                         });
                       },
-                    ),
+                    ),*/
 
                     // First Name textfield starts
                     const SizedBox(height: 9,),
@@ -554,7 +555,7 @@ class _GuestState extends State<Guest> {
                     ),
                     // Company name textfield ends
 
-                    // Email textfield starts here
+                   /* // Email textfield starts here
                     const SizedBox(height: 15,),
                     SizedBox(
                       width: 300,
@@ -579,7 +580,7 @@ class _GuestState extends State<Guest> {
                           suffixIcon: Icon(Icons.mail),
                         ),
                       ),
-                    ),
+                    ),*/
                     // Email textfield ends here
 
                     // Mobile number textfield starts here
@@ -615,7 +616,7 @@ class _GuestState extends State<Guest> {
                     // Mobile number textfield ends here
 
                     // Blood group drop down button starts
-                    const SizedBox(height: 15,),
+                    /*const SizedBox(height: 15,),
                     SizedBox(
                       width: 300,
                       child: DropdownButtonFormField<String>(
@@ -660,7 +661,7 @@ class _GuestState extends State<Guest> {
                           return null;
                         },
                       ),
-                    ),
+                    ),*/
                     // Blood group dropdown button ends here
 
                     // Location textfield starts
@@ -778,12 +779,12 @@ class _GuestState extends State<Guest> {
                     //   ),),
                     // // Confirm password textfield ends here
 
-                    const SizedBox(height: 20,),
+                    const SizedBox(height: 15,),
                     Visibility(
                       visible: isVisible,
                       child: Column(
                         children: [
-                          Padding(
+                          /*Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 180, 0),
                             child: Text('Personal Details',
                               style: Theme
@@ -818,11 +819,11 @@ class _GuestState extends State<Guest> {
                                 return null;
                               },
                             ),
-                          ),
+                          ),*/
                           // Member type dropdown button ends here
 
                           // District drop down button starts
-                          const SizedBox(height: 15,),//DropDown For District
+                        //  const SizedBox(height: 15,),//DropDown For District
                           /*
                           SizedBox(
                             width: 300,
@@ -848,7 +849,7 @@ class _GuestState extends State<Guest> {
                           ),
                     */
 
-                          SizedBox(
+                         /* SizedBox(
                             width: 305,
                             height: 50,
                             child: TypeAheadFormField<String>(
@@ -964,7 +965,7 @@ class _GuestState extends State<Guest> {
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
                             ),
-                          ),
+                          ),*/
 
                           const SizedBox(height: 15,),
                           SizedBox(
@@ -1170,7 +1171,7 @@ class _GuestState extends State<Guest> {
                             ),
                           ),
                           // Kovil textfield ends here
-                          const SizedBox(height: 15,),
+                          /*const SizedBox(height: 15,),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 190, 0),
                             child: Text('Marital Status',
@@ -1178,9 +1179,9 @@ class _GuestState extends State<Guest> {
                                   .of(context)
                                   .textTheme
                                   .headlineSmall,),
-                          ),
+                          ),*/
 
-                          const SizedBox(height: 20,),
+                          /*const SizedBox(height: 20,),
                           // Radio button starts here
                           Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1600,9 +1601,9 @@ class _GuestState extends State<Guest> {
                                 // Kovil textfield ends here
                               ],
                             ),
-                          ),
+                          ),*/
 
-                          Padding(
+                         /* Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 170, 0),
                             child: Text('Business Details',
                               style: Theme
@@ -1755,7 +1756,7 @@ class _GuestState extends State<Guest> {
                                 }
                                 return null;
                               },
-                              /*onTap: () async {
+                              *//*onTap: () async {
                                 DateTime currentDate = DateTime.now();
                                 DateTime firstSelectableYear = DateTime(1900);
                                 DateTime lastSelectableYear = DateTime(currentDate.year, 12, 31);
@@ -1773,7 +1774,7 @@ class _GuestState extends State<Guest> {
                                   });
                                 }
 
-                              },*/
+                              },*//*
 
                               decoration: const InputDecoration(
                                 labelText: "business established year",
@@ -1846,7 +1847,7 @@ class _GuestState extends State<Guest> {
                               ],
                             ),
                           ),
-
+*/
                           // Executive GiB Member ID textfield starts here
                           const SizedBox(height: 15,),
                           /// referrer Id auto fetched code starts here...
@@ -2084,46 +2085,28 @@ class _GuestState extends State<Guest> {
                                 borderRadius: BorderRadius.circular(5.0)),
                             minWidth: 130,
                             height: 50,
-                            color: Colors.green[800],
-
+                            color: Colors.orangeAccent,
                             onPressed: () {
-                              /*      if (type == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("Select the Type")));
-                              }
-                              *//*  else if (pickedimage == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("Please Select Image")));
-                              }*//*
-                              else if (_formKey.currentState!.validate()) {
-                                if(type == guest){
-                                }
-                                else if (otpcodevisible) {
-                                }
-                                else {
-                                }
-
-                              }*/
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage(userType: widget.userType, userID: widget.userId,)));
                             },
-                            child: otpcodevisible == true ? const Text('Save',
-                              style: TextStyle(color: Colors.white),)
-                                : const Text("Verify", style: TextStyle(color: Colors.white),)),
+                            child: const Text("Cancel", style: TextStyle(color: Colors.white),)),
                         // Login button ends
 
                         // Sign up button starts
                         MaterialButton(
                             minWidth: 130,
                             height: 50,
-                            color: Colors.orangeAccent,
+                            color: Colors.green[800],
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5.0)),
                             onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                uploadImage();
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=> Homepage(userType: widget.userType, userID: widget.userId)));
+                              }
                               //signUp();
-                              uploadImage();
                             },
-                            child: const Text('save',
+                            child: const Text('Register',
                               style: TextStyle(color: Colors.white),)),
                         // Sign up button ends
                       ],
@@ -2140,7 +2123,6 @@ class _GuestState extends State<Guest> {
       // Main content ends here
     );
   }
-
 }
 
 

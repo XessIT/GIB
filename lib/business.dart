@@ -8,18 +8,10 @@ import 'g2g_slip.dart';
 import 'honor_slip.dart';
 //import 'package:gib/guest_slip.dart';
 
-class Business extends StatelessWidget {
-  const Business({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: BusinessPage(),
-    );
-  }
-}
 class BusinessPage extends StatefulWidget {
-  const BusinessPage({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const BusinessPage({super.key, required this.userType, required this.userId});
 
   @override
   State<BusinessPage> createState() => _BusinessPageState();
@@ -33,13 +25,13 @@ class _BusinessPageState extends State<BusinessPage> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Center(child: Text('My Business')),
+          title: Center(child: Text('MY BUSINESS', style: Theme.of(context).textTheme.bodySmall)),
         ),
 
         body: SafeArea(
           child: Center(
             child: Column(
-              children: const [
+              children: [
                 //TABBAR STARTS
                 TabBar(
                   isScrollable: true,
@@ -56,7 +48,7 @@ class _BusinessPageState extends State<BusinessPage> {
                 Expanded(
                   child: TabBarView(children: <Widget>[
                     GibTransaction(),
-                    MyTransaction(),
+                    MyTransaction(userId: widget.userId, userType: widget.userType),
                     MyTotalTransaction(),
                   ],
                   ),
@@ -352,7 +344,9 @@ class _GibTransactionState extends State<GibTransaction> {
 
 
 class MyTransaction extends StatefulWidget {
-  const MyTransaction({Key? key}) : super(key: key);
+  final String? userId;
+  final String? userType;
+  const MyTransaction({Key? key, required this.userId, required this.userType}) : super(key: key);
 
   @override
   State<MyTransaction> createState() => _MyTransactionState();
@@ -422,7 +416,7 @@ class _MyTransactionState extends State<MyTransaction> {
                                             onPressed: (){
                                               Navigator.push(
                                                 context,
-                                                MaterialPageRoute(builder: (context) =>  const Referral()),
+                                                MaterialPageRoute(builder: (context) => ReferralPage(userType: widget.userType, userId: widget.userId,)),
                                               );
                                             },
                                             icon: const Icon(Icons.add_circle,color: Colors.white,))
