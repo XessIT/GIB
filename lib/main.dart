@@ -88,9 +88,9 @@ void main() {
                       userID: id,
                     );
                   case "Non-Executive":
-                    return NonExecutiveHome(
+                    return NonExecutiveHomeNav(
                       userType: userType ,
-                      userID: id,
+                      userId: id,
                     ); // Pass firstName to Homepage
                 //   return NonExecutiveHome();
                   case "Guest":

@@ -685,7 +685,7 @@ String? memberType ="Executive";
                                                               GlobalKey<FormState> tempKey =GlobalKey<FormState>();
 
                                                               //store purpose..
-                                                            //  registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
+                                                              registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
                                                               showDialog(
                                                                   context: context,
                                                                   builder: (ctx) =>
@@ -1215,7 +1215,7 @@ class _NavDrawerState extends State<NavDrawer> {
                   )),
                 )
               },
-            ),
+            ), /// gib members
 
             ListTile(
               leading: const Icon(Icons.person_add,color: Colors.green,),
@@ -1228,7 +1228,7 @@ class _NavDrawerState extends State<NavDrawer> {
                //   MaterialPageRoute(builder: (context) =>    AddMemberView(userID:widget.userId,userType:widget.userType,)),
                 )
               },
-            ),
+            ),  ///
 
             ListTile(
               leading: const Icon(Icons.local_offer,color: Colors.green,),
@@ -1239,10 +1239,11 @@ class _NavDrawerState extends State<NavDrawer> {
                    context,
                    MaterialPageRoute(builder: (context) =>  OffersPage(
                      userId: widget.userId,
+                     userType: widget.userType,
                    )),
                  )
               },
-            ),
+            ),  /// offers
 
             const Divider(color: Colors.grey,),
 

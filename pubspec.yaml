@@ -57,6 +57,7 @@ dependencies:
   wave: ^0.2.2
   crystal_navigation_bar: ^1.0.0
   iconly: ^1.0.1
+  card_swiper: ^3.0.1
 
 
 dev_dependencies:

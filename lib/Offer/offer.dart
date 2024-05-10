@@ -8,7 +8,8 @@ import 'offer_list.dart';
 
 class OffersPage extends StatefulWidget {
   final String? userId;
-  OffersPage({Key? key, required this.userId}) : super(key: key);
+  final String? userType;
+  OffersPage({Key? key, required this.userId, required  this.userType}) : super(key: key);
 
   @override
   State<OffersPage> createState() => _OffersPageState();
@@ -26,7 +27,7 @@ class _OffersPageState extends State<OffersPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -35,14 +36,26 @@ class _OffersPageState extends State<OffersPage> {
         final responseData = json.decode(response.body);
         print("ResponseData: $responseData");
         final List<dynamic> itemGroups = responseData;
-        setState(() {});
-        // data = itemGroups.cast<Map<String, dynamic>>();
-        // Filter data based on user_id
-        List<dynamic> filteredData = itemGroups.where((item) => item['user_id'] != widget.userId).toList();
-        // Call setState() after updating data
+
+        // Filter data based on validity date and user_id
+        List<Map<String, dynamic>> filteredData = [];
+        for (var item in itemGroups) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['validity']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            continue; // Skip this item if validity date parsing fails
+          }
+
+          // Check if validity date has not passed and user_id is not the current user's id
+          if (validityDate.isAfter(DateTime.now()) && item['user_id'] != widget.userId) {
+            filteredData.add(item); // Add item to filteredData if it satisfies the filter
+          }
+        }
+
         setState(() {
-          // Cast the filtered data to the correct type
-          data = filteredData.cast<Map<String, dynamic>>();
+          data = filteredData;
         });
         print('Data: $data');
       } else {
@@ -58,10 +71,10 @@ class _OffersPageState extends State<OffersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('OFFERS',
+        title: Text('OFFERS123',
             style: Theme.of(context).textTheme.bodySmall),
         centerTitle: true,
-        leading:IconButton(
+        leading: IconButton(
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage(userType: '', userID: widget.userId,)));
             },
@@ -69,7 +82,7 @@ class _OffersPageState extends State<OffersPage> {
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
         ),
-        actions: [
+        actions: [widget.userType == 'Executive' ?
           IconButton(onPressed: (){
             Navigator.push(context,
               MaterialPageRoute(builder:
@@ -77,7 +90,7 @@ class _OffersPageState extends State<OffersPage> {
             );
           },
               icon: const Icon(
-                Icons.add_circle_outline_sharp,size:30,)),
+                Icons.add_circle_outline_sharp,size:30,)): Container(),
         ],
       ),
       body: GridView.builder(

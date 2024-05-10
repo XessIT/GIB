@@ -58,11 +58,6 @@ class _GuestHomeState extends State<GuestHome> {
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home, color: Colors.black45,),
@@ -91,111 +86,18 @@ class _GuestHomeState extends State<GuestHome> {
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.black45,
         iconSize: 30,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         elevation: 5,
         selectedLabelStyle: TextStyle(color: Colors.white),
         unselectedLabelStyle: TextStyle(color: Colors.white),
         selectedIconTheme: IconThemeData(color: Colors.green),
       ),
 
-      /*
-      * bottomNavigationBar: BottomNavigationBar(
-  backgroundColor: Colors.white,
-  items: const <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.home_outlined,
-        color: Colors.black45,
-      ),
-      label: 'Home',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.wallet_outlined,
-        color: Colors.black45,
-      ),
-      label: 'Wallet',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.request_page_outlined,
-        color: Colors.black45,
-      ),
-      label: 'Budget',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.flight_takeoff_outlined,
-        color: Colors.black45,
-      ),
-      label: 'Trip',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.currency_rupee_outlined,
-        color: Colors.black45,
-      ),
-      label: 'Daily',
-    ),
-  ],
-  type: BottomNavigationBarType.fixed, // Set type to fixed for text labels
-  currentIndex: _selectedIndex,
-  selectedItemColor: Colors.deepPurple,
-  unselectedItemColor: Colors.black45,
-  iconSize: 30,
-  onTap: _onItemTapped,
-  elevation: 5,
-  selectedLabelStyle: TextStyle(color: Colors.white),
-  unselectedLabelStyle: TextStyle(color: Colors.white),
-  selectedIconTheme: IconThemeData(color: Colors.deepPurple), // Set selected icon color
-),
-int _selectedIndex = 0;
-void _onItemTapped(int index) {
-  setState(() {
-    _selectedIndex = index;
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => HomePage2(userId:widget.userId,)));
-        break;
-      case 1:
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => WalletReport(uid: widget.userId)));
-       break;
-      case 2:
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    MonthlyReportPage(uid: widget.userId)));// Replace '/nextpage' with the route of your next page
 
-        // Index of the "Records" item
-        break;
-      case 3: // Index of the "Settings" item
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    TripReportDashboard(uid: widget.userId)));
-        break;
-      case 4: // Index of the "Settings" item
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    DailyReportPage(uid: widget.userId)));
-        break;
-      default:
-      // Handle navigation for other items if needed
-        break;
-    }
-  });
-}
-      *
-      * */
     );
   }
 }
@@ -262,43 +164,80 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
 
   ///offers fetch
-  List<Map<String,dynamic>>offersdata=[];
-  Future<void> offersfetchData() async {
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
-      final response = await http.get(url);
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
-
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
       if (response.statusCode == 200) {
-
-
         final responseData = json.decode(response.body);
-        if (responseData is List<dynamic>) {
-          setState(() {
-            offersdata = responseData.cast<Map<String, dynamic>>();
-
-          });
-        } else {
-          // Handle invalid response data (not a List)
-          print('Invalid response data format');
-        }
+        print("ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        // data = itemGroups.cast<Map<String, dynamic>>();
+        // Filter data based on user_id and validity date
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['validity']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Widget User ID: ${widget.userId}');
+          print('Item User ID: ${item['user_id']}');
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now());
+          print("Item block status: ${item['block_status']}");
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        // Call setState() after updating data
+        setState(() {
+          // Cast the filtered data to the correct type
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+        print('Data: $data');
       } else {
-        // Handle non-200 status code
         print('Error: ${response.statusCode}');
       }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
     }
+
   }
 
-
+  Future<Uint8List?> getImageBytes(String imageUrl) async {
+    try {
+      print('imageUrl: $imageUrl');
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return null;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    offersfetchData();
     fetchData(widget.userId);
+    getData();
+
+
+
   }
 
   //  final CalendarController _calendarController =  CalendarController();
@@ -312,8 +251,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     return Scaffold(
       key: _scaffoldKey,
 
-
-
       drawer:  SafeArea(
           child: NavDrawer(
 
@@ -323,45 +260,142 @@ class _GuestHomePageState extends State<GuestHomePage> {
       ),
       body: Center(
         child: Container(
-
           child: Stack(
             fit: StackFit.expand,
             clipBehavior: Clip.antiAliasWithSaveLayer,
             children: [
-
-              Positioned(
-                top: 0,
-                left: 0,
-                child: ClipPath(
-                  clipper: CurveClipper(),
-                  child: Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width,
-                    //width: 400,
-                    color: Colors.green,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text('GIB',style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 20),
-                          child: IconButton(
-                            icon: Icon(Icons.menu,color: Colors.white,),
-                            onPressed: () {
-                              print('press nav drawer');
-                              _scaffoldKey.currentState!.openDrawer();
-                            },
+              Column(
+                children: [
+                  ClipPath(
+                    clipper: CurveClipper(),
+                    child: Container(
+                      height: 100,
+                      width: MediaQuery.of(context).size.width,
+                      //width: 400,
+                      color: Colors.green,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('GIB',style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),
                           ),
+                          Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: IconButton(
+                              icon: Icon(Icons.menu,color: Colors.white,),
+                              onPressed: () {
+                                print('press nav drawer');
+                                _scaffoldKey.currentState!.openDrawer();
+                              },
+                            ),
 
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                  SizedBox(height: 80,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Card(
+                            elevation: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(1),
+                              child: Text(
+                                'Offers+',
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 20,
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )                      ],
+                      ),
+
+                      SizedBox(height: 30),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (context, i) {
+                              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+                              String dateString = data[i]['validity']; // This will print the properly encoded URL
+                              DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                              return Center(
+                                child: Card(
+                                  child: Column(
+                                    children: [
+                                      //MAIN ROW STARTS
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children:  [
+                                          //CIRCLEAVATAR STARTS
+                                          CircleAvatar(
+                                            radius: 40,
+                                            backgroundColor: Colors.cyan,
+                                            backgroundImage: NetworkImage(imageUrl),
+                                            //IMAGE STARTS CIRCLEAVATAR
+                                            //  Image.network('${data[i]['offer_image']}').image,
+                                            child: Stack(
+                                              children: [
+                                                Align(
+                                                  alignment: Alignment.bottomLeft,
+                                                  //STARTS CIRCLE AVATAR OFFER
+                                                  child: CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundColor: Colors.green[900],
+                                                      child: Text('${data[i]['discount']}%',
+                                                          style: Theme.of(context).textTheme.titleLarge)),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          //END CIRCLEAVATAR
+
+                                          Column(
+                                            children: [
+                                              //START TEXTS
+                                              Text('${data[i]['company_name']}',
+                                                //Text style starts
+                                                style: const TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 15),),
+                                              const SizedBox(height: 10,),
+                                              //start texts
+                                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                                                //Text style starts
+                                                style: const TextStyle(fontSize: 11,
+                                                    fontWeight: FontWeight.bold
+                                                ),),
+                                              //Text starts
+                                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
+                                            ],
+                                          ),
+                                          //IconButton starts
+
+                                          //IconButton starts
+
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+
               Positioned(
                 top: 80,
                 left: 20,
@@ -438,95 +472,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     ),
                 ),
               ),
-              Positioned(
-                top: 170,
-                left: 20,
-                right: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Card(
-                          elevation: 0,
-                          child: Container(
-                            padding: EdgeInsets.all(1),
-                            child: Text(
-                              'Offers+',
-                              style: GoogleFonts.aBeeZee(
-                                fontSize: 20,
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        )                      ],
-                    ),
-
-                    SizedBox(height: 30),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
-                      child: ListView.builder(
-                        itemCount: 10, // Number of cards you want to display
-                        itemBuilder: (context, index) {
-                          return Card(
-                            child: SizedBox(
-                              height: 100,
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      height: 100, // Adjust the height as needed
-                                      width: 100, // Adjust the width as needed
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: ClipOval(
-                                        child: Image.network(
-                                          imageUrl,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          userdata.isNotEmpty ? userdata[0]["first_name"] : "",
-                                          style: GoogleFonts.aBeeZee(
-                                            fontSize: 20,
-                                            color: Colors.indigo,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Guest',
-                                          style: GoogleFonts.aBeeZee(
-                                            fontSize: 10,
-                                            color: Colors.indigo,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              )
             ],
           ),
         ),
@@ -734,12 +680,12 @@ class _NavDrawerState extends State<NavDrawer> {
               leading: const Icon(Icons.supervisor_account,color: Colors.green,),
               title: Text('Business',
                   style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                           Navigator.push(
-                         context,
-                       MaterialPageRoute(builder: (context) =>  const bootomnav()),
-                    )
-              },
+              // onTap: () => {
+              //              Navigator.push(
+              //            context,
+              //          MaterialPageRoute(builder: (context) =>  const bootomnav()),
+              //       )
+              // },
             ),
             const Divider(color: Colors.grey,),
             ListTile(

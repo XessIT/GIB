@@ -103,161 +103,11 @@ class _LoginSubClassState extends State<LoginSubClass> {
             userType = memberType;
           });
 
-          // Extract and store first name
-          String? fName = responseData["first_name"];
-          await prefs.setString('firstName', fName!);
-          setState(() {
-            firstName = fName;
-          });
           String? userID = responseData["id"];
           await prefs.setString('id', userID!);
           setState(() {
             userId = userID;
             print("USER: $userId");
-          });
-          String? companyName = responseData["company_name"];
-          await prefs.setString('company_name', companyName!);
-          setState(() {
-            company_name = companyName;
-          });
-
-          // Extract and store additional values
-          String? lName = responseData["last_name"];
-          await prefs.setString('lastName', lName!);
-
-          setState(() {
-            lastName = lName;
-          });
-
-
-          String? dist = responseData["district"];
-          await prefs.setString('district', dist!);
-
-          setState(() {
-            district = dist;
-          });
-
-          String? chap = responseData["chapter"];
-          await prefs.setString('chapter', chap!);
-
-          setState(() {
-            chapter = chap;
-          });
-
-          String? nat = responseData["native"];
-          await prefs.setString('native', nat!);
-
-          setState(() {
-            native = nat;
-          });
-
-          String? dob = responseData["dob"];
-          await prefs.setString('DOB', dob!);
-
-          setState(() {
-            DOB = dob;
-          });
-
-          String? koottam = responseData["koottam"];
-          await prefs.setString('Koottam', koottam!);
-
-          setState(() {
-            Koottam = koottam;
-          });
-
-          String? kovil = responseData["kovil"];
-          await prefs.setString('Kovil', kovil!);
-
-          setState(() {
-            Kovil = kovil;
-          });
-
-          String? bloodGroup = responseData["blood_group"];
-          await prefs.setString('BloodGroup', bloodGroup!);
-
-          setState(() {
-            BloodGroup = bloodGroup;
-          });
-          String? Wad = responseData["WAD"];
-          await prefs.setString('WAD', Wad!);
-
-          setState(() {
-            WAD = Wad;
-          });
-          String? s_name = responseData["s_name"];
-          await prefs.setString('s_name', s_name!);
-
-          setState(() {
-            spouse_name = bloodGroup;
-          });
-          String? s_blood = responseData["s_blood"];
-          await prefs.setString('s_blood', s_blood!);
-
-          setState(() {
-            spouse_blood = bloodGroup;
-          });
-          String? place = responseData["place"];
-          await prefs.setString('place', place!);
-
-          setState(() {
-            Place = place;
-          });
-          String? skovil = responseData["s_father_kovil"];
-          await prefs.setString('s_father_kovil', skovil!);
-
-          setState(() {
-            s_kovil = skovil;
-          });
-          String? skoottam = responseData["s_father_koottam"];
-          await prefs.setString('s_father_koottam', skoottam!);
-
-          setState(() {
-            s_koottam = skoottam;
-          });
-          String? edu = responseData["education"];
-          await prefs.setString('education', edu!);
-
-          setState(() {
-            education = edu;
-          });
-          String? mobileNo = responseData["mobile"];
-          await prefs.setString('mobile', mobileNo!);
-
-          setState(() {
-            mobile = mobileNo;
-          });String? b_year = responseData["b_year"];
-          await prefs.setString('b_year', b_year!);
-
-          setState(() {
-            byear = b_year;
-          });String? referrerid = responseData["referrer_id"];
-          await prefs.setString('referrer_id', referrerid!);
-
-          setState(() {
-            rid = referrerid;
-          });String? email_id = responseData["email"];
-          await prefs.setString('email', email_id!);
-
-          setState(() {
-            email = email_id;
-          });
-          String? pastExeperience = responseData["past_experience"];
-          await prefs.setString('past_experience', pastExeperience!);
-
-          setState(() {
-            pexe = pastExeperience;
-          });
-          String? web = responseData["website"];
-          await prefs.setString('website', web!);
-
-          setState(() {
-            website = web;
-          });
-          String? image = responseData["profile_image"];
-          await prefs.setString('profile_image', image!);
-
-          setState(() {
-            profile_image = image;
           });
 
         //  Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
@@ -267,28 +117,24 @@ class _LoginSubClassState extends State<LoginSubClass> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Homepage(
-
                   userType: userType,
                   userID: userId,
                 )),
-
               );
               break;
             case "Non-Executive":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NonExecutiveHome(
-
+                MaterialPageRoute(builder: (context) => NonExecutiveHomeNav(
                   userType: userType,
-                  userID:userId,
+                  userId:userId,
                 )),
-
               );
               break;
             case "Guest":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => GuestHomePage(
+                MaterialPageRoute(builder: (context) => GuestHome(
 
                   userType: userType,
                   userId: userId,
