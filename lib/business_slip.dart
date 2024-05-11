@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:gipapp/business.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,8 +23,8 @@ class _ReferralPageState extends State<ReferralPage> {
   TextEditingController tomobile =TextEditingController();
   TextEditingController to =TextEditingController();
   TextEditingController cname =TextEditingController();
-  TextEditingController referrername =TextEditingController();
-  TextEditingController businessmobile = TextEditingController();
+  TextEditingController referreename =TextEditingController();
+  TextEditingController referreemobile = TextEditingController();
   TextEditingController purpose = TextEditingController();
 
   String? fname = "";
@@ -66,21 +67,22 @@ class _ReferralPageState extends State<ReferralPage> {
   }
   Future<void> InsertBusinessSlip() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
         final response = await http.post(
           url,
-       /*   body: jsonEncode({
-            "type": data[0]["id"],
-            "Toname": namecontroller.text,
-            "Tomobile": discountcontroller.text,
-            "Tocompanyname": formattedDate,
-            "purpose": type,
-            "first_name": data[0]["first_name"],
-            "last_name": data[0]["last_name"],
-            "mobile": data[0]["mobile"],
-            "company_name": data[0]["company_name"],
-            "block_status": "Unblock"
-          }),*/
+          body: jsonEncode({
+            "type": typeofvisitor,
+            "Toname": to.text,
+            "Tomobile": tomobile.text,
+            "Tocompanyname": cname.text,
+            "purpose": purpose.text,
+            "referree_name": referreename.text,
+            "referree_mobile": referreemobile.text,
+            "referrer_name": fname,
+            "referrer_mobile": mobile,
+            "referrer_company": companyname,
+            "status": status
+          }),
         );
         print(url);
         print("ResponseStatus: ${response.statusCode}");
@@ -119,7 +121,8 @@ class _ReferralPageState extends State<ReferralPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(onPressed:(){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const SlipHistory())); },
+            Navigator.push(context, MaterialPageRoute(
+                builder: (context) => BusinessHistory(userType: widget.userType, userId: widget.userId))); },
               icon: const Icon(Icons.more_vert)),
         ],
       ),
@@ -270,7 +273,7 @@ class _ReferralPageState extends State<ReferralPage> {
                         child: SizedBox(
                           width: 300,
                           child: TextFormField(
-                            controller: referrername,
+                            controller: referreename,
                             validator: (value){
                               if(value!.isEmpty){
                                 return '* Enter the name';
@@ -281,14 +284,14 @@ class _ReferralPageState extends State<ReferralPage> {
                             },
                             onChanged: (value) {
                               String capitalizedValue = capitalizeFirstLetter(value);
-                              referrername.value = referrername.value.copyWith(
+                              referreename.value = referreename.value.copyWith(
                                 text: capitalizedValue,
                                 selection: TextSelection.collapsed(offset: capitalizedValue.length),
                               );
                             },
                             decoration: const InputDecoration(
-                              labelText: 'Referrer Name',
-                              hintText: 'Referrer Name',
+                              labelText: 'Referree Name',
+                              hintText: 'Referree Name',
                                 suffixIcon: Icon(Icons.account_circle_outlined,color: Colors.green,)
                             ),
                             inputFormatters: [
@@ -304,7 +307,7 @@ class _ReferralPageState extends State<ReferralPage> {
                         child: SizedBox(
                           width: 300,
                           child: TextFormField(
-                            controller: businessmobile,
+                            controller: referreemobile,
                             validator: (value){
                               if(value!.isEmpty){
                                 return '* Enter the mobile Number';
@@ -386,6 +389,7 @@ class _ReferralPageState extends State<ReferralPage> {
                               color: Colors.orangeAccent,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
                               onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>BusinessPage(userId: widget.userId, userType: widget.userType)));
                               },
                               child: const Text('Cancel',
                                 style: TextStyle(color: Colors.white),)),
@@ -398,9 +402,10 @@ class _ReferralPageState extends State<ReferralPage> {
                               color: Colors.green[800],
                               onPressed: (){
                                 if (_formKey.currentState!.validate()) {
+                                  InsertBusinessSlip();
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>BusinessPage(userId: widget.userId, userType: widget.userType)));
                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                       content: Text("Registered Successfully")));
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>BusinessHistory()));
                                 }
                               },
                               child: const Text('SUBMIT',

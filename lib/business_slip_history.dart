@@ -1,19 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
-class SlipHistory extends StatelessWidget {
-  const SlipHistory({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: BusinessHistory(),
-    );
-  }
-}
 class BusinessHistory extends StatefulWidget {
-  const BusinessHistory({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const BusinessHistory({Key? key, required this.userType, required this.userId}) : super(key: key);
 
   @override
   State<BusinessHistory> createState() => _BusinessHistoryState();
@@ -26,13 +22,14 @@ class _BusinessHistoryState extends State<BusinessHistory> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Business History"),
+          title: Text("Business History", style: Theme.of(context).textTheme.bodySmall,),
           centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
 
         body: Column(
-          children: const [
-            TabBar(
+          children: [
+            const TabBar(
                 isScrollable: true,
                 labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
@@ -44,9 +41,9 @@ class _BusinessHistoryState extends State<BusinessHistory> {
             Expanded(
               child: TabBarView(
                 children: [
-                  Pending(),
-                  Completed(),
-                  Unsuccessful(),
+                  Pending(userType: widget.userType, userId: widget.userId),
+                  Completed(userType: widget.userType, userId: widget.userId),
+                  Unsuccessful(userType: widget.userType, userId: widget.userId),
                 ],
               ),
             ),
@@ -58,7 +55,9 @@ class _BusinessHistoryState extends State<BusinessHistory> {
 }
 
 class Completed extends StatefulWidget {
-  const Completed({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const Completed({super.key, required this.userType, required this.userId});
 
   @override
   State<Completed> createState() => _CompletedState();
@@ -215,37 +214,93 @@ class _CompletedState extends State<Completed> {
   }
 }
 class Pending extends StatefulWidget {
-  const Pending({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const Pending({super.key, required this.userType, required this.userId});
 
   @override
   State<Pending> createState() => _PendingState();
 }
 
 class _PendingState extends State<Pending> {
-  //String? name = "";
-  // String? companyname ="";
-  // String? location ="";
-  // String? purpose="";
-  // String? to="";
-  // String? typeofvisitor="";
+
   String? uid="";
   String? mobile ="";
   String? firstname ="";
+  String? fetchMobile ="";
+  List<Map<String,dynamic>>userdata=[];
+  Future<void> fetchData() async {
+    print("with user id ${widget.userId}");
+    try {
+      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      final response = await http.get(url);
+      print("fetch url:$url");
 
+      if (response.statusCode == 200) {
+        print("fetch status code:${response.statusCode}");
+        print("fetch body:${response.body}");
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                fetchMobile = userdata[0]["mobile"]??"";
+              });
+              getData();
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  String status = "Pending";
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      print("gib members url =$url");
+      final response = await http.get(url);
+      print("gib members ResponseStatus: ${response.statusCode}");
+      print("gib members Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("gib members ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        data = itemGroups.cast<Map<String, dynamic>>();
+        print('gib members Data: $data');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
   @override
   void initState() {
-    // TODO: implement initState
+    fetchData();
     super.initState();
   }
 
-  String status = "Pending";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:
-
-
-        Center(
+        body: /*Center(
           child: Column(
             children: [
               ExpansionTile(
@@ -337,21 +392,20 @@ class _PendingState extends State<Pending> {
               ),
             ],
           ),
-        )
-      /*ListView.builder(
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      Map fromitem = [index] as Map;
-                      if (fromitem["To Mobile"] == mobile || fromitem["Mobile"] == mobile) {
-                        return Center(
+        )*/
+                 ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, i) {
+                      return Center(
                           child: Column(
                             children: [
                               ExpansionTile(
-                                leading: fromitem["Mobile"] != mobile
+                                leading: data[i]["Tomobile"] == fetchMobile
                                     ? Icon(Icons.call_received, color: Colors.green[800],)
                                     : const Icon(Icons.call_made, color: Colors.red,),
-                                title:fromitem["Mobile"] ==mobile
-                                    ? Row(
+                                title:
+                                //data[i]["mobile"] == mobile ?
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
 
@@ -359,31 +413,15 @@ class _PendingState extends State<Pending> {
                                       padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                                       child: Column(
                                         children: [
-                                          SizedBox(height: 20,),
-                                          Text('${fromitem["To Name"]}\n'),
+                                          SizedBox(height: 30,),
+                                          Text('${data[i]["Toname"]}\n'),
                                         ],
                                       ),
                                     ),
 
                                     IconButton(
                                         onPressed: () async {
-                                          final call = Uri.parse("tel://""${fromitem["To Mobile"]}");
-                                          if (await canLaunchUrl(call)) {
-                                            launchUrl(call);
-                                          } else {
-                                            throw 'Could not launch $call';
-                                          }
-                                        },
-                                        icon: const Icon(Icons.call,color: Colors.green,)),
-                                  ],
-                                )
-                                    : Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('${fromitem["First Name"]}\n'),
-                                    IconButton(
-                                        onPressed: () async {
-                                          final call = Uri.parse("tel://""${fromitem["Mobile"]}");
+                                          final call = Uri.parse("tel://""${data[i]["Tomobile"]}");
                                           if (await canLaunchUrl(call)) {
                                             launchUrl(call);
                                           } else {
@@ -393,19 +431,33 @@ class _PendingState extends State<Pending> {
                                         icon: const Icon(Icons.call,color: Colors.green,)),
                                   ],
                                 ),
+                                    /*: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('${data[i]["First Name"]}\n'),
+                                    IconButton(
+                                        onPressed: () async {
+                                          final call = Uri.parse("tel://""${data[i]["Mobile"]}");
+                                          if (await canLaunchUrl(call)) {
+                                            launchUrl(call);
+                                          } else {
+                                            throw 'Could not launch $call';
+                                          }
+                                        },
+                                        icon: const Icon(Icons.call,color: Colors.green,)),
+                                  ],
+                                ),*/
                                 children: [
-
-
-                                  Row(
+                                  data[i]['type'] != 'Self' ?Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text("Referrer Name :"'${fromitem["Referrer Name"]}\n'),
+                                        child: Text("Referree Name :"'${data[i]["referree_name"]}\n'),
                                       ),
                                       IconButton(
                                           onPressed: () async {
-                                            final call = Uri.parse("tel://""${fromitem["Referrer Mobile"]}");
+                                            final call = Uri.parse("tel://""${data[i]["referree_mobile"]}");
                                             if (await canLaunchUrl(call)) {
                                               launchUrl(call);
                                             } else {
@@ -414,36 +466,34 @@ class _PendingState extends State<Pending> {
                                           },
                                           icon: const Icon(Icons.call,color: Colors.green,)),
                                     ],
-                                  ),
+                                  ) : Container(),
 
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text("Purpose : " '${fromitem["Purpose"]}\n'),
+                                        child: Text("Purpose : " '${data[i]["purpose"]}\n'),
                                       ),
                                     ],
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                                        child:  Text('Date   :'"${data[i]["createdOn"]}"),
 
+                                      ),
+                                    ],
+                                  ),
 
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child:  Text('Date   :'"${fromitem["Date"]}"),
-
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text('Reason  : '"${fromitem["Hold Reason"]}"),
+                                        child: Text('Reason  : '"${data[i]["Hold Reason"]}"),
                                       ),
                                     ],
                                   ),
@@ -452,18 +502,18 @@ class _PendingState extends State<Pending> {
                             ],
                           ),
                         );
-                      }
                       return Container();
                     }
                 )
-*/
     );
 
   }
 }
 
 class Unsuccessful extends StatefulWidget {
-  const Unsuccessful({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const Unsuccessful({super.key, required this.userType, required this.userId});
 
   @override
   State<Unsuccessful> createState() => _UnsuccessfulState();

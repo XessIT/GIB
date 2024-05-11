@@ -14,17 +14,14 @@
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    $table = isset($_GET['table']) ? $_GET['table'] : "";
-    if ($table == "UnblockOffers") {
-            $offerlist = "SELECT * FROM offers where block_status='Unblock'";
+    if ($table == "business_slip") {
+    $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
+            $offerlist = "SELECT * FROM business_slip where Tomobile='$mobile' OR referrer_mobile='$mobile'";
             $offerResult = mysqli_query($conn, $offerlist);
             if ($offerResult && mysqli_num_rows($offerResult) > 0) {
                 $offers = array();
                 while ($row = mysqli_fetch_assoc($offerResult)) {
                     $offers[] = $row;
-                  /*    while ($row = mysqli_fetch_assoc($offerResult)) {
-                                    $row['offer_image'] = base64_encode(file_get_contents($row['offer_image'])); // Encode image data to base64
-                                    $offers[] = $row;
-                                } */
                 }
                 echo json_encode($offers);
             } else {
@@ -71,22 +68,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle the insert/update/delete actions
    $data = json_decode(file_get_contents("php://input"));
-   $imagename = mysqli_real_escape_string($conn, $data->imagename);
-   $imagedata = mysqli_real_escape_string($conn, $data->imagedata);
-   $name = mysqli_real_escape_string($conn, $data->name);
-   $discount = mysqli_real_escape_string($conn, $data->discount);
-   $user_id = mysqli_real_escape_string($conn, $data->user_id);
-   $offer_type = mysqli_real_escape_string($conn, $data->offer_type);
-   $validity = mysqli_real_escape_string($conn, $data->validity);
-   $first_name = mysqli_real_escape_string($conn, $data->first_name);
-   $last_name = mysqli_real_escape_string($conn, $data->last_name);
-   $mobile = mysqli_real_escape_string($conn, $data->mobile);
-   $company_name = mysqli_real_escape_string($conn, $data->company_name);
-   $block_status = mysqli_real_escape_string($conn, $data->block_status);
-    $path = "offers/$imagename";
-       $insertUserQuery = "INSERT INTO `offers`(`user_id`, `offer_type`, `name`, `discount`, `validity`, `first_name`, `last_name`, `mobile`, `company_name`, `block_status`, `offer_image`)
-      VALUES ('$user_id','$offer_type','$name','$discount','$validity', '$first_name', '$last_name', '$mobile', '$company_name', '$block_status', '$path')";
-      file_put_contents($path, base64_decode($imagedata));
+   $type = mysqli_real_escape_string($conn, $data->type);
+   $Toname = mysqli_real_escape_string($conn, $data->Toname);
+   $Tomobile = mysqli_real_escape_string($conn, $data->Tomobile);
+   $Tocompanyname = mysqli_real_escape_string($conn, $data->Tocompanyname);
+   $purpose = mysqli_real_escape_string($conn, $data->purpose);
+   $referree_name = mysqli_real_escape_string($conn, $data->referree_name);
+   $referree_mobile = mysqli_real_escape_string($conn, $data->referree_mobile);
+   $referrer_name = mysqli_real_escape_string($conn, $data->referrer_name);
+   $referrer_mobile = mysqli_real_escape_string($conn, $data->referrer_mobile);
+   $referrer_company = mysqli_real_escape_string($conn, $data->referrer_company);
+   $status = mysqli_real_escape_string($conn, $data->status);
+
+       $insertUserQuery = "INSERT INTO `business_slip`(`type`, `Toname`, `Tomobile`, `Tocompanyname`, `purpose`, `referree_name`, `referree_mobile`, `referrer_name`, `referrer_mobile`, `referrer_company`, `status`)
+      VALUES ('$type','$Toname','$Tomobile','$Tocompanyname','$purpose', '$referree_name', '$referree_mobile', '$referrer_name', '$referrer_mobile', '$referrer_company', '$status')";
       $arr = [];
       $insertUserResult = mysqli_query($conn, $insertUserQuery);
       if($insertUserResult) {
