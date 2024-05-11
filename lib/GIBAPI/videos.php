@@ -23,6 +23,9 @@ if (isset($_FILES['video'])) {
 
     // Define the directory where videos will be stored on the server
     $uploadDir = 'videos/';
+        // Set a maximum file size limit (10MB)
+
+
 
     // Validate file type (MP4)
     $fileType = strtolower(pathinfo($videoName, PATHINFO_EXTENSION));
@@ -31,7 +34,7 @@ if (isset($_FILES['video'])) {
     }
 
     // Set a maximum file size limit (e.g., 100MB)
-    $maxFileSize = 100 * 1024 * 1024; // 100MB in bytes
+    $maxFileSize = 10 * 1024 * 1024; // 100MB in bytes
     if ($videoSize > $maxFileSize) {
         die('File size exceeds the maximum limit of 100MB.');
     }

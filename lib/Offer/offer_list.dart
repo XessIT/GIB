@@ -105,7 +105,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
 /*
     offers();
 */
-    getData();
+   getData();
     // print("USER ID---${widget.userId}");
     // TODO: implement initState
     super.initState();
@@ -483,10 +483,15 @@ class _RunningPageState extends State<RunningPage> {
   @override
   void initState() {
     getData();
+    print('----------------------------');
+
+    print('getdata $getData()');
+    print('----------------------------');
     // TODO: implement initState
     super.initState();
   }
   List<Map<String, dynamic>> data=[];
+
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
@@ -535,6 +540,10 @@ class _RunningPageState extends State<RunningPage> {
     }
 
   }
+
+
+
+
   Future<Uint8List?> getImageBytes(String imageUrl) async {
     try {
       print('imageUrl: $imageUrl');
@@ -748,7 +757,10 @@ class _RunningPageState extends State<RunningPage> {
                 ),
               );
             }
-        ));
+        )
+
+
+    );
 
   }
 }
@@ -937,7 +949,8 @@ class _BlockPageState extends State<BlockPage> {
           data = filteredData;
         });
         print('Data: $data');
-      } else {
+      }
+      else {
         print('Error: ${response.statusCode}');
         // Handle HTTP error gracefully
         // For example, you could show a snackbar or toast to notify the user

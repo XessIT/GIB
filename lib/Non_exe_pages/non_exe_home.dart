@@ -1,16 +1,113 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart'as http;
+import '../Offer/offer.dart';
+import '../about_view.dart';
+import '../blood_group.dart';
 import '../change_mpin.dart';
+import '../duplicate.dart';
+import '../gib_doctors.dart';
 import '../gib_members.dart';
+import '../guest_home.dart';
+import '../guest_slip.dart';
 import '../home.dart';
 import '../login.dart';
 import '../profile.dart';
+
+
+class NonExecutiveHomeNav extends StatefulWidget {
+  final String? userType;
+  final String? userId;
+
+  NonExecutiveHomeNav({
+    Key? key,
+    required this.userType,
+    required this.userId,
+  }) : super(key: key);
+
+  @override
+  _NonExecutiveHomeNavState createState() => _NonExecutiveHomeNavState();
+}
+
+class _NonExecutiveHomeNavState extends State<NonExecutiveHomeNav> {
+
+  int _currentIndex = 0;
+
+  late List<Widget> _pages;
+  @override
+  void initState() {
+    _pages = [
+      NonExecutiveHome(userID:widget.userId , userType:widget.userType,)
+
+
+
+      // Add more pages as needed
+    ];
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+
+
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.black45,),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services, color: Colors.black45,),
+            label: 'Doctor',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bloodtype, color: Colors.black45,),
+            label: 'Blood Group',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.accessibility_new, color: Colors.black45),
+            label: 'About',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle, color: Colors.black45),
+            label: 'Profile',
+          ),
+
+          // Add more BottomNavigationBarItems as needed
+        ],
+        type: BottomNavigationBarType.fixed, // Set type to fixed for text labels
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.black45,
+        iconSize: 30,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        elevation: 5,
+        selectedLabelStyle: TextStyle(color: Colors.white),
+        unselectedLabelStyle: TextStyle(color: Colors.white),
+        selectedIconTheme: IconThemeData(color: Colors.green),
+      ),
+
+
+    );
+  }
+}
+
+
 
 class NonExecutiveHome extends StatefulWidget {
 
@@ -29,76 +126,30 @@ class NonExecutiveHome extends StatefulWidget {
 
 class _NonExecutiveHomeState extends State<NonExecutiveHome> {
 
-  List<Map<String,dynamic>>userdata=[];
-  Future<void> fetchData(String? userId) async {
-    try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
-      final response = await http.get(url);
+  TextEditingController guestcount =TextEditingController();
+  List<Map<String, dynamic>> userdata = [];
+  List<Map<String, dynamic>> offersdata = [];
+  String? registerStatus = "Register";
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Uint8List? _imageBytes;
+  String imageUrl = "";
+  String? fetchMobile ="";
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (responseData is List<dynamic>) {
-          setState(() {
-            userdata = responseData.cast<Map<String, dynamic>>();
-            if (userdata.isNotEmpty) {
-              setState(() {
-                // fetchName = userdata[0]["first_name"]??"";
-                // fetchLastName= userdata[0]['last_name']??"";
-                // fetchMemberId=userdata[0]["member_id"]??"";
-                // fetchMemberType = userdata[0]["member_type"]??"";
-                // fetchTeamName = userdata[0]["team_name"]??"";
-                // fetchMobile = userdata[0]["mobile"]??"";
-              });
-            }
-          });
-        } else {
-          // Handle invalid response data (not a List)
-          print('Invalid response data format');
-        }
-      } else {
-        // Handle non-200 status code
-        //  print('Error: ${response.statusCode}');
-      }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
-    }
+
+
+  @override
+  void initState() {
+    fetchData(widget.userID);
+    print('--------------------');
+    print('getdata:$getData()');
+    getData();
+    getData1();
+    print('--------------------');
+
+    super.initState();
   }
 
 
-  ///offers fetch
-  List<Map<String,dynamic>>offersdata=[];
-  Future<void> offersfetchData() async {
-    try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
-      final response = await http.get(url);
-      print(url);
-
-      if (response.statusCode == 200) {
-        // print("status code: ${response.statusCode}");
-        // print("status body: ${response.body}");
-
-        final responseData = json.decode(response.body);
-        if (responseData is List<dynamic>) {
-          setState(() {
-            offersdata = responseData.cast<Map<String, dynamic>>();
-            //  print("offers data : $offersdata");
-          });
-        } else {
-          // Handle invalid response data (not a List)
-          print('Invalid response data format');
-        }
-      } else {
-        // Handle non-200 status code
-        print('Error: ${response.statusCode}');
-      }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
-    }
-  }
-  ///register Meeting data store code
-  String? registerStatus="Register";
   Future<void> registerDateStoreDatabase(String meetingId,String meetingType, String meetingDate, String meetingPlace) async {
     try {
       String uri = "http://localhost/GIB/lib/GIBAPI/register_meeting.php";
@@ -117,7 +168,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
         // print("Register Response Status: ${res.statusCode}");
         //print("Register Response Body: ${res.body}");
         var response = jsonDecode(res.body);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> NonExecutiveHome(userID: widget.userID,userType: widget.userType,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> Home(userType: widget.userID, userId: widget.userType)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registration Successfully")));
       } else {
         print("Failed to upload image. Server returned status code: ${res.statusCode}");
@@ -127,185 +178,268 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
     }
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    offersfetchData();
-    fetchData(widget.userID);
-    super.initState();
+  Future<void> fetchData(String? userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+              _imageBytes = base64Decode(userdata[0]['profile_image']);
+            }
+          });
+        } else {
+          print('Invalid response data format');
+        }
+      } else {
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
   }
+  List<Map<String, dynamic>> data=[];
+  String type = "Non-Executive";
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/non_exe_meeting.php?member_type=$type');
+      print('URL: $url');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime registrationOpeningDate;
+          DateTime registrationClosingDate;
+          try {
+            registrationOpeningDate = DateTime.parse(item['registration_opening_date']);
+            registrationClosingDate = DateTime.parse(item['registration_closing_date']);
+          } catch (e) {
+            print('Error parsing registration dates: $e');
+            return false;
+          }
+          print('Registration Opening Date: $registrationOpeningDate');
+          print('Registration Closing Date: $registrationClosingDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the registration opening date is before the current date
+          bool isOpenForRegistration = registrationOpeningDate.isBefore(DateTime.now());
+
+          // Check if the registration closing date is after the current date
+          bool isRegistrationOpen = registrationClosingDate.isAfter(DateTime.now());
+
+          print('Is Open for Registration: $isOpenForRegistration');
+          print('Is Registration Open: $isRegistrationOpen');
+
+          // Return true if the meeting is open for registration and false otherwise
+          return isOpenForRegistration && isRegistrationOpen;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+          print('Data123: $data');
+          print('--------------------');
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
+///Define a function to format the time string
+  String _formatTimeString(String timeString) {
+    // Split the time string into hour, minute, and second components
+    List<String> timeComponents = timeString.split(':');
+
+    // Extract hour and minute components
+    int hour = int.parse(timeComponents[0]);
+    int minute = int.parse(timeComponents[1]);
+
+    // Format the time string
+    String formattedTime = '${_twoDigits(hour)}:${_twoDigits(minute)}';
+
+    return formattedTime;
+  }
+  String _twoDigits(int n) {
+    if (n >= 10) {
+      return "$n";
+    }
+    return "0$n";
+  }
+
+  /// offers fetch
+  List<Map<String, dynamic>> data1=[];
+  Future<void> getData1() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      print(url);
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        // data = itemGroups.cast<Map<String, dynamic>>();
+        // Filter data based on user_id and validity date
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['validity']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Widget User ID: ${widget.userID}');
+          print('Item User ID: ${item['user_id']}');
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now());
+          print("Item block status: ${item['block_status']}");
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        // Call setState() after updating data
+        setState(() {
+          // Cast the filtered data to the correct type
+          data1 = filteredData.cast<Map<String, dynamic>>();
+        });
+        print('Data: $data1');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
+  Future<Uint8List?> getImageBytes(String imageUrl) async {
+    try {
+      print("123456789087654323456789");
+      print('imageUrl: $imageUrl');
+      print("123456789087654323456789");
+
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return null;
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    var w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.green[50],
-      drawer:  SafeArea(
-          child: NavDrawer(
-            userID:widget.userID.toString(),
-            userType:widget.userType.toString(),
-          )),
-      appBar: AppBar(centerTitle: true,
-        actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.notifications_active_outlined))
-        ],
-        iconTheme:  IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
-        ),
-        title: Text("GIB",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green.shade900,
-        child: Row(
-          children: [
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.search,color: Colors.white,), onPressed: () {})),
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.people_alt_outlined,color: Colors.white,), onPressed: () {})),
-
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.home_outlined,color: Colors.white,), onPressed: () {})),
-
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.settings_outlined,color: Colors.white,), onPressed: () {})),
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.bloodtype_outlined,color: Colors.white,), onPressed: () {})),
-          ],
+      key: _scaffoldKey,
+      drawer: SafeArea(
+        child: NavDrawer(
+          userID: widget.userID.toString(),
+          userType: widget.userType.toString(),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Form(
+      body: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        children: [
+          // Your existing Column
+          SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SafeArea(
-                  child: SizedBox(
-                    width: w,
-                    height: 100,
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left:8.0),
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage("assets/pro1.jpg"),
-                            radius: 35,
-                          ),
+            
+                SizedBox(height: 180),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 0,
+                    child: Container(
+            
+                      child: Text(
+                        'Upcoming Meetings',
+                        style: GoogleFonts.aBeeZee(
+                          fontSize: 20,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left:8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Bhuvana',
-                                style: GoogleFonts.aBeeZee(
-                                  fontSize: 20,
-                                  color: Colors.indigo,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('memberid!',
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  //  Text('${widget.userType}',
-                                  Text('Executive',
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  Text('teamName!',
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  Text( DateFormat()
-                                  // displaying formatted date
-                                      .format(DateTime.now()),
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-
-
-
-
+                SizedBox(height: 10),
                 Container(
-                  width: w,
-                  // height: 900,
-                  decoration:   BoxDecoration(
-                      color: Colors.green.shade900,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
-                  ),
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('   Upcoming Meeting',style: Theme.of(context).textTheme.titleLarge,),
-                        ),
-                      ),
-                      const SizedBox(height: 10,width: 20,),
-
-                      Container(
-                        //  height: 300,
-                        width: w,
-                        color: Colors.green.shade900,
-                        child: Column(
-                          children: [
-
-                            Container(
-                              width: w-30,
-                              height: 120,
-                              //margin: const EdgeInsets.all(220.0),
-                              padding: const EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.blue.shade100
-                                  ],
-                                ),
-                                border: Border.all(
-                                    color: Colors.green,width: 2),
-                                borderRadius: BorderRadius.circular(20.0),
-                                /* image: DecorationImage(
-                      image: const AssetImage("assets/home.png"),
-                      colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.2), BlendMode.dstATop),
-                      fit: BoxFit.cover),*/
-                              ),
-                              child: CarouselSlider(
-                                items: [
-                                  Column(
-                                    children: [
-
-                                      const SizedBox(height: 30,),
-                                      Row(
+                  child: CarouselSlider(
+                    items: data.map((meeting) {
+                      String meetingDate = meeting['meeting_date'];
+                      String meetingPlace = meeting['place'];
+                      String meetingType = meeting['meeting_type'];
+                      String id = meeting['id'];
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container( // Wrap Card with Container
+                            width: MediaQuery.of(context).size.width, // Set width to full width of the screen
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('${meeting['meeting_type']}',style:TextStyle(color: Colors.green,fontSize: 20),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10,),
+            
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            
+                                        children: [
+                                          Text('${meeting['meeting_date']}',style:TextStyle(color: Colors.black,fontSize: 20),),
+                                          Text('${meeting['meeting_name']}',style:TextStyle(color: Colors.black,fontSize: 20),),
+                                        ],
+                                      ),
+                                    ),
+            
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text('4-7-2022\n'
-                                              'Erode',),
-                                          const Text('Team Meeting',),
+                                          Text(
+                                            '${_formatTimeString(meeting['from_time'])} to ${_formatTimeString(meeting['to_time'])}',
+                                            style: TextStyle(color: Colors.black, fontSize: 20),
+                                          ),
+                                          SizedBox(width: 10), // Space between icon and text
+                                          Icon(Icons.location_on,color: Colors.green,), // Location icon
+                                          SizedBox(width: 2), // Space between icon and text
+                                          Text(meeting['place'],style:TextStyle(color: Colors.black,fontSize: 20)),
+                                          SizedBox(width: 20,),
                                           IconButton(
                                               onPressed: () {
+                                                print('press icon');
                                                 showDialog(
                                                     context: context,
                                                     builder: (ctx) =>
@@ -317,51 +451,75 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                                                           style: TextStyle(
                                                               color: Colors.white)),
                                                       content: const Text(
-                                                          "Meeting Registered Successfully",
+                                                          "Do You Want to Register the Meeting?",
                                                           style: TextStyle(
                                                               color: Colors.white)),
                                                       actions: [
                                                         TextButton(
                                                             onPressed: () {
+                                                              GlobalKey<FormState> tempKey =GlobalKey<FormState>();
+            
+                                                              //store purpose..
+                                                                registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
                                                               showDialog(
                                                                   context: context,
                                                                   builder: (ctx) =>
-                                                                  // Dialog box for register meeting and add guest
-                                                                  AlertDialog(
-                                                                    backgroundColor: Colors.grey[800],
-                                                                    title: const Text('Add',
-                                                                        style: TextStyle(
-                                                                            color: Colors.white)),
-                                                                    content: const Text("Do you wish to add Guest?",
-                                                                        style: TextStyle(
-                                                                            color: Colors.white)),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                          onPressed: () {
-                                                                            //        Navigator.push(
-                                                                            //         context,
-                                                                            //        MaterialPageRoute(builder: (context) =>
-                                                                            //    const VisitorsSlip()),
-                                                                            //      );
-                                                                          },
-                                                                          child: const Text('Yes')),
-                                                                      /*   TextButton(
-                                                            onPressed: () {
-                                                              Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(builder: (context) =>
-                                                                const NonExeHomepage()),
-                                                              );
-                                                            },
-                                                            child: const Text('No'))
-*/                                                      ],
-                                                                  )
+                                                                      Form(
+                                                                        key:tempKey,
+                                                                        child: AlertDialog(
+                                                                          backgroundColor: Colors.grey[800],
+                                                                          title: const Text('Do you wish to add Guest?',
+                                                                              style: TextStyle(
+                                                                                  color: Colors.white)),
+                                                                          content: TextFormField(
+                                                                            controller: guestcount,
+                                                                            validator: (value){
+                                                                              if(value!.isEmpty){
+                                                                                return "* Enter a Guest Count";
+                                                                              }
+                                                                              return null;
+                                                                            },
+                                                                            decoration: const InputDecoration(
+                                                                              labelText: "Guest Count",
+                                                                              labelStyle: TextStyle(color: Colors.white),
+                                                                              hintText: "Ex:5",
+                                                                            ),
+                                                                          ),
+            
+                                                                          actions: [
+                                                                            TextButton(
+                                                                                onPressed: () {
+                                                                                  if(tempKey.currentState!.validate()) {
+                                                                                    Navigator.push(
+                                                                                        context,
+                                                                                        MaterialPageRoute(
+                                                                                            builder: (
+                                                                                                context) =>
+                                                                                                VisitorsSlip
+                                                                                                  (
+                                                                                                    userId:widget.userID,
+                                                                                                    meetingId:id,
+                                                                                                    guestcount: guestcount.text.trim(),
+                                                                                                    userType:widget.userType,
+                                                                                                    meeting_date:meetingDate,
+                                                                                                    user_mobile:fetchMobile.toString()
+                                                                                                )));
+                                                                                    print("UserID:-${widget.userID}${widget.userType}");
+                                                                                  } },
+                                                                                child: const Text('Yes')),
+                                                                            TextButton(
+                                                                                onPressed: () {
+                                                                                },
+                                                                                child: const Text('No'))
+                                                                          ],
+                                                                        ),
+                                                                      )
                                                               );
                                                             },
                                                             child: const Text('OK')),
                                                         TextButton(
                                                             onPressed: () {
-                                                              Navigator.of(ctx).pop();
+                                                              Navigator.pop(context);
                                                             },
                                                             child: const Text('Cancel'))
                                                       ],
@@ -370,578 +528,210 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                                               },
                                               icon: const Icon(
                                                 Icons.person_add_alt_1_rounded,
-                                                color: Colors.green,))
-                                        ],
-                                      )
-                                    ],
-                                  ),
+                                                color: Colors.green,
 
-                                  Column(
-                                    children: [
-
-                                      const SizedBox(height: 30,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          Text(
-                                            'Date: 4-7-2022\n'
-                                                'Place: Erode',),
-                                          Text('Network Meeting',),
-                                          Icon(
-                                            Icons.person_add_alt_1_rounded,
-                                            color: Colors.green,)
-                                        ],
-                                      )
-                                    ],
-                                  ),
-
-                                  Column(
-                                    children: [
-
-                                      const SizedBox(height: 30,),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          Text('Date: 4-7-2022\n'
-                                              'Place: Erode',),
-                                          Text('Training Program',),
-                                          Icon(Icons.person_add_alt_1_rounded,
-                                            color: Colors.green,)
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ],
-                                options: CarouselOptions(
-                                  height: 120.0,
-                                  enlargeCenterPage: true,
-                                  autoPlay: true,
-                                  aspectRatio: 16 / 9,
-                                  autoPlayCurve: Curves.fastOutSlowIn,
-                                  enableInfiniteScroll: true,
-                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                                  viewportFraction: 1,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Offers',style: Theme.of(context).textTheme.titleLarge,),
-                        ),
-                      ),
-                      Container(
-                        width: w,
-                        // height: 900,
-                        decoration:   BoxDecoration(
-                            color: Colors.green.shade900,
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
-                        ),
-                        child: Column(
-                          children: [
-
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Container(
-                                height: 700,
-                                child: Row(
-                                  children: offersdata.map((offer) {
-                                    String companyName = offer['company_name'] ?? '';
-                                    String name = offer['name'] ?? '';
-                                    String offerImage = offer['offer_image'] ?? '';
-                                    // print("image - $offerImage");
-
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: 120,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+                                              ))
                                         ],
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+            
+                                  ],
                                 ),
                               ),
                             ),
-
-/*
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Container(
-                        child: Row(
-                          children: [
-                            SizedBox(width: 15,),
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-
-                          ],
+                          );
+                        },
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      height: 170.0,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      aspectRatio: 16 / 9,
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enableInfiniteScroll: false,
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      viewportFraction: 1,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 0,
+                    child: Container(
+            
+                      child: Text(
+                        'Offer',
+                        style: GoogleFonts.aBeeZee(
+                          fontSize: 20,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-*/
-
-                            /*   const SizedBox(height: 15,),
-                    Container(
-                      width: 390,
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.white, Colors.white,
-                          ],
-                        ),
-                        border: Border.all(
-                            color: Colors.white,width: 2),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child:
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                height: 210,
-                                width: 180,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      color: Colors.black,
-                                    ),),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+                  child: ListView.builder(
+                      itemCount: data1.length,
+                      itemBuilder: (context, i) {
+                        String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data1[i]["offer_image"]}';
+                        String dateString = data1[i]['validity']; // This will print the properly encoded URL
+                        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                        return Center(
+                          child: Card(
+                            child: Column(
+                              children: [
+                                //MAIN ROW STARTS
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children:  [
+                                    //CIRCLEAVATAR STARTS
                                     CircleAvatar(
-                                      radius: 45,
+                                      radius: 40,
                                       backgroundColor: Colors.cyan,
-                                      backgroundImage: const
-                                      AssetImage('assets/car.jpg'),
+                                      backgroundImage: NetworkImage(imageUrl),
+                                      //IMAGE STARTS CIRCLEAVATAR
+                                      //  Image.network('${data[i]['offer_image']}').image,
                                       child: Stack(
-                                        children: const [
+                                        children: [
                                           Align(
                                             alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 18.5,
-                                                backgroundColor: Colors.green,
-                                                child: Text('10%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('A1 Car Accessories',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(height: 15,),
-                                    const Text('product -Ceramic Coating',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(DateFormat
-                                          ('dd/MM/yyyy').
-                                        format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                              Container(
-                                height: 210,
-                                width: 180,
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const AssetImage('assets/ro.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
+                                            //STARTS CIRCLE AVATAR OFFER
                                             child: CircleAvatar(
                                                 radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('15%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
+                                                backgroundColor: Colors.green[900],
+                                                child: Text('${data1[i]['discount']}%',
+                                                    style: Theme.of(context).textTheme.titleLarge)),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Jm Technology',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold), ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Service -Ro System',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    //END CIRCLEAVATAR
+            
+                                    Column(
                                       children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(DateFormat
-                                          ('dd/MM/yyyy').
-                                        format(DateTime.now(),),
+                                        //START TEXTS
+                                        Text('${data1[i]['company_name']}',
+                                          //Text style starts
                                           style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                              color: Colors.green,
+                                              fontSize: 15),),
+                                        const SizedBox(height: 10,),
+                                        //start texts
+                                        Text('${data1[i]['offer_type']} - ${data1[i]['name']}',
+                                          //Text style starts
+                                          style: const TextStyle(fontSize: 11,
+                                              fontWeight: FontWeight.bold
+                                          ),),
+                                        //Text starts
+                                        Text(DateFormat('dd-MM-yyyy').format(dateTime)),
                                       ],
                                     ),
+                                    //IconButton starts
+            
+                                    //IconButton starts
+            
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const Divider(color: Colors.black,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        );
+                      }
+                  ),
+                ),
+            
+            
+            
+              ],
+            ),
+          ),
+          /// meeting date. meeting type , place , time,  Additional Stack
+          Positioned(
+            top: 0,
+            left: 0,
+            right:0,
+            child:ClipPath(
+            clipper: CurveClipper(),
+            child: Container(
+              height: 100,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.green,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      'GIB',
+                      style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: IconButton(
+                      icon: Icon(Icons.menu, color: Colors.white),
+                      onPressed: () {
+                        print('press nav drawer');
+                        _scaffoldKey.currentState!.openDrawer();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ), ),
+          Positioned(
+            top: 80,
+            left: 20,
+            right: 20,
+            child: Card(
+              child: SizedBox(
+                height: 80,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          Text(
+                            userdata.isNotEmpty ? userdata[0]["first_name"] : "",
+                            style: GoogleFonts.aBeeZee(
+                              fontSize: 20,
+                              color: Colors.indigo,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                height: 210,
-                                width: 180,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      color: Colors.black,
-                                    ),),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const
-                                      AssetImage('assets/car.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('10%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('A1 Car Accessories',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(height: 15,),
-                                    const Text('product -Ceramic Coating',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(
-                                          DateFormat('dd/MM/yyyy').
-                                          format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                              Container(
-                                height: 210,
-                                width: 180,
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const AssetImage('assets/ro.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('15%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Jm Technology',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold), ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Service -Ro System',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(
-                                          DateFormat('dd/MM/yyyy').
-                                          format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                              Text(
+                                'Non-Executive Member',
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 10,
+                                  color: Colors.indigo,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -949,146 +739,20 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 180,),
-*/
-
-
-
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 100,),
-
-
-
-                    ],
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class MyBlinkingButton extends StatefulWidget {
-  const MyBlinkingButton({Key? key}) : super(key: key);
 
-  @override
-  _MyBlinkingButtonState createState() => _MyBlinkingButtonState();
-}
 
-class _MyBlinkingButtonState extends State<MyBlinkingButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
 
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _animationController.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animationController,
-      child: const Center(
-        child: CircleAvatar(
-          backgroundImage: AssetImage('assets/profile.jpg'),
-          radius: 30,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-}
-
-class MyBlinkingButton1 extends StatefulWidget {
-  const MyBlinkingButton1({Key? key}) : super(key: key);
-
-  @override
-  _MyBlinkingButton1State createState() => _MyBlinkingButton1State();
-}
-
-class _MyBlinkingButton1State extends State<MyBlinkingButton1>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _animationController.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animationController,
-      child: const Center(
-        child: CircleAvatar(
-          backgroundImage: AssetImage('assets/pro1.jpg'),
-          radius: 30,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-}
-
-class MyBlinkingButton2 extends StatefulWidget {
-  const MyBlinkingButton2({Key? key}) : super(key: key);
-
-  @override
-  _MyBlinkingButton2State createState() => _MyBlinkingButton2State();
-}
-
-class _MyBlinkingButton2State extends State<MyBlinkingButton2>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _animationController.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animationController,
-      child: const Center(
-        child: CircleAvatar(
-          backgroundImage: AssetImage('assets/pro2.jpg'),
-          radius: 30,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-}
 
 class NavDrawer extends StatefulWidget {
   String userType;
@@ -1101,7 +765,6 @@ class NavDrawer extends StatefulWidget {
   @override
   State<NavDrawer> createState() => _NavDrawerState();
 }
-
 class _NavDrawerState extends State<NavDrawer> {
 
   @override
@@ -1114,7 +777,7 @@ class _NavDrawerState extends State<NavDrawer> {
               leading: IconButton(
                 icon: const Icon(Icons.house,color: Colors.white,size: 30.0,),
                 onPressed: (){
-                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScrollApp(),));
                 }, ),
               title: const Text('Home',
                 style: TextStyle(fontSize: 20.0,color: Colors.white),),
@@ -1127,7 +790,7 @@ class _NavDrawerState extends State<NavDrawer> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
+                  /*IconButton(
                     icon: const Icon(Icons.snowshoeing,color: Colors.white,),
                     onPressed: () {
                       //   Navigator.push(
@@ -1135,7 +798,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       //    MaterialPageRoute(builder: (context) =>  const MyActivity()),
                       //   );
                     },
-                  ),
+                  ),*/
                   IconButton(
                     icon: const Icon(Icons.notifications,color: Colors.white,),
                     onPressed: () {
@@ -1167,29 +830,6 @@ class _NavDrawerState extends State<NavDrawer> {
                 // Navigator.pop(context),
               },
             ),
-            /* ListTile(
-              leading: const Icon(Icons.oil_barrel,color: Colors.green,),
-              title: Text('Business',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //     Navigator.push(
-                //     context,
-                //    MaterialPageRoute(builder: (context) =>  const Business()),
-                //   )
-              },
-            ),
-            const Divider(color: Colors.grey,),
-            ListTile(
-              leading: const Icon(Icons.account_tree,color: Colors.green,),
-              title: Text('Meeting',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //     Navigator.push(
-                //   context,
-                //    MaterialPageRoute(builder: (context) =>  const MeetingUpcoming()),
-                //     )
-              },
-            ),*/
             ListTile(
               leading: const Icon(Icons.oil_barrel,color: Colors.green,),
               title: Text('Attendance',
@@ -1213,17 +853,6 @@ class _NavDrawerState extends State<NavDrawer> {
               },
             ),
             const Divider(color: Colors.grey,),
-            /* ListTile(
-              leading: const Icon(Icons.photo,color: Colors.green,),
-              title: Text('My Gallery',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //       Navigator.push(
-                //    context,
-                //    MaterialPageRoute(builder: (context) =>  const MyGallery()),
-                //    )
-              },
-            ),*/
             ListTile(
               leading: const Icon(Icons.photo,color: Colors.green,),
               title: Text('GiB Gallery',
@@ -1252,41 +881,39 @@ class _NavDrawerState extends State<NavDrawer> {
               title: Text('GiB Members',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  GibMembers(userId: widget.userID, userType: widget.userType)))
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GibMembers(
+                    userType: widget.userType,
+                    userId: widget.userID,
+                  )),
+                )
               },
             ),
-            /* ListTile(
-              leading: const Icon(Icons.person_add,color: Colors.green,),
-              title: Text('Add Member',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //     Navigator.push(
-                //    context,
-                //    MaterialPageRoute(builder: (context) =>  const AddMember()),
-                //    )
-              },
-            ),*/
+            /// gib members
             ListTile(
               leading: const Icon(Icons.local_offer,color: Colors.green,),
               title: Text('Offers',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                //     Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) =>  const OffersPage()),
-                //    )
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  OffersPage(
+                    userId: widget.userID, userType: widget.userType,
+                  )),
+                )
               },
-            ),
+            ),  /// offers
             const Divider(color: Colors.grey,),
             ListTile(
               leading: const Icon(Icons.add_circle,color: Colors.red,),
               title: Text('GiB Doctors',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                //     Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) =>  const GibDoctors()),
-                //   )
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>   GibDoctors()),
+                )
               },
             ),
             ListTile(
@@ -1294,10 +921,10 @@ class _NavDrawerState extends State<NavDrawer> {
               title: Text('Blood Group',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                //       Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) =>  const BloodGroup()),
-                //   )
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BloodGroup(userId:widget.userID,userType:widget.userType)),
+                )
               },
             ),
             const Divider(color: Colors.grey,),
@@ -1306,10 +933,10 @@ class _NavDrawerState extends State<NavDrawer> {
               title: Text('About GiB',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                //          Navigator.push(
-                //       context,
-                //     MaterialPageRoute(builder: (context) =>  const AboutGib()),
-                //    )
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  AboutTab(userId:widget.userID,userType:widget.userType))
+                )
               },
             ),
             ListTile(
@@ -1324,19 +951,63 @@ class _NavDrawerState extends State<NavDrawer> {
               },
             ),
             ListTile(
-              leading: IconButton(
-                icon: Icon(Icons.logout),
-                onPressed: () async {
-                  // Clear the authentication status when logging out
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('isLoggedIn', false);
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
+              leading: Icon(
+                Icons.logout,
+                color: Colors.red,
               ),
+              title: Text(
+                'Log Out',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              onTap: () {
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.noHeader,
+                  width: 350,
+                  body: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Container(
+                          padding: EdgeInsets.all(20),
+                          child: Text("Are you sure want to Log out"));
+                    },
+                  ),
+                  btnOk: ElevatedButton(
+                    onPressed: () async {
+                      SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                      await prefs.setBool('isLoggedIn', false);
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
+                      // Handle OK button press
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.green),
+                    ),
+                    child: Text(
+                      'Yes',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  btnCancel: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.red),
+                    ),
+                    child: Text(
+                      'No',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ).show();
+                // Update UI based on item 2
+              },
             ),
           ],
         )
@@ -1344,58 +1015,6 @@ class _NavDrawerState extends State<NavDrawer> {
   }
 }
 
-
-class BlinkWidget extends StatefulWidget {
-  final List<Widget> children;
-  final int interval;
-
-  const BlinkWidget({required this.children, this.interval = 500, required Key key}) : super(key: key);
-
-  @override
-  _BlinkWidgetState createState() => _BlinkWidgetState();
-}
-
-class _BlinkWidgetState extends State<BlinkWidget> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  int _currentWidget = 0;
-
-  @override
-  initState() {
-    super.initState();
-
-    _controller = AnimationController(
-        duration: Duration(milliseconds: widget.interval),
-        vsync: this
-    );
-
-    _controller.addStatusListener((status) {
-      if(status == AnimationStatus.completed) {
-        setState(() {
-          if(++_currentWidget == widget.children.length) {
-            _currentWidget = 0;
-          }
-        });
-
-        _controller.forward(from: 0.0);
-      }
-    });
-
-    _controller.forward();
-  }
-
-  @override
-  dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: widget.children[_currentWidget],
-    );
-  }
-}
 
 
 

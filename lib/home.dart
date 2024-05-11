@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:typed_data';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -21,6 +22,7 @@ import 'gib_achievements.dart';
 import 'gib_doctors.dart';
 import 'gib_gallery.dart';
 import 'gib_members.dart';
+import 'guest_home.dart';
 import 'guest_slip.dart';
 import 'guest_slip_history.dart';
 import 'login.dart';
@@ -95,12 +97,7 @@ class _HomeState extends State<Home> {
 String? memberType ="Executive";
   @override
   void initState() {
-
-    print("UserId: ${widget.userId}");
-   // offersfetchData();
-  //  wishData(memberType!);
-
-    // TODO: implement initState
+    fetchData(widget.userId);
     super.initState();
   }
   final bdayDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
@@ -168,44 +165,31 @@ String? memberType ="Executive";
     }
   }
   String imageUrl = "";
+  Uint8List? _imageBytes;
+
   List<Map<String,dynamic>>userdata=[];
   Future<void> fetchData(String? userId) async {
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
-      //  print("fetch url:$url");
 
       if (response.statusCode == 200) {
-        // print("fetch status code:${response.statusCode}");
-        // print("fetch body:${response.body}");
-
         final responseData = json.decode(response.body);
         if (responseData is List<dynamic>) {
           setState(() {
             userdata = responseData.cast<Map<String, dynamic>>();
             if (userdata.isNotEmpty) {
-              setState(() {
-                fetchName = userdata[0]["first_name"]??"";
-                fetchLastName= userdata[0]['last_name']??"";
-                fetchMemberId=userdata[0]["member_id"]??"";
-                fetchMemberType = userdata[0]["member_type"]??"";
-                fetchTeamName = userdata[0]["team_name"]??"";
-                fetchMobile = userdata[0]["mobile"]??"";
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
-              });
+              imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+              _imageBytes = base64Decode(userdata[0]['profile_image']);
             }
           });
         } else {
-          // Handle invalid response data (not a List)
           print('Invalid response data format');
         }
       } else {
-        // Handle non-200 status code
-      //  print('Error: ${response.statusCode}');
+        //  print('Error: ${response.statusCode}');
       }
     } catch (error) {
-      // Handle other errors
       print('Error: $error');
     }
   }
@@ -309,725 +293,566 @@ String? memberType ="Executive";
     }
   }
 
+
+  /// Done By gowtham
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List<Map<String, dynamic>> data=[];
+  String type = "Executive";
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/non_exe_meeting.php?member_type=$type');
+      print('URL: $url');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final List<dynamic> itemGroups = responseData;
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime registrationOpeningDate;
+          DateTime registrationClosingDate;
+          try {
+            registrationOpeningDate = DateTime.parse(item['registration_opening_date']);
+            registrationClosingDate = DateTime.parse(item['registration_closing_date']);
+          } catch (e) {
+            print('Error parsing registration dates: $e');
+            return false;
+          }
+          print('Registration Opening Date: $registrationOpeningDate');
+          print('Registration Closing Date: $registrationClosingDate');
+          print('Current Date: ${DateTime.now()}');
+
+          // Check if the registration opening date is before the current date
+          bool isOpenForRegistration = registrationOpeningDate.isBefore(DateTime.now());
+
+          // Check if the registration closing date is after the current date
+          bool isRegistrationOpen = registrationClosingDate.isAfter(DateTime.now());
+
+          print('Is Open for Registration: $isOpenForRegistration');
+          print('Is Registration Open: $isRegistrationOpen');
+
+          // Return true if the meeting is open for registration and false otherwise
+          return isOpenForRegistration && isRegistrationOpen;
+        }).toList();
+        setState(() {
+          // Cast the filtered data to the correct type and update your state
+          data = filteredData.cast<Map<String, dynamic>>();
+          print('Data123: $data');
+          print('--------------------');
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
+  ///Define a function to format the time string
+  String _formatTimeString(String timeString) {
+    // Split the time string into hour, minute, and second components
+    List<String> timeComponents = timeString.split(':');
+
+    // Extract hour and minute components
+    int hour = int.parse(timeComponents[0]);
+    int minute = int.parse(timeComponents[1]);
+
+    // Format the time string
+    String formattedTime = '${_twoDigits(hour)}:${_twoDigits(minute)}';
+
+    return formattedTime;
+  }
+  String _twoDigits(int n) {
+    if (n >= 10) {
+      return "$n";
+    }
+    return "0$n";
+  }
+
+  /// offers fetch
+  List<Map<String, dynamic>> data1=[];
+  Future<void> getData1() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      print(url);
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        // data = itemGroups.cast<Map<String, dynamic>>();
+        // Filter data based on user_id and validity date
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['validity']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Widget User ID: ${widget.userId}');
+          print('Item User ID: ${item['user_id']}');
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now());
+          print("Item block status: ${item['block_status']}");
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        // Call setState() after updating data
+        setState(() {
+          // Cast the filtered data to the correct type
+          data1 = filteredData.cast<Map<String, dynamic>>();
+        });
+        print('Data: $data1');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
+  Future<Uint8List?> getImageBytes(String imageUrl) async {
+    try {
+      print("123456789087654323456789");
+      print('imageUrl: $imageUrl');
+      print("123456789087654323456789");
+
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return null;
+    }
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
   //  fetchMeetingData();
     //fetchData(widget.userId.toString());
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: _scaffoldKey,
+
       drawer:  SafeArea(
           child: NavDrawer(userType: widget.userType.toString(), userId: widget.userId,
           )),
-      backgroundColor: Colors.white,
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green.shade900,
-        child: Row(
-          children: [
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.search,color: Colors.white,), onPressed: () {})),
-            const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.people_alt_outlined,color: Colors.white,), onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHistory(userId: widget.userId.toString(),)));
-            })),
-            const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.home_outlined,color: Colors.white,), onPressed: () {})),
-            const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.settings_outlined,color: Colors.white,), onPressed: () {})),
-            const Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: const Icon(Icons.bloodtype_outlined,color: Colors.white,), onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>awesomeDilog()));
 
-            })),
-          ],
-        ),
-      ),
       floatingActionButton: FloatingActionButton(onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context)=>const MeetingUpdateDate()));
       },child: const Icon(Icons.calendar_month_outlined),),
-      appBar: AppBar(centerTitle: true,
-        actions: [
-          // IconButton(onPressed: (){
-          //   Navigator.push(context, MaterialPageRoute(builder: (context)=>PageCheck()));
-          //
-          // }, icon: const Icon(Icons.notifications_active_outlined))
-        ],
-        iconTheme:  const IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
-        ),
-        title: Text("GIB",style: Theme.of(context).textTheme.bodySmall),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Form(
-            child: Column(
-              children: [
-                SafeArea(
-                  child: SizedBox(
-                    width: w,
-                    height: 100,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          child: Image.network(imageUrl, width: 40,height: 40,),
-                        ),
-                        /*const Padding(
-                          padding: EdgeInsets.only(left:8.0),
-                          child: CircleAvatar(
-                           // backgroundImage: AssetImage("assets/pro1.jpg"),
-                            radius: 35,
-                          ),
-                        ),*/
-                        Padding(
-                          padding:  EdgeInsets.only(left:8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "",
-                                style: GoogleFonts.aBeeZee(
-                                  fontSize: 10,
-                                  color: Colors.indigo,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),Text(
-                                fetchName!,
-                                style: GoogleFonts.aBeeZee(
-                                  fontSize: 10,
-                                  color: Colors.indigo,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(fetchMemberId!,
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  //  Text('${widget.userType}',
-                                  Text(fetchMemberType!,
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  Text("Vaagai",
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  Text( DateFormat()
-                                  // displaying formatted date
-                                      .format(DateTime.now()),
-                                    style: GoogleFonts.aBeeZee(
-                                      fontSize: 10,
-                                      color: Colors.indigo,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                ],
-                              ),
-                            ],
+      body: Form(
+        child: Stack(
+          fit: StackFit.expand,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+
+                  SizedBox(height: 180),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 0,
+                      child: Container(
+
+                        child: Text(
+                          'Upcoming Meetings',
+                          style: GoogleFonts.aBeeZee(
+                            fontSize: 20,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  width: w,
-                  // height: 900,
-                  decoration:   BoxDecoration(
-                      color: Colors.green.shade900,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20,width: 20,),
-
-                      Row(
-                        children: [
-                          const SizedBox(width: 15,),
-
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Text('Birthday/Anniversary',style: Theme.of(context).textTheme.titleLarge,),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10,),
-                  // Container(
-                  //   height: 100,
-                  //   child:ListView.builder(
-                  //     itemCount: userdata.length,
-                  //     itemBuilder: (context, index) {
-                  //       final user = userdata[index];
-                  //       final dob = user['dob'] as String?;
-                  //       if (dob != null) {
-                  //         final formattedDob = formatDateString(dob); // Format date
-                  //         final today = DateTime.now();
-                  //         final userDob = DateTime.parse(formattedDob);
-                  //         if (userDob.month == today.month && userDob.day == today.day) {
-                  //           return Row(
-                  //             children: [
-                  //               Padding(
-                  //                 padding: const EdgeInsets.all(3.0),
-                  //                 child: Column(
-                  //                   children: [
-                  //                     InkWell(
-                  //                       onTap:(){
-                  //                         showDialog<void>(
-                  //                           context: context,
-                  //                           builder: (BuildContext dialogContext) {
-                  //                             return AlertDialog(
-                  //                               backgroundColor: Colors.white,
-                  //                               title: const Text('Convey Your Wish',style: TextStyle(color: Colors.green),),
-                  //                               content:  SizedBox(width: 300,
-                  //                                 child: TextFormField(
-                  //                                   controller: wishing,
-                  //                                   validator: (value){
-                  //                                     if(value!.isEmpty){
-                  //                                       return "Convey Your wishes";
-                  //                                     }else{
-                  //                                       return null;
-                  //                                     }
-                  //                                   },
-                  //                                   decoration: InputDecoration(
-                  //                                       hintText:"Share Your Hearty Wishes",
-                  //                                       suffixIcon: IconButton(onPressed: (){
-                  //                                         wishing.clear();
-                  //                                       }, icon: const Icon(Icons.cancel_presentation,color: Colors.red,))
-                  //                                   ) ,
-                  //                                 ),
-                  //                               ),
-                  //                               actions: <Widget>[
-                  //                                 Row(
-                  //                                   mainAxisAlignment: MainAxisAlignment.end,
-                  //                                   children: [
-                  //                                     TextButton(
-                  //                                       child: const Text('Wish',),
-                  //                                       onPressed:  ()  {
-                  //                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  //                                             content: Text("Your Wishes Conveyed")));
-                  //                                       },
-                  //                                     ),
-                  //                                     TextButton(
-                  //                                       child:  const Text('Cancel',),
-                  //                                       onPressed: () {
-                  //                                         //notificationsServices.sendNotification("hello", "My First Notification");
-                  //
-                  //                                         Navigator.pop(context);
-                  //                                         // Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-                  //                                       },
-                  //                                     ),
-                  //
-                  //                                   ],
-                  //                                 ),
-                  //                               ],
-                  //                             );
-                  //                           }, );
-                  //
-                  //       },
-                  //                       child: CircleAvatar(
-                  //                         backgroundImage: AssetImage("assets/pro1.jpg"),
-                  //                         radius: 25,
-                  //                       ),
-                  //                     ),
-                  //                     Text(
-                  //                       "${user['first_name']} ",
-                  //                       style: Theme.of(context).textTheme.titleSmall,
-                  //                     )
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           );
-                  //         }
-                  //       }
-                  //       return SizedBox();
-                  //     },
-                  //   ),
-                  // ),
-
-
-///birthday design starts here
-
-/*
-                        Row(
-                        children: [
-                          const SizedBox(width: 20,),
-
-                          Column(
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage:AssetImage("assets/pro1.jpg"),
-                                radius: 25,
-                              ),
-                              Text("Baby", style: Theme.of(context).textTheme.titleSmall,)
-                            ],
-                          ),
-                          const SizedBox(width: 5,),
-                          Column(
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage: AssetImage("assets/pro2.jpg"),
-                                radius: 25,
-                              ),
-                              Text("Bhuvana", style: Theme.of(context).textTheme.titleSmall),
-                            ],
-                          ),
-                          SizedBox(width: 7,),
-                          Column(
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage: AssetImage("assets/profile.png"),
-                                radius: 25,
-                              ),
-                              Text("Arjun", style: Theme.of(context).textTheme.titleSmall,)
-                            ],
-                          ),const SizedBox(width: 7,),
-
-
-                          Column(
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage:AssetImage("assets/pro1.jpg"),
-                                radius: 25,
-                              ),
-                              Text("Nasreen",style: Theme.of(context).textTheme.titleSmall,)
-                            ],
-                          ),                          const SizedBox(width: 7,),
-
-                          Column(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: AssetImage("assets/profile.jpg"),
-                                radius: 25,
-                              ),
-                              Text("Sathish",style: Theme.of(context).textTheme.titleSmall,)
-                            ],
-                          ),                          SizedBox(width: 7,),
-
-                          SizedBox(width: 5,),
-                          Text("...",style: Theme.of(context).textTheme.titleSmall,)
-
-                        ],
-                      ),
-*/
-                      const SizedBox(height: 8,),
-                      Container(
-                        //  height: 300,
-                        width: w,
-                        color: Colors.green.shade900,
-                        child: Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.topLeft,
+                  SizedBox(height: 10),
+                  Container(
+                    child: CarouselSlider(
+                      items: data.map((meeting) {
+                        String meetingDate = meeting['meeting_date'];
+                        String meetingPlace = meeting['place'];
+                        String meetingType = meeting['meeting_type'];
+                        String id = meeting['id'];
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Container( // Wrap Card with Container
+                              width: MediaQuery.of(context).size.width, // Set width to full width of the screen
                               child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Text('Upcoming Meeting',style: Theme.of(context).textTheme.titleLarge,),
-                              ),
-                            ),
-                            Container(
-                              width: w - 30,
-                              height: 120,
-                              padding: const EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.blue.shade100
-                                  ],
-                                ),
-                                border: Border.all(color: Colors.green, width: 2),
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: CarouselSlider(
-                                items: dynamicdata.map((meeting) {
-                                  // Extract meeting details from the map
-                                  String meetingDate = meeting['meeting_date'];
-                                  String meetingPlace = meeting['place'];
-                                  String meetingType = meeting['meeting_type'];
-                                  String id = meeting['id'];
-                                //  registerFetch(id);
-                                  return Column(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      const SizedBox(height: 30),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text('$meetingDate\n$meetingPlace'),
-                                          Text(meetingType),
-                                          IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (ctx) =>
-                                                    // Dialog box for register meeting and add guest
-                                                    AlertDialog(
-                                                      backgroundColor: Colors.grey[800],
-                                                      title: const Text(
-                                                          'Meeting',
-                                                          style: TextStyle(
-                                                              color: Colors.white)),
-                                                      content: const Text(
-                                                          "Do You Want to Register the Meeting?",
-                                                          style: TextStyle(
-                                                              color: Colors.white)),
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () {
-                                                              GlobalKey<FormState> tempKey =GlobalKey<FormState>();
-
-                                                              //store purpose..
-                                                            //  registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
-                                                              showDialog(
-                                                                  context: context,
-                                                                  builder: (ctx) =>
-                                                                      Form(
-                                                                        key:tempKey,
-                                                                        child: AlertDialog(
-                                                                          backgroundColor: Colors.grey[800],
-                                                                          title: const Text('Do you wish to add Guest?',
-                                                                              style: TextStyle(
-                                                                                  color: Colors.white)),
-                                                                          content: TextFormField(
-                                                                            controller: guestcount,
-                                                                            validator: (value){
-                                                                              if(value!.isEmpty){
-                                                                                return "* Enter a Guest Count";
-                                                                              }
-                                                                              return null;
-                                                                            },
-                                                                            decoration: const InputDecoration(
-                                                                              labelText: "Guest Count",
-                                                                              labelStyle: TextStyle(color: Colors.white),
-                                                                              hintText: "Ex:5",
-                                                                            ),
-                                                                          ),
-
-                                                                          actions: [
-                                                                            TextButton(
-                                                                                onPressed: () {
-                                                                                  if(tempKey.currentState!.validate()) {
-                                                                                    Navigator
-                                                                                        .push(
-                                                                                        context,
-                                                                                        MaterialPageRoute(
-                                                                                            builder: (
-                                                                                                context) =>
-                                                                                                VisitorsSlip(
-                                                                                                  userId:widget.userId,
-                                                                                                  meetingId:id,
-                                                                                                  guestcount: guestcount.text.trim(),
-                                                                                                  userType:widget.userType,
-                                                                                                  meeting_date:meetingDate,
-                                                                                                  user_mobile:fetchMobile.toString()
-
-                                                                                                )));
-                                                                                    print("UserID:-${widget.userId}${widget.userType}");
-                                                                                  } },
-                                                                                child: const Text('Yes')),
-                                                                            TextButton(
-                                                                                onPressed: () {
-                                                                                },
-                                                                                child: const Text('No'))
-                                                                          ],
-                                                                        ),
-                                                                      )
-                                                              );
-                                                            },
-                                                            child: const Text('OK')),
-                                                        TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(context);
-                                                            },
-                                                            child: const Text('Cancel'))
-                                                      ],
-                                                    )
-                                                );
-                                              },
-                                              icon: const Icon(
-                                                Icons.person_add_alt_1_rounded,
-                                                color: Colors.green,
-                                              ))
+                                          Text('${meeting['meeting_type']}',style:TextStyle(color: Colors.green,fontSize: 20),),
                                         ],
                                       ),
+                                      SizedBox(height: 10,),
+
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                          children: [
+                                            Text('${meeting['meeting_date']}',style:TextStyle(color: Colors.black,fontSize: 20),),
+                                            Text('${meeting['meeting_name']}',style:TextStyle(color: Colors.black,fontSize: 20),),
+                                          ],
+                                        ),
+                                      ),
+
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${_formatTimeString(meeting['from_time'])} to ${_formatTimeString(meeting['to_time'])}',
+                                              style: TextStyle(color: Colors.black, fontSize: 20),
+                                            ),
+                                            SizedBox(width: 10), // Space between icon and text
+                                            Icon(Icons.location_on,color: Colors.green,), // Location icon
+                                            SizedBox(width: 2), // Space between icon and text
+                                            Text(meeting['place'],style:TextStyle(color: Colors.black,fontSize: 20)),
+                                            SizedBox(width: 20,),
+                                            IconButton(
+                                                onPressed: () {
+                                                  print('press icon');
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (ctx) =>
+                                                      // Dialog box for register meeting and add guest
+                                                      AlertDialog(
+                                                        backgroundColor: Colors.grey[800],
+                                                        title: const Text(
+                                                            'Meeting',
+                                                            style: TextStyle(
+                                                                color: Colors.white)),
+                                                        content: const Text(
+                                                            "Do You Want to Register the Meeting?",
+                                                            style: TextStyle(
+                                                                color: Colors.white)),
+                                                        actions: [
+                                                          TextButton(
+                                                              onPressed: () {
+                                                                GlobalKey<FormState> tempKey =GlobalKey<FormState>();
+
+                                                                //store purpose..
+                                                                registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
+                                                                showDialog(
+                                                                    context: context,
+                                                                    builder: (ctx) =>
+                                                                        Form(
+                                                                          key:tempKey,
+                                                                          child: AlertDialog(
+                                                                            backgroundColor: Colors.grey[800],
+                                                                            title: const Text('Do you wish to add Guest?',
+                                                                                style: TextStyle(
+                                                                                    color: Colors.white)),
+                                                                            content: TextFormField(
+                                                                              controller: guestcount,
+                                                                              validator: (value){
+                                                                                if(value!.isEmpty){
+                                                                                  return "* Enter a Guest Count";
+                                                                                }
+                                                                                return null;
+                                                                              },
+                                                                              decoration: const InputDecoration(
+                                                                                labelText: "Guest Count",
+                                                                                labelStyle: TextStyle(color: Colors.white),
+                                                                                hintText: "Ex:5",
+                                                                              ),
+                                                                            ),
+
+                                                                            actions: [
+                                                                              TextButton(
+                                                                                  onPressed: () {
+                                                                                    if(tempKey.currentState!.validate()) {
+                                                                                      Navigator.push(
+                                                                                          context,
+                                                                                          MaterialPageRoute(
+                                                                                              builder: (
+                                                                                                  context) =>
+                                                                                                  VisitorsSlip
+                                                                                                    (
+                                                                                                      userId:widget.userId,
+                                                                                                      meetingId:id,
+                                                                                                      guestcount: guestcount.text.trim(),
+                                                                                                      userType:widget.userType,
+                                                                                                      meeting_date:meetingDate,
+                                                                                                      user_mobile:fetchMobile.toString()
+                                                                                                  )));
+                                                                                      print("UserID:-${widget.userId}${widget.userType}");
+                                                                                    } },
+                                                                                  child: const Text('Yes')),
+                                                                              TextButton(
+                                                                                  onPressed: () {
+                                                                                  },
+                                                                                  child: const Text('No'))
+                                                                            ],
+                                                                          ),
+                                                                        )
+                                                                );
+                                                              },
+                                                              child: const Text('OK')),
+                                                          TextButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(context);
+                                                              },
+                                                              child: const Text('Cancel'))
+                                                        ],
+                                                      )
+                                                  );
+                                                },
+                                                icon: const Icon(
+                                                  Icons.person_add_alt_1_rounded,
+                                                  color: Colors.green,
+
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+
                                     ],
-                                  );
-                                }).toList(),
-                                options: CarouselOptions(
-                                  height: 120.0,
-                                  enlargeCenterPage: true,
-                                  autoPlay: true,
-                                  aspectRatio: 16 / 9,
-                                  autoPlayCurve: Curves.fastOutSlowIn,
-                                  enableInfiniteScroll: true,
-                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                                  viewportFraction: 1,
+                                  ),
                                 ),
                               ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                      options: CarouselOptions(
+                        height: 170.0,
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                        aspectRatio: 16 / 9,
+                        autoPlayCurve: Curves.fastOutSlowIn,
+                        enableInfiniteScroll: false,
+                        autoPlayAnimationDuration: Duration(milliseconds: 800),
+                        viewportFraction: 1,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 0,
+                      child: Container(
+
+                        child: Text(
+                          'Offer',
+                          style: GoogleFonts.aBeeZee(
+                            fontSize: 20,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+                    child: ListView.builder(
+                        itemCount: data1.length,
+                        itemBuilder: (context, i) {
+                          String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data1[i]["offer_image"]}';
+                          String dateString = data1[i]['validity']; // This will print the properly encoded URL
+                          DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                          return Center(
+                            child: Card(
+                              child: Column(
+                                children: [
+                                  //MAIN ROW STARTS
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children:  [
+                                      //CIRCLEAVATAR STARTS
+                                      CircleAvatar(
+                                        radius: 40,
+                                        backgroundColor: Colors.cyan,
+                                        backgroundImage: NetworkImage(imageUrl),
+                                        //IMAGE STARTS CIRCLEAVATAR
+                                        //  Image.network('${data[i]['offer_image']}').image,
+                                        child: Stack(
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.bottomLeft,
+                                              //STARTS CIRCLE AVATAR OFFER
+                                              child: CircleAvatar(
+                                                  radius: 20,
+                                                  backgroundColor: Colors.green[900],
+                                                  child: Text('${data1[i]['discount']}%',
+                                                      style: Theme.of(context).textTheme.titleLarge)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      //END CIRCLEAVATAR
+
+                                      Column(
+                                        children: [
+                                          //START TEXTS
+                                          Text('${data1[i]['company_name']}',
+                                            //Text style starts
+                                            style: const TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 15),),
+                                          const SizedBox(height: 10,),
+                                          //start texts
+                                          Text('${data1[i]['offer_type']} - ${data1[i]['name']}',
+                                            //Text style starts
+                                            style: const TextStyle(fontSize: 11,
+                                                fontWeight: FontWeight.bold
+                                            ),),
+                                          //Text starts
+                                          Text(DateFormat('dd-MM-yyyy').format(dateTime)),
+                                        ],
+                                      ),
+                                      //IconButton starts
+
+                                      //IconButton starts
+
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                    ),
+                  ),
+
+
+
+                ],
+              ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right:0,
+              child:ClipPath(
+                clipper: CurveClipper(),
+                child: Container(
+                  height: 100,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.green,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Text(
+                          'GIB',
+                          style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: IconButton(
+                          icon: Icon(Icons.menu, color: Colors.white),
+                          onPressed: () {
+                            print('press nav drawer');
+                            _scaffoldKey.currentState!.openDrawer();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ), ),
+            Positioned(
+              top: 80,
+              left: 20,
+              right: 20,
+              child: Card(
+                child: SizedBox(
+                  height: 80,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          height: 300,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            Text(
+                              userdata.isNotEmpty ? userdata[0]["first_name"] : "",
+                              style: GoogleFonts.aBeeZee(
+                                fontSize: 20,
+                                color: Colors.indigo,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Executive Member',
+                                  style: GoogleFonts.aBeeZee(
+                                    fontSize: 10,
+                                    color: Colors.indigo,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-
-
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Offers',style: Theme.of(context).textTheme.titleLarge,),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Container(
-                          child: Row(
-                            children: offersdata.map((offer) {
-                              String companyName = offer['company_name'] ?? '';
-                              String name = offer['name'] ?? '';
-                              String offerImage = offer['offer_image'] ?? '';
-                             // print("image - $offerImage");
-
-                              return Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: 120,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 8,),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Today Transactions',style: Theme.of(context).textTheme.titleLarge,),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Column(
-                            children: [
-                              Container(
-                                width: 175,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.blue.shade100
-                                    ],
-                                  ),
-
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: Center(child: Text("Business : 12 ",style: Theme.of(context).textTheme.bodyMedium,)),
-
-                              ),
-
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                width: 175,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.blue.shade100
-                                    ],
-                                  ),
-
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: Center(child: Text("G2G : 7",style: Theme.of(context).textTheme.bodyMedium,)),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                        children: [
-                          Column(
-                            children: [
-                              Container(
-                                width: 175,
-                                height: 60,
-
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.blue.shade100
-                                    ],
-                                  ),
-
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: Center(child: Text("Guest : 10 ",style: Theme.of(context).textTheme.bodyMedium,)),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                width: 175,
-                                height: 60,
-
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.blue.shade100
-                                    ],
-                                  ),
-
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child:Center(child: Text("Honoring : 20 ",style: Theme.of(context).textTheme.bodyMedium,)),
-
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 100,),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
 
   }
-  // String formatDateString(String dateString) {
-  //   final parts = dateString.split('-');
-  //   return "${parts[2]}-${parts[1]}-${parts[0]}"; // Convert to yyyy-mm-dd format
-  // }
+
 }
-
-
-class MyBlinkingButton extends StatefulWidget {
-  const MyBlinkingButton({Key? key}) : super(key: key);
-
-  @override
-  _MyBlinkingButtonState createState() => _MyBlinkingButtonState();
-}
-
-class _MyBlinkingButtonState extends State<MyBlinkingButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _animationController.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animationController,
-      child: const Center(
-        child: CircleAvatar(
-          backgroundImage: AssetImage('assets/profile.jpg'),
-          radius: 20,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-}
-
-class MyBlinkingButton1 extends StatefulWidget {
-  const MyBlinkingButton1({Key? key}) : super(key: key);
-
-
-
-  @override
-  _MyBlinkingButton1State createState() => _MyBlinkingButton1State();
-}
-
-class _MyBlinkingButton1State extends State<MyBlinkingButton1>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-
-
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _animationController.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child:   CircleAvatar(
-        backgroundImage: Image.network('').image,
-        radius: 20,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-}
-
-
 
 class NavDrawer extends StatefulWidget {
 
@@ -1215,7 +1040,7 @@ class _NavDrawerState extends State<NavDrawer> {
                   )),
                 )
               },
-            ),
+            ), /// gib members
 
             ListTile(
               leading: const Icon(Icons.person_add,color: Colors.green,),
@@ -1228,7 +1053,7 @@ class _NavDrawerState extends State<NavDrawer> {
                //   MaterialPageRoute(builder: (context) =>    AddMemberView(userID:widget.userId,userType:widget.userType,)),
                 )
               },
-            ),
+            ),  ///
 
             ListTile(
               leading: const Icon(Icons.local_offer,color: Colors.green,),
@@ -1239,10 +1064,11 @@ class _NavDrawerState extends State<NavDrawer> {
                    context,
                    MaterialPageRoute(builder: (context) =>  OffersPage(
                      userId: widget.userId,
+                     userType: widget.userType,
                    )),
                  )
               },
-            ),
+            ),  /// offers
 
             const Divider(color: Colors.grey,),
 

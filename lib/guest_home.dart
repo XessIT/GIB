@@ -1,34 +1,107 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:gipapp/wave.dart';
 import 'package:http/http.dart'as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'blood_group.dart';
 import 'change_mpin.dart';
 import 'guest_profile.dart';
 import 'login.dart';
+import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
+import 'package:iconly/iconly.dart';
 
-class GuestHome extends StatelessWidget {
+
+
+
+class GuestHome extends StatefulWidget {
   final String? userType;
   final String? userId;
-   GuestHome({
-     Key? key,
-     required this. userType,
-     required this. userId,
-   }) : super(key: key);
+
+  GuestHome({
+    Key? key,
+    required this.userType,
+    required this.userId,
+  }) : super(key: key);
 
   @override
+  _GuestHomeState createState() => _GuestHomeState();
+}
+
+class _GuestHomeState extends State<GuestHome> {
+
+  int _currentIndex = 0;
+
+  late List<Widget> _pages;
+  @override
+  void initState() {
+    _pages = [
+      GuestHomePage(userId: widget.userId, userType: widget.userType,),
+
+      BloodGroup(userId: widget.userId, userType: widget.userType!,),
+      GuestProfile(userID: widget.userId),
+      // Add more pages as needed
+    ];
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: GuestHomePage(
-        userType: userType,
-        userId: userId,
-        ),
+    return Scaffold(
+      body: _pages[_currentIndex],
+
+
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.black45,),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services, color: Colors.black45,),
+            label: 'Doctor',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bloodtype, color: Colors.black45,),
+            label: 'Blood Group',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.accessibility_new, color: Colors.black45),
+            label: 'About',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle, color: Colors.black45),
+            label: 'Profile',
+          ),
+
+          // Add more BottomNavigationBarItems as needed
+        ],
+        type: BottomNavigationBarType.fixed, // Set type to fixed for text labels
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.black45,
+        iconSize: 30,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        elevation: 5,
+        selectedLabelStyle: TextStyle(color: Colors.white),
+        unselectedLabelStyle: TextStyle(color: Colors.white),
+        selectedIconTheme: IconThemeData(color: Colors.green),
+      ),
+
+
     );
   }
 }
+
 
 class GuestHomePage extends StatefulWidget {
 
@@ -50,10 +123,16 @@ class GuestHomePage extends StatefulWidget {
 class _GuestHomePageState extends State<GuestHomePage> {
   Uint8List? _imageBytes;
   List<Map<String,dynamic>>userdata=[];
+  String imageUrl = "";
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+
+
   Future<void> fetchData(String? userId) async {
     try {
       final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
+
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -62,6 +141,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
             userdata = responseData.cast<Map<String, dynamic>>();
             if (userdata.isNotEmpty) {
               setState(() {
+                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+
                 _imageBytes = base64Decode(userdata[0]['profile_image']);
               });
               print("Image: $_imageBytes");
@@ -83,41 +164,80 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
 
   ///offers fetch
-  List<Map<String,dynamic>>offersdata=[];
-  Future<void> offersfetchData() async {
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
-      final response = await http.get(url);
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
-
+      final response = await http.get(url);
+      print("ResponseStatus: ${response.statusCode}");
+      print("Response: ${response.body}");
       if (response.statusCode == 200) {
-        // print("status code: ${response.statusCode}");
-        // print("status body: ${response.body}");
-
         final responseData = json.decode(response.body);
-        if (responseData is List<dynamic>) {
-          setState(() {
-            offersdata = responseData.cast<Map<String, dynamic>>();
-            //  print("offers data : $offersdata");
-          });
-        } else {
-          // Handle invalid response data (not a List)
-          print('Invalid response data format');
-        }
+        print("ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        // data = itemGroups.cast<Map<String, dynamic>>();
+        // Filter data based on user_id and validity date
+        List<dynamic> filteredData = itemGroups.where((item) {
+          DateTime validityDate;
+          try {
+            validityDate = DateTime.parse(item['validity']);
+          } catch (e) {
+            print('Error parsing validity date: $e');
+            return false;
+          }
+          print('Widget User ID: ${widget.userId}');
+          print('Item User ID: ${item['user_id']}');
+          print('Validity Date: $validityDate');
+          print('Current Date: ${DateTime.now()}');
+          bool satisfiesFilter = validityDate.isAfter(DateTime.now());
+          print("Item block status: ${item['block_status']}");
+          print('Satisfies Filter: $satisfiesFilter');
+          return satisfiesFilter;
+        }).toList();
+        // Call setState() after updating data
+        setState(() {
+          // Cast the filtered data to the correct type
+          data = filteredData.cast<Map<String, dynamic>>();
+        });
+        print('Data: $data');
       } else {
-        // Handle non-200 status code
         print('Error: ${response.statusCode}');
       }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
+
+  Future<Uint8List?> getImageBytes(String imageUrl) async {
+    try {
+      print('imageUrl: $imageUrl');
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return null;
     }
   }
+
   @override
   void initState() {
     super.initState();
-    offersfetchData();
     fetchData(widget.userId);
+    getData();
+
+
+
   }
 
   //  final CalendarController _calendarController =  CalendarController();
@@ -125,661 +245,259 @@ class _GuestHomePageState extends State<GuestHomePage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    offersfetchData();
+   // offersfetchData();
     fetchData(widget.userId);
 
     return Scaffold(
-   //   backgroundColor: Colors.green[50],
+      key: _scaffoldKey,
+
       drawer:  SafeArea(
           child: NavDrawer(
 
             userType:widget.userType.toString(),
             userId:widget.userId.toString(),
-          )),
-      appBar: AppBar(centerTitle: true,
-        actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.notifications_active_outlined))
-        ],
-        iconTheme:  IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
-        ),
-        title: Text("GIB",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+          )
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green.shade900,
-        child: Row(
-          children: [
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.search,color: Colors.white,), onPressed: () {})),
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.people_alt_outlined,color: Colors.white,), onPressed: () {})),
-
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.home_outlined,color: Colors.white,), onPressed: () {})),
-
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.settings_outlined,color: Colors.white,), onPressed: () {})),
-            Spacer(),
-            SizedBox(width:20,height:20,child: IconButton(icon: Icon(Icons.bloodtype_outlined,color: Colors.white,), onPressed: () {})),
-          ],
-        ),
-      ),
-
-
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
+      body: Center(
+        child: Container(
+          child: Stack(
+            fit: StackFit.expand,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
             children: [
-              // const SizedBox(height: 20,),
-              //1st container
-              SafeArea(
-                child: SizedBox(
-                  width: w,
-                  height: 100,
-                  child: Row(
-                    children: [
-                       Padding(
-                        padding: EdgeInsets.only(left:8.0),
-                        child: Container(
-                          height: 100,
-                          width: 100,
-                          child: FittedBox(
-                            fit: BoxFit.fill,
-                            child: ClipOval(
-                              child: _imageBytes != null
-                                  ? Image.memory(
-                                _imageBytes!,
-                              )
-                                  : Icon(Icons.person),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10,),
-
-                            Text(
-                           userdata.isNotEmpty?   userdata[0]["first_name"]:"",
-                              style: GoogleFonts.aBeeZee(
-                                fontSize: 20,
-                                color: Colors.indigo,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Text('memberid!',
-                                //   style: GoogleFonts.aBeeZee(
-                                //     fontSize: 10,
-                                //     color: Colors.indigo,
-                                //     fontWeight: FontWeight.bold,
-                                //   ),),
-                                //  Text('${widget.userType}',
-                                Text('Guest',
-                                  style: GoogleFonts.aBeeZee(
-                                    fontSize: 10,
-                                    color: Colors.indigo,
-                                    fontWeight: FontWeight.bold,
-                                  ),),
-
-                               /* Text( DateFormat()
-                                // displaying formatted date
-                                    .format(DateTime.now()),
-                                  style: GoogleFonts.aBeeZee(
-                                    fontSize: 10,
-                                    color: Colors.indigo,
-                                    fontWeight: FontWeight.bold,
-                                  ),),*/
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: w,
-                // height: 900,
-                decoration:   BoxDecoration(
-                    color: Colors.green.shade900,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
-                ),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('     Offers',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Container(
-                        height: 700,
-                        child: Row(
-                          children: offersdata.map((offer) {
-                            String companyName = offer['company_name'] ?? '';
-                            String name = offer['name'] ?? '';
-                            String offerImage = offer['offer_image'] ?? '';
-                            // print("image - $offerImage");
-
-                            return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: offerImage.isNotEmpty ? Image.network("GIBAPI/$offerImage", fit: BoxFit.cover) : Image.asset("assets/img_1.png"), // Use placeholder image if offerImage is empty
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text("$companyName\n$name", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-
-/*
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Container(
-                        child: Row(
-                          children: [
-                            SizedBox(width: 15,),
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-                            Column(
-                              children: [
-                                Container(
-                                  width: 120,
-                                  decoration: BoxDecoration(
-
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset("assets/img_1.png"),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text("Zappy\nPhotography",style: Theme.of(context).textTheme.subtitle2,),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-
-
-                          ],
-                        ),
-                      ),
-                    ),
-*/
-
-                 /*   const SizedBox(height: 15,),
-                    Container(
-                      width: 390,
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.white, Colors.white,
-                          ],
-                        ),
-                        border: Border.all(
-                            color: Colors.white,width: 2),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child:
-                      Column(
+              Column(
+                children: [
+                  ClipPath(
+                    clipper: CurveClipper(),
+                    child: Container(
+                      height: 100,
+                      width: MediaQuery.of(context).size.width,
+                      //width: 400,
+                      color: Colors.green,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                height: 210,
-                                width: 180,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      color: Colors.black,
-                                    ),),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const
-                                      AssetImage('assets/car.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 18.5,
-                                                backgroundColor: Colors.green,
-                                                child: Text('10%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('A1 Car Accessories',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(height: 15,),
-                                    const Text('product -Ceramic Coating',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(DateFormat
-                                          ('dd/MM/yyyy').
-                                        format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                              Container(
-                                height: 210,
-                                width: 180,
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const AssetImage('assets/ro.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('15%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Jm Technology',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold), ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Service -Ro System',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(DateFormat
-                                          ('dd/MM/yyyy').
-                                        format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                          Padding(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('GIB',style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),
                           ),
-                          const Divider(color: Colors.black,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                height: 210,
-                                width: 180,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      color: Colors.black,
-                                    ),),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(
-                                            Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const
-                                      AssetImage('assets/car.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('10%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('A1 Car Accessories',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(height: 15,),
-                                    const Text('product -Ceramic Coating',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(
-                                          DateFormat('dd/MM/yyyy').
-                                          format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //       VerticalDivider(width: 5,thickness: 1,color: Colors.black,),
-                              Container(
-                                height: 210,
-                                width: 180,
-                                child: Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: (){},
-                                          icon:  const Icon(Icons.call_outlined,
-                                            color: Colors.green,)),),
-                                    CircleAvatar(
-                                      radius: 45,
-                                      backgroundColor: Colors.cyan,
-                                      backgroundImage: const AssetImage('assets/ro.jpg'),
-                                      child: Stack(
-                                        children: const [
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: Colors.green,
-                                                child: Text('15%',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Jm Technology',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold), ),
-                                    const SizedBox(height: 15,),
-                                    const Text('Service -Ro System',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),),
+                          Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: IconButton(
+                              icon: Icon(Icons.menu,color: Colors.white,),
+                              onPressed: () {
+                                print('press nav drawer');
+                                _scaffoldKey.currentState!.openDrawer();
+                              },
+                            ),
 
-                                    const SizedBox(width: 1,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Text('Validity -',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),),
-                                        Text(
-                                          DateFormat('dd/MM/yyyy').
-                                          format(DateTime.now(),),
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 180,),
-*/
+                  ),
+                  SizedBox(height: 80,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
 
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Card(
+                            elevation: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(1),
+                              child: Text(
+                                'Offers+',
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 20,
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )                      ],
+                      ),
 
+                      SizedBox(height: 30),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (context, i) {
+                              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+                              String dateString = data[i]['validity']; // This will print the properly encoded URL
+                              DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                              return Center(
+                                child: Card(
+                                  child: Column(
+                                    children: [
+                                      //MAIN ROW STARTS
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children:  [
+                                          //CIRCLEAVATAR STARTS
+                                          CircleAvatar(
+                                            radius: 40,
+                                            backgroundColor: Colors.cyan,
+                                            backgroundImage: NetworkImage(imageUrl),
+                                            //IMAGE STARTS CIRCLEAVATAR
+                                            //  Image.network('${data[i]['offer_image']}').image,
+                                            child: Stack(
+                                              children: [
+                                                Align(
+                                                  alignment: Alignment.bottomLeft,
+                                                  //STARTS CIRCLE AVATAR OFFER
+                                                  child: CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundColor: Colors.green[900],
+                                                      child: Text('${data[i]['discount']}%',
+                                                          style: Theme.of(context).textTheme.titleLarge)),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          //END CIRCLEAVATAR
 
-                  ],
-                ),
+                                          Column(
+                                            children: [
+                                              //START TEXTS
+                                              Text('${data[i]['company_name']}',
+                                                //Text style starts
+                                                style: const TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 15),),
+                                              const SizedBox(height: 10,),
+                                              //start texts
+                                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                                                //Text style starts
+                                                style: const TextStyle(fontSize: 11,
+                                                    fontWeight: FontWeight.bold
+                                                ),),
+                                              //Text starts
+                                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
+                                            ],
+                                          ),
+                                          //IconButton starts
+
+                                          //IconButton starts
+
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
+              Positioned(
+                top: 80,
+                left: 20,
+                right: 20,
+                child: Card(
+                  child: SizedBox(
+                     // width: w,
+                      height: 80,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle, // This makes the container circular
+                                // Optionally, you can add other decorations like border or background color here
+                              ),
+                              child: ClipOval(
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover, // You might want to use cover to fill the circle completely
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left:8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10,),
 
+                                Text(
+                               userdata.isNotEmpty?   userdata[0]["first_name"]:"",
+                                  style: GoogleFonts.aBeeZee(
+                                    fontSize: 20,
+                                    color: Colors.indigo,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Text('memberid!',
+                                    //   style: GoogleFonts.aBeeZee(
+                                    //     fontSize: 10,
+                                    //     color: Colors.indigo,
+                                    //     fontWeight: FontWeight.bold,
+                                    //   ),),
+                                    //  Text('${widget.userType}',
+                                    Text('Guest',
+                                      style: GoogleFonts.aBeeZee(
+                                        fontSize: 10,
+                                        color: Colors.indigo,
+                                        fontWeight: FontWeight.bold,
+                                      ),),
+
+                                   /* Text( DateFormat()
+                                    // displaying formatted date
+                                        .format(DateTime.now()),
+                                      style: GoogleFonts.aBeeZee(
+                                        fontSize: 10,
+                                        color: Colors.indigo,
+                                        fontWeight: FontWeight.bold,
+                                      ),),*/
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ),
+              ),
 
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+
+class CurveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 50);
+    path.quadraticBezierTo(0, size.height, 50, size.height);
+    path.lineTo(size.width - 50, size.height);
+    path.quadraticBezierTo(size.width, size.height, size.width, size.height - 50);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return false;
   }
 }
 
@@ -962,12 +680,12 @@ class _NavDrawerState extends State<NavDrawer> {
               leading: const Icon(Icons.supervisor_account,color: Colors.green,),
               title: Text('Business',
                   style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //            Navigator.push(
-                //          context,
-                //        MaterialPageRoute(builder: (context) =>  const GibMembers()),
-                //     )
-              },
+              // onTap: () => {
+              //              Navigator.push(
+              //            context,
+              //          MaterialPageRoute(builder: (context) =>  const bootomnav()),
+              //       )
+              // },
             ),
             const Divider(color: Colors.grey,),
             ListTile(
@@ -986,10 +704,10 @@ class _NavDrawerState extends State<NavDrawer> {
               title: Text('Blood Group',
                   style: Theme.of(context).textTheme.bodyMedium),
               onTap: () => {
-                //       Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) =>  const BloodGroup()),
-                //   )
+                      Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>   BloodGroup(userType: widget.userType, userId: widget.userId,)),
+                  )
               },
             ),
             const Divider(color: Colors.grey,),

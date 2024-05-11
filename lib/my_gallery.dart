@@ -322,13 +322,36 @@ class _GalleryState extends State<Gallery> {
     }
 
     Future<void> _pickAndUploadVideo() async {
+
+
       final XFile? pickedVideo = await _picker.pickVideo(source: ImageSource.gallery);
 
       if (pickedVideo != null) {
         final Uint8List videoBytes = await pickedVideo.readAsBytes();
+        if (videoBytes.length > 10 * 1024 * 1024) {
+          // File size exceeds the limit, show an alert
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('File Too Large'),
+                content: Text('The selected file exceeds the maximum size limit of 10MB.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+          return;
+        }
+
         print('videoBytes: $videoBytes');
-        final url =
-            'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
+        final url = 'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
 
         print('url: $url');
         // Make HTTP request to upload video file to server

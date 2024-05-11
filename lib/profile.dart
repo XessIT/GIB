@@ -54,34 +54,43 @@ class _ViewState extends State<View> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Center(child: Text('My Profile')),
+          title: Text(
+            'My Profile',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          iconTheme: const IconThemeData(
+            color: Colors.white, // Set the color for the drawer icon
+          ),
           centerTitle: true,
-
-    leading: IconButton(onPressed: (){
-      if(widget.userType =="Non-Executive") {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NonExecutiveHome(
-    userType:widget.userType.toString(),
-    userID: widget.userID.toString(),
-
-    )));
-      }
-     if(widget.userType =="Executive") {
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>Home(
-      userType:widget.userType.toString(),
-      userId: widget.userID.toString(),
-    )));
-     }
-    if(widget.userType =="Guest") {
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>GuestHomePage(
-      userType:widget.userType.toString(),
-
-      userId: widget.userID.toString(),
-    )));
-    }
-
-    },icon: const Icon(Icons.arrow_back),
-    ),),
-        body: Column(
+          leading: IconButton(
+            onPressed: () {
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NonExecutiveHome(
+                      userType: widget.userType.toString(),
+                      userID: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
+              if (widget.userType == "Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Home(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+          body: Column(
           children:  [
             const TabBar(
                 isScrollable: true,
@@ -625,7 +634,7 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return widget.userType == "Executive" ? DefaultTabController(
       length: 2,
       child: Scaffold(
         body: Column(
@@ -677,6 +686,10 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
           ],
         ),
       ),
+    )
+    : BusinessInfo(
+      userType:widget.userType,
+      userID:widget.userID,
     );
   }
 }
