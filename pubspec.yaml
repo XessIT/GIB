@@ -115,6 +115,13 @@ flutter:
     - assets/img_2.png
     - assets/Untitled (3).png
     - assets/img_3.png
+    - assets/business-model.png
+    - assets/letter-b.png
+    - assets/letter-g.png
+    - assets/letter-h.png
+    - assets/G2G.png
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

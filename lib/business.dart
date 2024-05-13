@@ -144,7 +144,7 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-b.png'),
                                   ),
                                 ],
 
@@ -208,7 +208,7 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/G2G.png'),
                                   ),
                                 ],
 
@@ -270,7 +270,7 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-g.png'),
                                   ),
                                 ],
 
@@ -332,7 +332,7 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-h.png'),
                                   ),
                                 ],
 
@@ -439,7 +439,7 @@ class _MyTransactionState extends State<MyTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-b.png'),
                                   ),
                                 ],
 
@@ -515,7 +515,7 @@ class _MyTransactionState extends State<MyTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/G2G.png'),
                                   ),
                                 ],
 
@@ -589,7 +589,7 @@ class _MyTransactionState extends State<MyTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-g.png'),
                                   ),
                                 ],
 
@@ -698,7 +698,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-b.png'),
                                   ),
                                 ],
 
@@ -762,7 +762,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/G2G.png'),
                                   ),
                                 ],
 
@@ -824,7 +824,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-g.png'),
                                   ),
                                 ],
 
@@ -886,7 +886,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/logo.png'),
+                                    backgroundImage: AssetImage('assets/letter-h.png'),
                                   ),
                                 ],
 
@@ -913,6 +913,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
               SizedBox(height: 20,),
 
             ],
+
           ),
         ),
       ),

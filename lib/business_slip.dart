@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gipapp/business.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -96,9 +97,24 @@ class _ReferralPageState extends State<ReferralPage> {
       // Handle error as needed
     }
   }
+
+
+  void updateTextFields(int index) {
+    setState(() {
+      to.text = searchResults[index]['first_name'];
+      tomobile.text = searchResults[index]['mobile'];
+      cname.text = searchResults[index]['company_name'];
+      // Update other text fields as needed
+    });
+  }
   @override
   void initState() {
     fetchData(widget.userId.toString());
+    searchResults = List.from(allItems);
+    print("searchResults: $searchResults");
+    fetchRegistrationData();
+    print('fetchRegistrationData$fetchRegistrationData');
+
     // TODO: implement initState
     super.initState();
   }
@@ -111,6 +127,54 @@ class _ReferralPageState extends State<ReferralPage> {
     if (text.isEmpty) return text;
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
+
+  /// Search bar
+  Future<void> fetchRegistrationData() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the JSON
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          allItems = data; // Store all registration data
+        });
+      } else {
+        // If the server did not return a 200 OK response, throw an exception
+        throw Exception('Failed to load registration data: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      throw Exception('Error: $error');
+    }
+  }
+  void filterSearchResults(String query) {
+    List<dynamic> searchList = [];
+    if (query.isNotEmpty) {
+      allItems.forEach((item) {
+        // Check each field for a match with the query
+        if (item['first_name'].toLowerCase().contains(query.toLowerCase()) ||
+            item['last_name'].toLowerCase().contains(query.toLowerCase()) ||
+            item['member_id'].toLowerCase().contains(query.toLowerCase()) ||
+            item['mobile'].toLowerCase().contains(query.toLowerCase()) ||
+            item['company_name'].toLowerCase().contains(query.toLowerCase())) {
+          searchList.add(item);
+        }
+      });
+    } else {
+      // If query is empty, show all items
+      searchList = List.from(allItems);
+    }
+    setState(() {
+      searchResults = searchList;
+    });
+  }
+
+
+  TextEditingController searchController = TextEditingController();
+  List<dynamic> searchResults = [];
+  List<dynamic> allItems = [];
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +197,68 @@ class _ReferralPageState extends State<ReferralPage> {
             child: Column(
               children: [
                 const SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TypeAheadFormField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: searchController,
+                      onChanged: (value) {
+                        filterSearchResults(value);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) {
+                      return Future.value(searchResults);
+                    },
+                    itemBuilder: (context, dynamic suggestion) {
+                      return ListTile(
+                        title: Text('${suggestion['first_name']} (${suggestion['member_id']})'),
+                        subtitle: Text(suggestion['last_name']),
+                        // You can add other fields as needed
+                      );
+                    },
+                    onSuggestionSelected: (dynamic suggestion) {
+                      // Handle when a suggestion is selected
+                      // Update text fields with suggestion data
+                      setState(() {
+                        to.text = suggestion['first_name'];
+                        tomobile.text = suggestion['mobile'];
+                        cname.text = suggestion['company_name'];
+                        // Update other text fields as needed
+                      });
+                    },
+                  ),
+                ),
+
+/*
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4, // Adjust height as needed
+
+                  child: ListView.builder(
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      return  ListTile(
+                        title: Text(
+                          '${searchResults[index]['first_name']} (${searchResults[index]['member_id']})',
+                        ),
+                        subtitle: Text(searchResults[index]['last_name']),
+                        onTap: () {
+
+                          updateTextFields(index);
+                        },
+                      );
+                    },
+                  ),
+                ),
+*/
+                const SizedBox(height: 20,),
+
                 Container(
                   width: 350,
                   //   height: 600,
@@ -142,11 +268,6 @@ class _ReferralPageState extends State<ReferralPage> {
                   ),
                   child: Column(
                     children: [
-                      /*const SizedBox(height: 10,),
-                      Text('Business Slip',
-                        style: TextStyle(
-                            color: Colors.green[800],
-                            fontSize: 20),),*/
                       const SizedBox(height: 20,),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -330,28 +451,6 @@ class _ReferralPageState extends State<ReferralPage> {
                         ),
                       ),
                       //TextFormField Location starts
-                      /*Visibility(
-                    visible: isVisible,
-                    child:SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: location,
-                          validator: (value){
-                            if(value!.isEmpty){
-                              return "*Enter the Location";
-                            }else{
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Location",
-                            suffixIcon: Icon(
-                              Icons.location_on,
-                              color: Colors.green,),
-                          ),
-                        ),
-                      ),
-                  ),*/
 
                       SizedBox(
                         width: 300,
@@ -430,6 +529,10 @@ class _ReferralPageState extends State<ReferralPage> {
     );
   }
 }
+
+
+
+
 class AlphabetInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
