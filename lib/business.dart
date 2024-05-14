@@ -208,8 +208,11 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/G2G.png'),
-                                  ),
+                                  backgroundColor: Colors.green,
+                          child: Text(
+                            'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                          ),
+                        ),
                                 ],
 
                               ),
@@ -515,7 +518,10 @@ class _MyTransactionState extends State<MyTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/G2G.png'),
+                                    backgroundColor: Colors.green,
+                                    child: Text(
+                                      'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ],
 
@@ -762,9 +768,11 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: AssetImage('assets/G2G.png'),
-                                  ),
-                                ],
+                                    backgroundColor: Colors.green,
+                                    child: Text(
+                                      'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),                                ],
 
                               ),
                             ],

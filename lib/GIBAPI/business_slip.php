@@ -15,10 +15,12 @@
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    $table = isset($_GET['table']) ? $_GET['table'] : "";
     if ($table == "business_slip") {
-    $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
-            $offerlist = "SELECT * FROM business_slip where Tomobile='$mobile' OR referrer_mobile='$mobile'";
+        $mobile = isset($_GET['mobile']) ? mysqli_real_escape_string($conn, $_GET['mobile']) : "";
+        $status = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : "";
+        $offerlist = "SELECT * FROM business_slip WHERE (Tomobile='$mobile' OR referrer_mobile='$mobile') AND status='$status'";
             $offerResult = mysqli_query($conn, $offerlist);
-            if ($offerResult && mysqli_num_rows($offerResult) > 0) {
+            if ($offerResult && mysqli_num_rows($offerResult) > 0)
+            {
                 $offers = array();
                 while ($row = mysqli_fetch_assoc($offerResult)) {
                     $offers[] = $row;
@@ -132,6 +134,30 @@ else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                     echo "Error: " . mysqli_error($conn);
                 }
             }
+
+     else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+         $data = json_decode(file_get_contents("php://input"));
+
+         // Check if status and reason are provided
+         if(isset($data->status) && isset($data->reason)) {
+             $id = mysqli_real_escape_string($conn, $data->id);
+             $status = mysqli_real_escape_string($conn, $data->status);
+             $reason = mysqli_real_escape_string($conn, $data->reason);
+
+             $updateBusinessSlipQuery = "UPDATE `business_slip` SET `status`='$status', `reason`='$reason' WHERE `id`='$id'";
+             $updateBusinessSlipResult = mysqli_query($conn, $updateBusinessSlipQuery);
+
+             if ($updateBusinessSlipResult) {
+                 echo "Business slip updated successfully";
+             } else {
+                 echo "Error: " . mysqli_error($conn);
+             }
+         } else {
+             echo "Status and Reason are required fields";
+         }
+     }
+
+
     else {
         // Handle the insert/update actions for editing an offer
         $imagename = mysqli_real_escape_string($conn, $data->imagename);

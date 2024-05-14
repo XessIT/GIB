@@ -58,6 +58,7 @@ dependencies:
   crystal_navigation_bar: ^1.0.0
   iconly: ^1.0.1
   card_swiper: ^3.0.1
+  ffmpeg_kit_flutter: ^6.0.3
 
 
 

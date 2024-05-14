@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+
+import 'duplicate.dart';
 
 
 class BusinessHistory extends StatefulWidget {
@@ -25,6 +29,13 @@ class _BusinessHistoryState extends State<BusinessHistory> {
           title: Text("Business History", style: Theme.of(context).textTheme.bodySmall,),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(onPressed:(){
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => RadioListTileExample()));
+                  },
+                icon: const Icon(Icons.more_vert)),
+          ],
         ),
 
         body: Column(
@@ -65,170 +76,16 @@ class Completed extends StatefulWidget {
 
 
 class _CompletedState extends State<Completed> {
-  String? name = "";
-  String? mobile = "";
-  String? successreason="";
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-  String status = "Successful";
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body:/* ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    Map fromitem = [index] as Map;
-                    if (fromitem["To Mobile"] == mobile ||
-                        fromitem["Mobile"] == mobile) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            ExpansionTile(
-                              leading:fromitem["Mobile"]!=mobile ? Icon(Icons.call_made, color: Colors.green[800],):
-                              const Icon(Icons.call_received, color: Colors.red,),
-                              title: fromitem["Mobile"] != mobile ? Text(
-                                  "${fromitem["Name"]}") :
-                              Text("${fromitem["To Name"]}"),
-
-                              children: [
-                                const SizedBox(height: 10,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children:  [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Text('Referrer Name  :'"${fromitem["Referrer Name"]}"),
-                                    ),
-
-                                  ],
-                                ),
-
-                                const SizedBox(height: 10,),
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children:  [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text('Purpose  :  '"${fromitem["Purpose"]}"),
-                                      ),
-                                    ]
-
-                                ),
-
-                                const SizedBox(height: 10,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children:  [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Text('Feedback   : '"${fromitem["Successful Reason"]}"),
-                                    ),
-
-                                  ],
-                                ),
-                                const SizedBox(height: 10,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children:  [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child:  Text('Date   :'"${fromitem["Date"]}"),
-                                    ),
-
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                    return Container();
-                  }
-
-              )*/
-      Center(
-        child: Column(
-          children: [
-            ExpansionTile(
-              leading: Icon(Icons.call_made, color: Colors.green[800],),
-              title: Text("Bhuvana"),
-
-              children: [
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:  [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text('Referrer Name  :'"Nasreen"),
-                    ),
-
-                  ],
-                ),
-
-                const SizedBox(height: 10,),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children:  [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text('Purpose  :  '"Purpose"),
-                      ),
-                    ]
-
-                ),
-
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:  [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text('Feedback   : '"Successful Reason"),
-                    ),
-
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:  [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child:  Text('Date   :'"Date"),
-                    ),
-
-                  ],
-                ),
-              ],
-            )
-          ],
-        ),
-      )
-    );
-  }
-}
-class Pending extends StatefulWidget {
-  final String? userType;
-  final String? userId;
-  const Pending({super.key, required this.userType, required this.userId});
-
-  @override
-  State<Pending> createState() => _PendingState();
-}
-
-class _PendingState extends State<Pending> {
-
   String? uid="";
   String? mobile ="";
   String? firstname ="";
   String? fetchMobile ="";
   List<Map<String,dynamic>>userdata=[];
+
+  bool isExpanded = false;   /// this is a edit button only for expension
+  String selectedStatus = "Pending"; // Default selected status
+  TextEditingController reasonController = TextEditingController(); // Controller for the reason text field
+
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
@@ -264,7 +121,7 @@ class _PendingState extends State<Pending> {
       print('Error: $error');
     }
   }
-  String status = "Pending";
+  String status = "Successful";
   List<Map<String, dynamic>> data=[];
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
@@ -291,6 +148,30 @@ class _PendingState extends State<Pending> {
     }
 
   }
+
+
+  Future<void> updateBusinessSlip(String id, String status, String reason) async {
+    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    print('url123$url');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': id,
+        'status': status,
+        'reason': reason,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Business slip updated successfully');
+    } else {
+      throw Exception('Failed to update business slip');
+    }
+  }
+
   @override
   void initState() {
     fetchData();
@@ -299,8 +180,12 @@ class _PendingState extends State<Pending> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
-        body: /*Center(
+        body:
+
+        /*Center(
           child: Column(
             children: [
               ExpansionTile(
@@ -393,122 +278,590 @@ class _PendingState extends State<Pending> {
             ],
           ),
         )*/
-                 ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, i) {
-                      return Center(
-                          child: Column(
+        ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, i) {
+              return Center(
+                child: Column(
+                  children: [
+                    Card(
+                      child: ExpansionTile(
+                        leading: CircleAvatar(
+                          backgroundColor: ColorGenerator.getRandomColor(),
+                          child: Text(
+                            data[i]["Toname"][0].toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                          title: Text('${data[i]["Toname"]}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              ExpansionTile(
-                                leading: data[i]["Tomobile"] == fetchMobile
-                                    ? Icon(Icons.call_received, color: Colors.green[800],)
-                                    : const Icon(Icons.call_made, color: Colors.red,),
-                                title:
-                                //data[i]["mobile"] == mobile ?
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(height: 30,),
-                                          Text('${data[i]["Toname"]}\n'),
-                                        ],
-                                      ),
-                                    ),
-
-                                    IconButton(
-                                        onPressed: () async {
-                                          final call = Uri.parse("tel://""${data[i]["Tomobile"]}");
-                                          if (await canLaunchUrl(call)) {
-                                            launchUrl(call);
-                                          } else {
-                                            throw 'Could not launch $call';
-                                          }
-                                        },
-                                        icon: const Icon(Icons.call,color: Colors.green,)),
-                                  ],
-                                ),
-                                    /*: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('${data[i]["First Name"]}\n'),
-                                    IconButton(
-                                        onPressed: () async {
-                                          final call = Uri.parse("tel://""${data[i]["Mobile"]}");
-                                          if (await canLaunchUrl(call)) {
-                                            launchUrl(call);
-                                          } else {
-                                            throw 'Could not launch $call';
-                                          }
-                                        },
-                                        icon: const Icon(Icons.call,color: Colors.green,)),
-                                  ],
-                                ),*/
-                                children: [
-                                  data[i]['type'] != 'Self' ?Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text("Referree Name :"'${data[i]["referree_name"]}\n'),
-                                      ),
-                                      IconButton(
-                                          onPressed: () async {
-                                            final call = Uri.parse("tel://""${data[i]["referree_mobile"]}");
-                                            if (await canLaunchUrl(call)) {
-                                              launchUrl(call);
-                                            } else {
-                                              throw 'Could not launch $call';
-                                            }
-                                          },
-                                          icon: const Icon(Icons.call,color: Colors.green,)),
-                                    ],
-                                  ) : Container(),
-
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text("Purpose : " '${data[i]["purpose"]}\n'),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child:  Text('Date   :'"${data[i]["createdOn"]}"),
-
-                                      ),
-                                    ],
-                                  ),
-
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text('Reason  : '"${data[i]["Hold Reason"]}"),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              IconButton(
+                                onPressed: () async {
+                                  final call = Uri.parse("tel://${data[i]["Tomobile"]}");
+                                  if (await canLaunchUrl(call)) {
+                                    launchUrl(call);
+                                  } else {
+                                    throw 'Could not launch $call';
+                                  }
+                                },
+                                icon: Icon(Icons.call, color: Colors.green),
                               ),
+                              Card(
+                                child: data[i]["Tomobile"] == fetchMobile
+                                    ? Icon(Icons.call_received, color: Colors.green[800])
+                                    : Icon(Icons.call_made, color: Colors.red),
+                              ),
+                              if (data[i]["Tomobile"] == fetchMobile && isExpanded)
+                                IconButton(
+                                  onPressed: () {
+                                    if (data[i]['id']!= null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                title: Text('Edit Status'),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    // Radio buttons for status selection
+                                                    ListTile(
+                                                      title: Text('Pending'),
+                                                      leading: Radio(
+                                                        value: 'Pending',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Successful'),
+                                                      leading: Radio(
+                                                        value: 'Successful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Unsuccessful'),
+                                                      leading: Radio(
+                                                        value: 'Unsuccessful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    // Text form field for additional input
+                                                    TextFormField(
+                                                      controller: reasonController,
+                                                      decoration: InputDecoration(
+                                                        labelText: 'Additional Information',
+                                                        border: OutlineInputBorder(),
+                                                      ),
+                                                      // Add controller if you need to capture the input
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Implement save functionality here
+                                                      updateBusinessSlip(data[i]['id'], selectedStatus, reasonController.text);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Save'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+                                    else {
+                                      print('ID is null');
+                                    }
+                                  },
+                                  icon: Icon(Icons.edit, color: Colors.blue),
+                                ),
                             ],
                           ),
-                        );
-                      return Container();
-                    }
-                )
-    );
+                        ),
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          data[i]['type'] != 'Self'
+                              ? ListTile(
+                            title: Text("Referee Name: ${data[i]["referree_name"]}"),
+                            trailing: IconButton(
+                              onPressed: () async {
+                                final call = Uri.parse("tel://${data[i]["referree_mobile"]}");
+                                if (await canLaunchUrl(call)) {
+                                  launchUrl(call);
+                                } else {
+                                  throw 'Could not launch $call';
+                                }
+                              },
+                              icon: Icon(Icons.call, color: Colors.green),
+                            ),
+                          )
+                              : Container(),
+                          ListTile(
+                            title: Text("Purpose: ${data[i]["purpose"]}"),
+                          ),
+                          ListTile(
+                            title: Text('Date: ${data[i]["createdOn"]}'),
+                          ),
+                          ListTile(
+                            title: Text('Reason: ${data[i]["reason"]}'),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  ],
+                ),
+              );
+              return Container();
+            }
+        )    );
 
   }
 }
+
+
+
+
+class Pending extends StatefulWidget {
+  final String? userType;
+  final String? userId;
+  const Pending({super.key, required this.userType, required this.userId});
+
+  @override
+  State<Pending> createState() => _PendingState();
+}
+
+class _PendingState extends State<Pending> {
+
+  String? uid="";
+  String? mobile ="";
+  String? firstname ="";
+  String? fetchMobile ="";
+  List<Map<String,dynamic>>userdata=[];
+
+  bool isExpanded = false;   /// this is a edit button only for expension
+  String selectedStatus = "Pending"; // Default selected status
+  TextEditingController reasonController = TextEditingController(); // Controller for the reason text field
+
+  Future<void> fetchData() async {
+    print("with user id ${widget.userId}");
+    try {
+      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      final response = await http.get(url);
+      print("fetch url:$url");
+
+      if (response.statusCode == 200) {
+        print("fetch status code:${response.statusCode}");
+        print("fetch body:${response.body}");
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                fetchMobile = userdata[0]["mobile"]??"";
+              });
+            getData();
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  String status = "Pending";
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      print("gib members url =$url");
+      final response = await http.get(url);
+      print("gib members ResponseStatus: ${response.statusCode}");
+      print("gib members Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("gib members ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        data = itemGroups.cast<Map<String, dynamic>>();
+        print('gib members Data: $data');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+  }
+
+
+  Future<void> updateBusinessSlip(String id, String status, String reason) async {
+    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    print('url123$url');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': id,
+        'status': status,
+        'reason': reason,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Business slip updated successfully');
+    } else {
+      throw Exception('Failed to update business slip');
+    }
+  }
+
+  Color _getRandomColor() {
+    // List of colors you want to use
+    List<Color> colors = [
+      Colors.red,
+      Colors.blue,
+      Colors.green,
+      Colors.yellow,
+      Colors.orange,
+    ];
+    // Generate a random index
+    int randomIndex = Random().nextInt(colors.length);
+    // Return the color at the random index
+    return colors[randomIndex];
+  }
+
+  @override
+  void initState() {
+    fetchData();
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+
+    return Scaffold(
+        body:
+
+        /*Center(
+          child: Column(
+            children: [
+              ExpansionTile(
+                leading:
+                    const Icon(Icons.call_made, color: Colors.red,),
+                title:
+                     Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20,),
+                          Text('Nasreen'),
+                        ],
+                      ),
+                    ),
+
+                    IconButton(
+                        onPressed: () async {
+                          final call = Uri.parse("tel://""1234567890");
+                          if (await canLaunchUrl(call)) {
+                            launchUrl(call);
+                          } else {
+                            throw 'Could not launch $call';
+                          }
+                        },
+                        icon: const Icon(Icons.call,color: Colors.green,)),
+                  ],
+                ),
+
+                children: [
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Referrer Name :"'"Baby"'),
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            final call = Uri.parse("tel://""1234567876543");
+                            if (await canLaunchUrl(call)) {
+                              launchUrl(call);
+                            } else {
+                              throw 'Could not launch $call';
+                            }
+                          },
+                          icon: const Icon(Icons.call,color: Colors.green,)),
+                    ],
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Purpose : " 'Purpose'),
+                      ),
+                    ],
+                  ),
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child:  Text('Date   :'"Date"),
+
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text('Reason  : '"Hold Reason"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )*/
+        ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, i) {
+              return Center(
+                child: Column(
+                  children: [
+                    Card(
+                      child: ExpansionTile(
+                        leading: CircleAvatar(
+                          backgroundColor: ColorGenerator.getRandomColor(),
+                          child: Text(
+                            data[i]["Toname"][0].toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                          title: Text('${data[i]["Toname"]}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () async {
+                                  final call = Uri.parse("tel://${data[i]["Tomobile"]}");
+                                  if (await canLaunchUrl(call)) {
+                                    launchUrl(call);
+                                  } else {
+                                    throw 'Could not launch $call';
+                                  }
+                                },
+                                icon: Icon(Icons.call, color: Colors.green),
+                              ),
+                              Card(
+                                child: data[i]["Tomobile"] == fetchMobile
+                                    ? Icon(Icons.call_received, color: Colors.green[800])
+                                    : Icon(Icons.call_made, color: Colors.red),
+                              ),
+                              if (data[i]["Tomobile"] == fetchMobile && isExpanded)
+                                IconButton(
+                                  onPressed: () {
+                                    if (data[i]['id']!= null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                title: Text('Edit Status'),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    // Radio buttons for status selection
+                                                    ListTile(
+                                                      title: Text('Pending'),
+                                                      leading: Radio(
+                                                        value: 'Pending',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Successful'),
+                                                      leading: Radio(
+                                                        value: 'Successful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Unsuccessful'),
+                                                      leading: Radio(
+                                                        value: 'Unsuccessful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    // Text form field for additional input
+                                                    TextFormField(
+                                                      controller: reasonController,
+                                                      decoration: InputDecoration(
+                                                        labelText: 'Additional Information',
+                                                        border: OutlineInputBorder(),
+                                                      ),
+                                                      // Add controller if you need to capture the input
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Implement save functionality here
+                                                      updateBusinessSlip(data[i]['id'], selectedStatus, reasonController.text);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Save'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+                                    else {
+                                      print('ID is null');
+                                    }
+                                  },
+                                  icon: Icon(Icons.edit, color: Colors.blue),
+                                ),
+                            ],
+                          ),
+                        ),
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          data[i]['type'] != 'Self'
+                              ? ListTile(
+                            title: Text("Referee Name: ${data[i]["referree_name"]}"),
+                            trailing: IconButton(
+                              onPressed: () async {
+                                final call = Uri.parse("tel://${data[i]["referree_mobile"]}");
+                                if (await canLaunchUrl(call)) {
+                                  launchUrl(call);
+                                } else {
+                                  throw 'Could not launch $call';
+                                }
+                              },
+                              icon: Icon(Icons.call, color: Colors.green),
+                            ),
+                          )
+                              : Container(),
+                          ListTile(
+                            title: Text("Purpose: ${data[i]["purpose"]}"),
+                          ),
+                          ListTile(
+                            title: Text('Date: ${data[i]["createdOn"]}'),
+                          ),
+                          ListTile(
+                            title: Text('Reason: ${data[i]["reason"]}'),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  ],
+                ),
+              );
+              return Container();
+            }
+        )    );
+
+  }
+}
+
+
+
+
 
 class Unsuccessful extends StatefulWidget {
   final String? userType;
@@ -524,154 +877,398 @@ class _UnsuccessfulState extends State<Unsuccessful> {
   String? uid="";
   String? mobile ="";
   String? firstname ="";
+  String? fetchMobile ="";
+  List<Map<String,dynamic>>userdata=[];
+
+  bool isExpanded = false;   /// this is a edit button only for expension
+  String selectedStatus = "Pending"; // Default selected status
+  TextEditingController reasonController = TextEditingController(); // Controller for the reason text field
+
+  Future<void> fetchData() async {
+    print("with user id ${widget.userId}");
+    try {
+      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      final response = await http.get(url);
+      print("fetch url:$url");
+
+      if (response.statusCode == 200) {
+        print("fetch status code:${response.statusCode}");
+        print("fetch body:${response.body}");
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            userdata = responseData.cast<Map<String, dynamic>>();
+            if (userdata.isNotEmpty) {
+              setState(() {
+                fetchMobile = userdata[0]["mobile"]??"";
+              });
+              getData();
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        //  print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  String status = "Unsuccessful";
+  List<Map<String, dynamic>> data=[];
+  Future<void> getData() async {
+    print('Attempting to make HTTP request...');
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      print("gib members url =$url");
+      final response = await http.get(url);
+      print("gib members ResponseStatus: ${response.statusCode}");
+      print("gib members Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("gib members ResponseData: $responseData");
+        final List<dynamic> itemGroups = responseData;
+        setState(() {});
+        data = itemGroups.cast<Map<String, dynamic>>();
+        print('gib members Data: $data');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+      print('HTTP request completed. Status code: ${response.statusCode}');
+    } catch (e) {
+      print('Error making HTTP request: $e');
+      throw e; // rethrow the error if needed
+    }
+
+  }
 
 
+  Future<void> updateBusinessSlip(String id, String status, String reason) async {
+    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    print('url123$url');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': id,
+        'status': status,
+        'reason': reason,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Business slip updated successfully');
+    } else {
+      throw Exception('Failed to update business slip');
+    }
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
+    fetchData();
     super.initState();
   }
-  String status = "Rejected";
+
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
-      body:   Center(
-        child: Column(
-          children: [
-            ExpansionTile(
-              leading: Icon(Icons.call_made, color: Colors.green[800],),
+        body:
 
-              title:Text("Bhuvana"),
+        /*Center(
+          child: Column(
+            children: [
+              ExpansionTile(
+                leading:
+                    const Icon(Icons.call_made, color: Colors.red,),
+                title:
+                     Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
 
-              children: [
-                const SizedBox(height: 10,),
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:  [
                     Padding(
                       padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text('Referrer Name  :Baby'),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20,),
+                          Text('Nasreen'),
+                        ],
+                      ),
                     ),
 
+                    IconButton(
+                        onPressed: () async {
+                          final call = Uri.parse("tel://""1234567890");
+                          if (await canLaunchUrl(call)) {
+                            launchUrl(call);
+                          } else {
+                            throw 'Could not launch $call';
+                          }
+                        },
+                        icon: const Icon(Icons.call,color: Colors.green,)),
                   ],
                 ),
 
-                const SizedBox(height: 10,),
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children:  [
+                children: [
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Referrer Name :"'"Baby"'),
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            final call = Uri.parse("tel://""1234567876543");
+                            if (await canLaunchUrl(call)) {
+                              launchUrl(call);
+                            } else {
+                              throw 'Could not launch $call';
+                            }
+                          },
+                          icon: const Icon(Icons.call,color: Colors.green,)),
+                    ],
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text("Purpose : " 'Purpose'),
+                      ),
+                    ],
+                  ),
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
                       Padding(
                         padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text('Purpose  :  Purpose'),
+                        child:  Text('Date   :'"Date"),
+
                       ),
-                    ]
-
-                ),
-
-                const SizedBox(height: 10,),
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:  [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text('UnSuccessful Reason  :UnSuccessful Reason '),
-                    ),
-
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ],
+                  ),
+                  const SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text('Reason  : '"Hold Reason"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )*/
+        ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, i) {
+              return Center(
+                child: Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text('Date   :Date'),
+                    Card(
+                      child: ExpansionTile(
+                        leading: CircleAvatar(
+                          backgroundColor: ColorGenerator.getRandomColor(),
+                          child: Text(
+                            data[i]["Toname"][0].toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                          title: Text('${data[i]["Toname"]}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () async {
+                                  final call = Uri.parse("tel://${data[i]["Tomobile"]}");
+                                  if (await canLaunchUrl(call)) {
+                                    launchUrl(call);
+                                  } else {
+                                    throw 'Could not launch $call';
+                                  }
+                                },
+                                icon: Icon(Icons.call, color: Colors.green),
+                              ),
+                              Card(
+                                child: data[i]["Tomobile"] == fetchMobile
+                                    ? Icon(Icons.call_received, color: Colors.green[800])
+                                    : Icon(Icons.call_made, color: Colors.red),
+                              ),
+                              if (data[i]["Tomobile"] == fetchMobile && isExpanded)
+                                IconButton(
+                                  onPressed: () {
+                                    if (data[i]['id']!= null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return AlertDialog(
+                                                title: Text('Edit Status'),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    // Radio buttons for status selection
+                                                    ListTile(
+                                                      title: Text('Pending'),
+                                                      leading: Radio(
+                                                        value: 'Pending',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Successful'),
+                                                      leading: Radio(
+                                                        value: 'Successful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text('Unsuccessful'),
+                                                      leading: Radio(
+                                                        value: 'Unsuccessful',
+                                                        groupValue: selectedStatus,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedStatus = value.toString();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    // Text form field for additional input
+                                                    TextFormField(
+                                                      controller: reasonController,
+                                                      decoration: InputDecoration(
+                                                        labelText: 'Additional Information',
+                                                        border: OutlineInputBorder(),
+                                                      ),
+                                                      // Add controller if you need to capture the input
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Implement save functionality here
+                                                      updateBusinessSlip(data[i]['id'], selectedStatus, reasonController.text);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Save'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+                                    else {
+                                      print('ID is null');
+                                    }
+                                  },
+                                  icon: Icon(Icons.edit, color: Colors.blue),
+                                ),
+                            ],
+                          ),
+                        ),
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          data[i]['type'] != 'Self'
+                              ? ListTile(
+                            title: Text("Referee Name: ${data[i]["referree_name"]}"),
+                            trailing: IconButton(
+                              onPressed: () async {
+                                final call = Uri.parse("tel://${data[i]["referree_mobile"]}");
+                                if (await canLaunchUrl(call)) {
+                                  launchUrl(call);
+                                } else {
+                                  throw 'Could not launch $call';
+                                }
+                              },
+                              icon: Icon(Icons.call, color: Colors.green),
+                            ),
+                          )
+                              : Container(),
+                          ListTile(
+                            title: Text("Purpose: ${data[i]["purpose"]}"),
+                          ),
+                          ListTile(
+                            title: Text('Date: ${data[i]["createdOn"]}'),
+                          ),
+                          ListTile(
+                            title: Text('Reason: ${data[i]["reason"]}'),
+                          ),
+                        ],
+                      ),
                     ),
+
                   ],
                 ),
-              ],
-            )
-          ],
-        ),
-      ),
-      /*ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    Map fromitem = [index] as Map;
-                    if (fromitem["To Mobile"] == mobile ||
-                        fromitem["Mobile"] == mobile) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            ExpansionTile(
-                              leading:fromitem["Mobile"]!=mobile ? Icon(Icons.call_made, color: Colors.green[800],):
-                              const Icon(Icons.call_received, color: Colors.red,),
+              );
+              return Container();
+            }
+        )    );
 
-                              title: fromitem["Mobile"] != mobile ? Text(
-                                  "${fromitem["Name"]}") :
-                              Text("${fromitem["To Name"]}"),
-
-                              children: [
-                                const SizedBox(height: 10,),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children:  [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Text('Referrer Name  :'"${fromitem["Referrer Name"]}"),
-                                    ),
-
-                                  ],
-                                ),
-
-                                const SizedBox(height: 10,),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children:  [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                        child: Text('Purpose  :  '"${fromitem["Purpose"]}"),
-                                      ),
-                                    ]
-
-                                ),
-
-                                const SizedBox(height: 10,),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children:  [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Text('UnSuccessful Reason  : '"${fromitem["UnSuccessful Reason"]}"),
-                                    ),
-
-                                  ],
-                                ),
-                                const SizedBox(height: 10,),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                      child: Text('Date   :'"${fromitem["Date"]}"),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                    return Container();
-                  }
-
-              )*/
-
-    );
   }
 }
 
+
+
+
+class ColorGenerator {
+  static Color getRandomColor() {
+    // List of colors you want to use
+    List<Color> colors = [
+      Colors.deepOrange,
+      Colors.blue,
+      Colors.indigo,
+      Colors.purple,
+      Colors.pinkAccent,
+    ];
+    // Generate a random index
+    int randomIndex = Random().nextInt(colors.length);
+    // Return the color at the random index
+    return colors[randomIndex];
+  }
+}
 
 

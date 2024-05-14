@@ -315,6 +315,8 @@ class _GalleryState extends State<Gallery> {
   class _VideoState extends State<Video> {
     final ImagePicker _picker = ImagePicker();
     List<dynamic> _videos = [];
+    List<String> _thumbnails = [];
+
     @override
     void initState() {
       super.initState();
@@ -396,12 +398,33 @@ class _GalleryState extends State<Gallery> {
       if (response.statusCode == 200) {
         setState(() {
           _videos = jsonDecode(response.body);
+          // Fetch thumbnails for each video
+          _thumbnails = List<String>.filled(_videos.length, '');
+          for (int i = 0; i < _videos.length; i++) {
+            _fetchThumbnail(i);
+          }
         });
       } else {
         // Handle error
         print('Failed to fetch videos');
       }
     }
+
+    Future<void> _fetchThumbnail(int index) async {
+      final videoPath = _videos[index]['video_path'];
+      final url = 'http://localhost/GIB/lib/GIBAPI/videosmp4.php?video_path=' + videoPath;
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        setState(() {
+          _thumbnails[index] = response.body;
+        });
+      } else {
+        // Handle error
+        print('Failed to fetch thumbnail for video at index $index');
+      }
+    }
+
 
     Future<void> _deleteVideo(int videoIndex) async {
       int videoId = _videos[videoIndex]['id'];
@@ -507,37 +530,35 @@ class _GalleryState extends State<Gallery> {
           itemCount: _videos.length,
           itemBuilder: (context, index) {
             final videoId = _videos[index]['id'];
+            final video_name = _videos[index]['video_name'];
             final videoPath = _videos[index]['video_path'];
-            return Stack(
-              children: [
-                Column(
-                  children: [
-                    VideoPlayerWidget(videoUrl: videoPath),
-                  ],
-                ),
-                Positioned(
-                  top: 5,
-                  right: 5,
-                  child: IconButton(
-                    icon: Icon(Icons.cancel,color: Colors.red,),
-                    onPressed: () {
-                      _showDeleteConfirmationDialog(index);
-                    },
+            final thumbnail = _thumbnails[index];
+
+            return ListTile(
+              title: Text(video_name),
+              leading: Container(
+                width: 50, // Adjust the width as needed
+                child: thumbnail.isNotEmpty
+                    ? Image.network(thumbnail)
+                    : CircularProgressIndicator(), // Show a loading indicator if thumbnail is being fetched
+              ),              onTap: () {
+                // Navigate to VideoPlayerScreen when the name is clicked
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideoPlayerScreen(videoPath: videoPath),
                   ),
-                ),
-              ],
+                );
+              },
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  _showDeleteConfirmationDialog(index);
+                },
+              ),
             );
           },
         ),
-/*
-        body: ListView.builder(
-          itemCount: _videos.length,
-          itemBuilder: (context, index) {
-            final videoPath = _videos[index]['video_path'];
-            return VideoPlayerWidget(videoUrl: videoPath);
-          },
-        ),
-*/
       );
     }
   }

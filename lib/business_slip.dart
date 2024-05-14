@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gipapp/business.dart';
 import 'package:http/http.dart' as http;
@@ -187,7 +189,7 @@ class _ReferralPageState extends State<ReferralPage> {
           IconButton(onPressed:(){
             Navigator.push(context, MaterialPageRoute(
                 builder: (context) => BusinessHistory(userType: widget.userType, userId: widget.userId))); },
-              icon: const Icon(Icons.more_vert)),
+              icon: const Icon(Icons.history)),
         ],
       ),
       body: SingleChildScrollView(
@@ -196,7 +198,7 @@ class _ReferralPageState extends State<ReferralPage> {
             key: _formKey,
             child: Column(
               children: [
-                const SizedBox(height: 20,),
+                const SizedBox(height: 10,),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TypeAheadFormField(
@@ -235,37 +237,11 @@ class _ReferralPageState extends State<ReferralPage> {
                     },
                   ),
                 ),
-
-/*
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.4, // Adjust height as needed
-
-                  child: ListView.builder(
-                    itemCount: searchResults.length,
-                    itemBuilder: (context, index) {
-                      return  ListTile(
-                        title: Text(
-                          '${searchResults[index]['first_name']} (${searchResults[index]['member_id']})',
-                        ),
-                        subtitle: Text(searchResults[index]['last_name']),
-                        onTap: () {
-
-                          updateTextFields(index);
-                        },
-                      );
-                    },
-                  ),
-                ),
-*/
-                const SizedBox(height: 20,),
-
-                Container(
-                  width: 350,
-                  //   height: 600,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      border: Border.all(color: Colors.green)
-                  ),
+        
+                const SizedBox(height: 10,),
+        
+               Container(
+                  //elevation: 5,
                   child: Column(
                     children: [
                       const SizedBox(height: 20,),
@@ -299,10 +275,13 @@ class _ReferralPageState extends State<ReferralPage> {
                             const Text("Referer"),
                           ]
                       ),
+                      const SizedBox(height: 10,),
+
 
                       //To TextFormField starts
                       SizedBox(
-                        width: 300,
+                       width: 320,
+                        height: 50,
                         child: TextFormField(
                           controller: to,
                           validator: (value) {
@@ -319,15 +298,21 @@ class _ReferralPageState extends State<ReferralPage> {
                               selection: TextSelection.collapsed(offset: capitalizedValue.length),
                             );
                           },
-                          decoration: const InputDecoration(
+                          decoration:  InputDecoration(
+
                               labelText: 'To',
-                              hintText: 'To',
-                              suffixIcon: Icon(Icons.search,color: Colors.green,)
+                              suffixIcon: Icon(Icons.account_circle,color: Colors.green,),
+                            // filled: true,
+                            // fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 3.0),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20,),
+
                       SizedBox(
-                        width: 300,
+                        width: 320,
+                        height: 50,
                         child: TextFormField(
                           controller: tomobile,
                           validator: (value){
@@ -342,8 +327,11 @@ class _ReferralPageState extends State<ReferralPage> {
                           },
                           decoration: const InputDecoration(
                             labelText: 'To Mobile number',
-                            hintText: 'To Mobile number',
-                              suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
+
+                            suffixIcon: Icon(Icons.phone_android,color: Colors.green,),
+                            // filled: true,
+                            // fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 3.0),
                           ),keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
@@ -351,9 +339,12 @@ class _ReferralPageState extends State<ReferralPage> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 20,),
+
                       //Company name TextFormField starts
                       SizedBox(
-                        width: 300,
+                        width: 320,
+                        height: 50,
                         child: TextFormField(
                           controller: cname,
                           validator: (value) {
@@ -372,8 +363,11 @@ class _ReferralPageState extends State<ReferralPage> {
                           },
                           decoration: const InputDecoration(
                             labelText: 'Company name',
-                            hintText: 'Company name',
-                              suffixIcon: Icon(Icons.business,color: Colors.green,)
+
+                              suffixIcon: Icon(Icons.business,color: Colors.green,),
+                            // filled: true,
+                            // fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 3.0),
                           ),
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(30)
@@ -388,12 +382,18 @@ class _ReferralPageState extends State<ReferralPage> {
                           style: TextStyle(
                             fontSize: 18,),),
                       ),
+                      Visibility(
+                          visible: isVisible,
+
+                          child: SizedBox(height: 20,)),
                       //TextFormField Name starts
                       Visibility(
                         visible: isVisible,
                         child: SizedBox(
-                          width: 300,
+                          width: 320,
+                          height: 50,
                           child: TextFormField(
+
                             controller: referreename,
                             validator: (value){
                               if(value!.isEmpty){
@@ -412,8 +412,10 @@ class _ReferralPageState extends State<ReferralPage> {
                             },
                             decoration: const InputDecoration(
                               labelText: 'Referree Name',
-                              hintText: 'Referree Name',
-                                suffixIcon: Icon(Icons.account_circle_outlined,color: Colors.green,)
+                                suffixIcon: Icon(Icons.account_circle_outlined,color: Colors.green,),
+                              // filled: true,
+                              // fillColor: Colors.white,
+                              contentPadding: EdgeInsets.symmetric(vertical: 25.0, horizontal: 3.0),
                             ),
                             inputFormatters: [
                               AlphabetInputFormatter(),
@@ -422,11 +424,17 @@ class _ReferralPageState extends State<ReferralPage> {
                           ),
                         ),
                       ),
+                       Visibility(
+                           visible: isVisible,
+
+                           child: SizedBox(height: 20,)),
+
                       //TextFormField MobileNo starts
                       Visibility(
                         visible: isVisible,
                         child: SizedBox(
-                          width: 300,
+                          width: 320,
+                          height: 50,
                           child: TextFormField(
                             controller: referreemobile,
                             validator: (value){
@@ -441,7 +449,10 @@ class _ReferralPageState extends State<ReferralPage> {
                             },
                             decoration: const InputDecoration(
                               labelText: 'Mobile number',
-                              hintText: 'Mobile number',
+                                // filled: true,
+                                // fillColor: Colors.white,
+                                contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 3.0),
+
                                 suffixIcon: Icon(Icons.phone_android,color: Colors.green,)                            ),keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
@@ -450,10 +461,13 @@ class _ReferralPageState extends State<ReferralPage> {
                           ),
                         ),
                       ),
-                      //TextFormField Location starts
+                      const SizedBox(height: 20,),
 
+                      //TextFormField Location starts
+        
                       SizedBox(
-                        width: 300,
+                        width: 320,
+                        height: 50,
                         child: TextFormField(
                           controller: purpose,
                           validator: (value){
@@ -465,10 +479,12 @@ class _ReferralPageState extends State<ReferralPage> {
                           },
                           decoration: const InputDecoration(
                             labelText: "Purpose",
-                            hintText: "Purpose",
                             suffixIcon: Icon(
                               Icons.note,
                               color: Colors.green,),
+                            // filled: true,
+                            // fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 3.0),
                           ),
                           inputFormatters: [
                             AlphabetInputFormatter(),
@@ -476,27 +492,15 @@ class _ReferralPageState extends State<ReferralPage> {
                           ],
                         ),
                       ),
-
+        
                       const SizedBox(height: 20,),
-                      Row(
+               /*       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Cancel button starts
-                          MaterialButton(
-                              minWidth: 100,
-                              height: 50,
-                              color: Colors.orangeAccent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                              onPressed: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>BusinessPage(userId: widget.userId, userType: widget.userType)));
-                              },
-                              child: const Text('Cancel',
-                                style: TextStyle(color: Colors.white),)),
-                          // Cancel button ends
-                          // Submit button starts
+
                           MaterialButton(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                              minWidth: 100,
+                              //minWidth: 100,
                               height: 50,
                               color: Colors.green[800],
                               onPressed: (){
@@ -510,17 +514,34 @@ class _ReferralPageState extends State<ReferralPage> {
                               child: const Text('SUBMIT',
                                 style: TextStyle(color: Colors.white),)),
                           // Submit button ends
-
-
+        
+        
                         ],
-                      ),
-                      const SizedBox(height: 20,),
-                      //        const Text('Thanks for your Referral😊', style: TextStyle(fontSize: 13),),
+                      ),*/
 
 
+        
                     ],
                   ),
-                )
+                ),
+                SizedBox(height: 30,),
+                MaterialButton(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                    minWidth: 320,
+                    height: 50,
+                    color: Colors.green[800],
+                    onPressed: (){
+                      if (_formKey.currentState!.validate()) {
+                        InsertBusinessSlip();
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>BusinessPage(userId: widget.userId, userType: widget.userType)));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text("Registered Successfully")));
+                      }
+                    },
+                    child: const Text('SUBMIT',
+                      style: TextStyle(color: Colors.white),)),
+                SizedBox(height: 20,),
+
               ],
             ),
           ),

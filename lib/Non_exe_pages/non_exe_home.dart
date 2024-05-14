@@ -777,7 +777,7 @@ class _NavDrawerState extends State<NavDrawer> {
               leading: IconButton(
                 icon: const Icon(Icons.house,color: Colors.white,size: 30.0,),
                 onPressed: (){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScrollApp(),));
+               //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScrollApp(),));
                 }, ),
               title: const Text('Home',
                 style: TextStyle(fontSize: 20.0,color: Colors.white),),
