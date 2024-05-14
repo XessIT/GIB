@@ -42,6 +42,8 @@ class _ReferralPageState extends State<ReferralPage> {
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
         print("response B: ${response.body}");
+        print('-----------------------------------');
+
         final responseData = json.decode(response.body);
         if (responseData is List<dynamic>) {
           setState(() {
@@ -188,7 +190,8 @@ class _ReferralPageState extends State<ReferralPage> {
         actions: [
           IconButton(onPressed:(){
             Navigator.push(context, MaterialPageRoute(
-                builder: (context) => BusinessHistory(userType: widget.userType, userId: widget.userId))); },
+                builder: (context) => BusinessHistory(userType: widget.userType, userId: widget.userId)
+            )); },
               icon: const Icon(Icons.history)),
         ],
       ),
@@ -236,7 +239,7 @@ class _ReferralPageState extends State<ReferralPage> {
                       });
                     },
                   ),
-                ),
+                ),/// search controller
         
                 const SizedBox(height: 10,),
         
@@ -274,7 +277,7 @@ class _ReferralPageState extends State<ReferralPage> {
                             ),
                             const Text("Referer"),
                           ]
-                      ),
+                      ),  /// radio tile
                       const SizedBox(height: 10,),
 
 
