@@ -131,14 +131,16 @@ class _BloodState extends State<Blood> {
                         ),
                         Column(
                           children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
+                            Card(
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
                               ),
                             ),
                             Text("A-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
