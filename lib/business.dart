@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-
 import 'business_slip.dart';
 import 'g2g_slip.dart';
 import 'honor_slip.dart';
+
 //import 'package:gib/guest_slip.dart';
 
 class BusinessPage extends StatefulWidget {
@@ -621,7 +620,7 @@ class _MyTransactionState extends State<MyTransaction> {
                             IconButton(onPressed: (){
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) =>  const ThankNotes()),
+                                MaterialPageRoute(builder: (context) => Direct(userId: widget.userId, userType: widget.userType)),
                               );
                             }, icon: Icon(Icons.chevron_right,color: Colors.black,),),
                           ],

@@ -4,6 +4,9 @@ import 'dart:math';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
@@ -472,11 +475,13 @@ class _PendingState extends State<Pending> {
   String? firstname ="";
   String? fetchMobile ="";
   List<Map<String,dynamic>>userdata=[];
-
+  final _formKey =GlobalKey<FormState>();
   bool isExpanded = false;   /// this is a edit button only for expension
   String selectedStatus = "Pending"; // Default selected status
   TextEditingController reasonController = TextEditingController(); // Controller for the reason text field
-
+  TextEditingController amountController = TextEditingController(); // Controller for the reason text field
+  bool isReason = true;
+  bool isAmount = false;
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
@@ -580,7 +585,6 @@ class _PendingState extends State<Pending> {
   @override
   void initState() {
     fetchData();
-
     super.initState();
   }
 
@@ -687,6 +691,8 @@ class _PendingState extends State<Pending> {
         ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
+              DateTime createdOn = DateTime.parse(data[i]["createdOn"]);
+              String formattedDate = DateFormat('dd-MM-yyyy').format(createdOn);
               return Center(
                 child: Column(
                   children: [
@@ -701,13 +707,22 @@ class _PendingState extends State<Pending> {
                         ),
                         title: ListTile(
                           contentPadding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                          title: Text('${data[i]["Toname"]}'),
+                          title: data[i]["Tomobile"] == fetchMobile
+                              ? Text('${data[i]["referrer_name"]}') : Text('${data[i]["Toname"]}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                onPressed: () async {
-                                  final call = Uri.parse("tel://${data[i]["Tomobile"]}");
+                                onPressed: data[i]["Tomobile"] == fetchMobile
+                                    ? () async {
+                                  final call = Uri.parse("tel:// ${data[i]["referrer_mobile"]}");
+                                  if (await canLaunchUrl(call)) {
+                                    launchUrl(call);
+                                  } else {
+                                    throw 'Could not launch $call';
+                                  }
+                                } : () async {
+                                  final call = Uri.parse("tel:// ${data[i]["Tomobile"]}");
                                   if (await canLaunchUrl(call)) {
                                     launchUrl(call);
                                   } else {
@@ -743,6 +758,8 @@ class _PendingState extends State<Pending> {
                                                         groupValue: selectedStatus,
                                                         onChanged: (value) {
                                                           setState(() {
+                                                            isReason = true;
+                                                            isAmount = false;
                                                             selectedStatus = value.toString();
                                                           });
                                                         },
@@ -755,40 +772,121 @@ class _PendingState extends State<Pending> {
                                                         groupValue: selectedStatus,
                                                         onChanged: (value) {
                                                           setState(() {
+                                                            isAmount = true;
+                                                            isReason = false;
                                                             selectedStatus = value.toString();
                                                           });
                                                         },
                                                       ),
                                                     ),
                                                     ListTile(
-                                                      title: Text('Unsuccessful'),
+                                                      title: const Text('Unsuccessful'),
                                                       leading: Radio(
                                                         value: 'Unsuccessful',
                                                         groupValue: selectedStatus,
                                                         onChanged: (value) {
                                                           setState(() {
+                                                            isReason = true;
+                                                            isAmount = false;
                                                             selectedStatus = value.toString();
                                                           });
                                                         },
                                                       ),
                                                     ),
                                                     // Text form field for additional input
-                                                    TextFormField(
-                                                      controller: reasonController,
-                                                      decoration: InputDecoration(
-                                                        labelText: 'Additional Information',
-                                                        border: OutlineInputBorder(),
+                                                    Visibility(
+                                                      visible: isReason,
+                                                      child: Form(
+                                                        key: _formKey,
+                                                        child: TextFormField(
+                                                          controller: reasonController,
+                                                          validator: (value){
+                                                            if(value!.isEmpty){
+                                                              return "* Enter the Reason";
+                                                            }else{
+                                                              return null;
+                                                            }
+                                                          },
+                                                          decoration: const InputDecoration(
+                                                            labelText: 'Reason',
+                                                            border: OutlineInputBorder(),
+                                                          ),
+                                                          // Add controller if you need to capture the input
+                                                        ),
                                                       ),
-                                                      // Add controller if you need to capture the input
+                                                    ),
+                                                    Visibility(
+                                                      visible: isAmount,
+                                                      child: Form(
+                                                        key: _formKey,
+                                                        child: TextFormField(
+                                                          controller: amountController,
+                                                          validator: (value){
+                                                            if(value!.isEmpty){
+                                                              return "* Enter the Amount";
+                                                            } else if(value == "0"){
+                                                              return "* Amount cannot be zero";
+                                                            }else{
+                                                              return null;
+                                                            }
+                                                          },
+                                                          decoration: const InputDecoration(
+                                                            labelText: 'Amount',
+                                                            prefixIcon: Icon(
+                                                              Icons.currency_rupee_rounded,
+                                                              color: Colors.green,),
+                                                            border: OutlineInputBorder(),
+                                                          ),
+                                                          keyboardType: TextInputType.number,
+                                                          inputFormatters: <TextInputFormatter>[
+                                                            FilteringTextInputFormatter.digitsOnly,
+                                                          ],
+                                                          // Add controller if you need to capture the input
+                                                        ),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                                 actions: <Widget>[
                                                   TextButton(
-                                                    onPressed: () {
-                                                      // Implement save functionality here
-                                                      updateBusinessSlip(data[i]['id'], selectedStatus, reasonController.text);
-                                                      Navigator.of(context).pop();
+                                                    onPressed: ()async {
+                                                      if (_formKey.currentState!.validate()) {
+                                                      if(selectedStatus == 'Successful') {
+                                                          updateBusinessSlip(data[i]['id'], selectedStatus, amountController.text);
+                                                          try {
+                                                            final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/honor_slip.php');
+                                                            final response = await http.post(url,
+                                                              body: jsonEncode({
+                                                                "Toname": data[i]["referrer_name"],
+                                                                "Tomobile": data[i]["referrer_mobile"],
+                                                                "Tocompanyname": data[i]["referrer_company"],
+                                                                "purpose": data[i]["purpose"],
+                                                                "business_name": data[i]["referree_name"],
+                                                                "business_mobile": data[i]["referree_mobile"],
+                                                                "name": data[i]["Toname"],
+                                                                "mobile": data[i]["Tomobile"],
+                                                                "company": data[i]["Tocompanyname"],
+                                                                "amount": amountController.text.trim(),
+                                                              }),
+                                                            );
+                                                            print(url);
+                                                            print("ResponseStatus: ${response.statusCode}");
+                                                            if (response.statusCode == 200) {
+                                                              print("Offers response: ${response.body}");
+                                                            } else {
+                                                              print("Error: ${response.statusCode}");
+                                                            }
+                                                          } catch (e) {
+                                                            print("Error during signup: $e");
+                                                            // Handle error as needed
+                                                          }
+                                                        }
+                                                        else {
+                                                          // Implement save functionality here
+                                                          updateBusinessSlip(data[i]['id'], selectedStatus, reasonController.text);
+                                                        }
+                                                        Navigator.of(context).pop();
+                                                      }
                                                     },
                                                     child: Text('Save'),
                                                   ),
@@ -840,11 +938,11 @@ class _PendingState extends State<Pending> {
                             title: Text("Purpose: ${data[i]["purpose"]}"),
                           ),
                           ListTile(
-                            title: Text('Date: ${data[i]["createdOn"]}'),
+                            title: Text('Date: $formattedDate'),
                           ),
-                          ListTile(
+                          data[i]["reason"].isNotEmpty ? ListTile(
                             title: Text('Reason: ${data[i]["reason"]}'),
-                          ),
+                          ) : Container(),
                         ],
                       ),
                     ),
