@@ -149,6 +149,7 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         centerTitle:true,
         title: Text("Guest Slip",style: Theme.of(context).textTheme.bodySmall),
         iconTheme:  const IconThemeData(

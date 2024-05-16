@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gipapp/sample_login.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Non_exe_pages/non_exe_home.dart';
 import 'guest_home.dart';
@@ -12,36 +13,34 @@ void main() {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           appBarTheme: AppBarTheme(
-              backgroundColor: Colors.green[900]
+              backgroundColor: Colors.green
+          ),
+          /// app bar 18
+          /// inside body heding  16
+          /// inside text 14
+          /// body for black
+          /// label for white
+          /// headline for medium  green
+
+          textTheme: GoogleFonts.aBeeZeeTextTheme().copyWith(
+            headlineSmall: TextStyle(fontSize: 16.0,color: Colors.green),
+            headlineMedium: const TextStyle(fontSize: 16.0,color: Colors.green,fontWeight: FontWeight.bold),
+            headlineLarge:  TextStyle(fontSize: 16.0,color: Colors.blue),
+
+
+            bodySmall: const TextStyle(fontSize: 14, color: Colors.black),
+            bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
+            bodyLarge: const TextStyle(fontSize: 18.0, color: Colors.black),
+
+            displayLarge:TextStyle(fontSize: 18, color: Colors.white),
+            displayMedium: TextStyle(fontSize: 16, color: Colors.white),
+            displaySmall: const TextStyle(fontSize: 14, color: Colors.white), // Assuming this is for labels
           ),
 
-          textTheme: TextTheme(
-              displayLarge: TextStyle(fontSize: 30.0,fontWeight: FontWeight.bold,color: Colors.green[900]),
-              displayMedium: TextStyle(fontSize: 20.0,color: Colors.green[900]),
-              displaySmall: const TextStyle(fontSize: 20.0,color: Colors.yellow),
-              headlineMedium: const TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold,color: Colors.black),
-              headlineSmall: TextStyle(fontSize: 16.0,color: Colors.green[900],fontWeight: FontWeight.bold),
-              titleLarge: const TextStyle(fontSize: 16, color: Colors.white),
-              bodyLarge: const TextStyle(fontSize: 18.0),
-              bodyMedium: const TextStyle(fontSize: 16),
-              headlineLarge:  TextStyle(fontSize: 16.0,color: Colors.blue[900],fontWeight: FontWeight.bold),
-              titleSmall: const TextStyle( fontSize: 13.5,color: Colors.white70,fontWeight: FontWeight.w200),
-              bodySmall: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold)
-           //   subtitle1:   TextStyle( fontSize: 20, color: Colors.black, ),
-          //    labelSmall: const TextStyle(fontSize: 16, color: Colors.white),
 
 
-          ),
 
-          outlinedButtonTheme: OutlinedButtonThemeData(
-              style: OutlinedButton.styleFrom(
-                 // primary: Colors.white,
-                  backgroundColor: Colors.green[800],
-                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)  ),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15, horizontal: 50),
-                  textStyle: const TextStyle(
-                      fontSize: 15))),
+
         ),
 
         home: FutureBuilder<Map<String, dynamic>>(
@@ -129,6 +128,9 @@ void main() {
 
       ));
 }
+
+
+
 Future<Map<String, dynamic>> isLoggedIn() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

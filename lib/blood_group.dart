@@ -96,11 +96,11 @@ class _BloodState extends State<Blood> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                    /// dark  colors: [Color(0xFFD81B60), Color(0xFFEF5350)], // Pink to Red gradient
+                      /// dark  colors: [Color(0xFFD81B60), Color(0xFFEF5350)], // Pink to Red gradient
                       colors: [
                         Colors.pink.shade100, // Light Pink
                         Color(0xFFFFAB91), // Light Orange
-                      //  Color(0xFFF06292), // Light Pink
+                        //  Color(0xFFF06292), // Light Pink
                         Colors.pink.shade100, // Light Pink
 
                         Color(0xFFFFAB91),
@@ -110,31 +110,15 @@ class _BloodState extends State<Blood> {
 
                   ),
                   child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A+',)),);
-                                },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Card(
-                              child: IconButton(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A+',)),);
                                 },
                                 icon: Icon(
                                   Icons.water_drop_outlined,
@@ -142,304 +126,345 @@ class _BloodState extends State<Blood> {
                                   size: 50,
                                 ),
                               ),
-                            ),
-                            Text("A-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1+',)),);
-
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A1+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
-
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A1-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2+',)),);
-
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A2+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2-',)),);
-
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A2-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-
-
-
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1B+',)),);
-
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A1B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1B-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A1B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2B+',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A2B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-
-
-
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2B-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("A2B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'AB+',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("AB+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'AB-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("AB-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-
-
-
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'B+',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'B-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'O+',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("O+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'O-',)),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("O-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'BBG')),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("BBG",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'INRA')),);
-                              },
-                              icon: Icon(
-                                Icons.water_drop_outlined,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            ),
-                            Text("INRA",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-
-                      ],
-                    ),
-
-
-
-                  ],
+                              Text("A+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
+                                  },
+                                  icon: Icon(
+                                    Icons.water_drop_outlined,
+                                    color: Colors.white,
+                                    size: 50,
+                                  ),
                                 ),
-              ),)
+                              ),
+                              Text("A-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1+',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A1+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Chip(
+                            elevation: 20,
+                            padding: EdgeInsets.all(8),
+                            backgroundColor: Colors.greenAccent[100],
+                            shadowColor: Colors.black,
+                            avatar: CircleAvatar(
+                              child:  IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1+',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              //NetworkImage
+                            ), //CircleAvatar
+                            label: Text(
+                              'A',
+                              style: TextStyle(fontSize: 20),
+                            ), //Text
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A-',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A1-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2+',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A2+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2-',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A2-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+
+
+
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1B+',)),);
+
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A1B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A1B-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A1B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2B+',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A2B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+
+
+
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'A2B-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("A2B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'AB+',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("AB+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'AB-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("AB-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+
+
+
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'B+',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("B+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'B-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("B-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'O+',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("O+",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'O-',)),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("O-",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'BBG')),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("BBG",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BloodList(bloods: 'INRA')),);
+                                },
+                                icon: Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
+                              Text("INRA",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+
+                        ],
+                      ),
+
+
+
+                    ],
+                  ),
+                ),)
 
               // Container(
               //   width: 350,

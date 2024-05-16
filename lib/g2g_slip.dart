@@ -171,7 +171,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
   Future<void> fetchRegistrationData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php');
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

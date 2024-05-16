@@ -17,9 +17,12 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Perform GET query
-$sql = "SELECT * FROM `registration` WHERE member_type='Executive';
-";
+// Fetch the userId sent from Flutter
+$userId = $_GET['userId'];
+
+// Perform GET query, excluding the current user's data
+$sql = "SELECT * FROM `registration` WHERE member_type='Executive' AND id != '$userId'";
+
 $result = mysqli_query($conn, $sql);
 
 // Check if any rows returned
