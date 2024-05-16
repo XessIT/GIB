@@ -77,7 +77,6 @@ class Completed extends StatefulWidget {
   State<Completed> createState() => _CompletedState();
 }
 
-
 class _CompletedState extends State<Completed> {
   String? uid="";
   String? mobile ="";
@@ -567,20 +566,7 @@ class _PendingState extends State<Pending> {
     }
   }
 
-  Color _getRandomColor() {
-    // List of colors you want to use
-    List<Color> colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.yellow,
-      Colors.orange,
-    ];
-    // Generate a random index
-    int randomIndex = Random().nextInt(colors.length);
-    // Return the color at the random index
-    return colors[randomIndex];
-  }
+
 
   @override
   void initState() {
@@ -593,102 +579,7 @@ class _PendingState extends State<Pending> {
 
 
     return Scaffold(
-        body:
-
-        /*Center(
-          child: Column(
-            children: [
-              ExpansionTile(
-                leading:
-                    const Icon(Icons.call_made, color: Colors.red,),
-                title:
-                     Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20,),
-                          Text('Nasreen'),
-                        ],
-                      ),
-                    ),
-
-                    IconButton(
-                        onPressed: () async {
-                          final call = Uri.parse("tel://""1234567890");
-                          if (await canLaunchUrl(call)) {
-                            launchUrl(call);
-                          } else {
-                            throw 'Could not launch $call';
-                          }
-                        },
-                        icon: const Icon(Icons.call,color: Colors.green,)),
-                  ],
-                ),
-
-                children: [
-
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text("Referrer Name :"'"Baby"'),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            final call = Uri.parse("tel://""1234567876543");
-                            if (await canLaunchUrl(call)) {
-                              launchUrl(call);
-                            } else {
-                              throw 'Could not launch $call';
-                            }
-                          },
-                          icon: const Icon(Icons.call,color: Colors.green,)),
-                    ],
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text("Purpose : " 'Purpose'),
-                      ),
-                    ],
-                  ),
-
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child:  Text('Date   :'"Date"),
-
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text('Reason  : '"Hold Reason"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )*/
-        ListView.builder(
+        body:ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
               DateTime createdOn = DateTime.parse(data[i]["createdOn"]);
@@ -952,12 +843,11 @@ class _PendingState extends State<Pending> {
               );
               return Container();
             }
-        )    );
+        )
+    );
 
   }
 }
-
-
 
 
 

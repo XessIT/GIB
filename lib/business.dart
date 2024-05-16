@@ -56,7 +56,7 @@ class _BusinessPageState extends State<BusinessPage> {
                 //TABBAR VIEW STARTS
                 Expanded(
                   child: TabBarView(children: <Widget>[
-                    GibTransaction(),
+                    GibTransaction(userId: widget.userId, userType: widget.userType),
                     MyTransaction(userId: widget.userId, userType: widget.userType),
                     MyTotalTransaction(),
                   ],
@@ -76,7 +76,11 @@ class _BusinessPageState extends State<BusinessPage> {
 
 
 class GibTransaction extends StatefulWidget {
-  const GibTransaction({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+
+  const GibTransaction({super.key, required this.userType, required this.userId}
+      );
 
   @override
   State<GibTransaction> createState() => _GibTransactionState();
@@ -546,7 +550,7 @@ class _MyTransactionState extends State<MyTransaction> {
                             IconButton(onPressed: (){
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) =>  const  GtoG()),
+                                MaterialPageRoute(builder: (context) =>    GtoG(userType: widget.userType, userId: widget.userId,)),
                               );
                             }, icon: Icon(Icons.chevron_right,color: Colors.black,),),
                           ],
