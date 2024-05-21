@@ -29,11 +29,11 @@ void main() {
 
 
             bodySmall: const TextStyle(fontSize: 14, color: Colors.black),
-            bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
+            bodyMedium: const TextStyle(fontSize: 16, color: Colors.black,fontWeight: FontWeight.bold),
             bodyLarge: const TextStyle(fontSize: 18.0, color: Colors.black),
 
             displayLarge:TextStyle(fontSize: 18, color: Colors.white),
-            displayMedium: TextStyle(fontSize: 16, color: Colors.white),
+            displayMedium: TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold),
             displaySmall: const TextStyle(fontSize: 14, color: Colors.white), // Assuming this is for labels
           ),
 

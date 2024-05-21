@@ -150,7 +150,7 @@ class _PersonalEditoldState extends State<PersonalEditold> {
     }
   }
 
-  Future updatedetails(
+        Future updatedetails(
       String fname,
       String mobile,
       String lname,

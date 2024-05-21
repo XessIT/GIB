@@ -84,16 +84,20 @@ class _GalleryState extends State<Gallery> {
   List<bool> _isSelectedList = [];
 
   Future<void> _pickAndUploadImage(ImageSource source) async {
-    final pickedImage = await _imagePicker.pickImage(source: source);
+    final pickedImages = await
+    _imagePicker.pickMultiImage
+      (imageQuality: 100,
+      maxHeight: 1000,
+      maxWidth: 1000,);
 
-    if (pickedImage != null) {
-      final bytes = await pickedImage.readAsBytes();
-
-      setState(() {
-        _imageBytes = bytes;
-      });
-
-      await _uploadImage(_imageBytes!);
+    if (pickedImages != null) {
+      for (var pickedImage in pickedImages) {
+        final bytes = await pickedImage.readAsBytes();
+        setState(() {
+          _imageBytesList.add(bytes);
+        });
+        await _uploadImage(bytes);
+      }
     }
   }
 
@@ -103,6 +107,7 @@ class _GalleryState extends State<Gallery> {
 
     final response = await http.post(
       Uri.parse(url),
+
       body: {
         'image': base64Encode(imageBytes),
       },
@@ -304,264 +309,265 @@ class _GalleryState extends State<Gallery> {
 
 
 
-  class Video extends StatefulWidget {
-    final String? userId;
-    const Video({super.key, required this.userId});
+class Video extends StatefulWidget {
+  final String? userId;
+  const Video({super.key, required this.userId});
 
-    @override
-    State<Video> createState() => _VideoState();
+  @override
+  State<Video> createState() => _VideoState();
+}
+
+class _VideoState extends State<Video> {
+  final ImagePicker _picker = ImagePicker();
+  List<dynamic> _videos = [];
+  List<String> _thumbnails = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchVideos();
   }
 
-  class _VideoState extends State<Video> {
-    final ImagePicker _picker = ImagePicker();
-    List<dynamic> _videos = [];
-    List<String> _thumbnails = [];
+  Future<void> _pickAndUploadVideo() async {
 
-    @override
-    void initState() {
-      super.initState();
-      _fetchVideos();
+
+    final XFile? pickedVideo = await _picker.pickVideo(source: ImageSource.gallery);
+
+    if (pickedVideo != null) {
+      final Uint8List videoBytes = await pickedVideo.readAsBytes();
+      if (videoBytes.length > 10 * 1024 * 1024) {
+        // File size exceeds the limit, show an alert
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('File Too Large'),
+              content: Text('The selected file exceeds the maximum size limit of 10MB.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      print('videoBytes: $videoBytes');
+      final url = 'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
+
+      print('url: $url');
+      // Make HTTP request to upload video file to server
+
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(url),
+      );
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'video',
+          videoBytes,
+          filename: 'video.mp4', // Provide a filename with the appropriate extension
+          contentType: MediaType('video', 'mp4'), // Adjust the content type as per your video format
+        ),
+      );
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        // Video uploaded successfully
+        print('Video uploaded successfully.');
+        // Optionally, you can show a success message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Video uploaded successfully.')),
+        );
+      } else {
+        // Failed to upload video
+        print('Failed to upload video.');
+        // Optionally, you can show an error message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload video.')),
+        );
+      }
     }
+  }
 
-    Future<void> _pickAndUploadVideo() async {
+  Future<void> _fetchVideos() async {
+    final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userId}';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      setState(() {
+        _videos = jsonDecode(response.body);
+        // Fetch thumbnails for each video
+        _thumbnails = List<String>.filled(_videos.length, '');
+        for (int i = 0; i < _videos.length; i++) {
+          _fetchThumbnail(i);
+        }
+      });
+    } else {
+      // Handle error
+      print('Failed to fetch videos');
+    }
+  }
+
+  Future<void> _fetchThumbnail(int index) async {
+    final videoPath = _videos[index]['video_path'];
+    final url = 'http://localhost/GIB/lib/GIBAPI/videosmp4.php?video_path=' + videoPath;
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      setState(() {
+        _thumbnails[index] = response.body;
+      });
+    } else {
+      // Handle error
+      print('Failed to fetch thumbnail for video at index $index');
+    }
+  }
 
 
-      final XFile? pickedVideo = await _picker.pickVideo(source: ImageSource.gallery);
+  Future<void> _deleteVideo(int videoIndex) async {
+    int videoId = _videos[videoIndex]['id'];
+    final url = 'http://localhost/GIB/lib/GIBAPI/deletevideos.php?video_id=$videoId';
 
-      if (pickedVideo != null) {
-        final Uint8List videoBytes = await pickedVideo.readAsBytes();
-        if (videoBytes.length > 10 * 1024 * 1024) {
-          // File size exceeds the limit, show an alert
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('File Too Large'),
-                content: Text('The selected file exceeds the maximum size limit of 10MB.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('OK'),
-                  ),
+    final response = await http.delete(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      print('Video deleted successfully.');
+      setState(() {
+        _videos.removeAt(videoIndex);
+      });
+    } else {
+      print('Failed to delete video.');
+    }
+  }
+
+
+  Future<void> _showDeleteConfirmationDialog(int videoIndex) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Video'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this video?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                _deleteVideo(videoIndex);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green,
+        onPressed: () async {
+          // Check if there is already a video stored
+          if (_videos.isEmpty) {
+            // Allow picking and uploading a video
+            showModalBottomSheet(context: context, builder: (ctx) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.storage),
+                    title: const Text("From Gallery"),
+                    onTap: _pickAndUploadVideo,
+                  )
                 ],
               );
-            },
-          );
-          return;
-        }
-
-        print('videoBytes: $videoBytes');
-        final url = 'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
-
-        print('url: $url');
-        // Make HTTP request to upload video file to server
-
-
-        var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(url),
-        );
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'video',
-            videoBytes,
-            filename: 'video.mp4', // Provide a filename with the appropriate extension
-            contentType: MediaType('video', 'mp4'), // Adjust the content type as per your video format
-          ),
-        );
-
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          // Video uploaded successfully
-          print('Video uploaded successfully.');
-          // Optionally, you can show a success message to the user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Video uploaded successfully.')),
-          );
-        } else {
-          // Failed to upload video
-          print('Failed to upload video.');
-          // Optionally, you can show an error message to the user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to upload video.')),
-          );
-        }
-      }
-    }
-
-    Future<void> _fetchVideos() async {
-      final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userId}';
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        setState(() {
-          _videos = jsonDecode(response.body);
-          // Fetch thumbnails for each video
-          _thumbnails = List<String>.filled(_videos.length, '');
-          for (int i = 0; i < _videos.length; i++) {
-            _fetchThumbnail(i);
-          }
-        });
-      } else {
-        // Handle error
-        print('Failed to fetch videos');
-      }
-    }
-
-    Future<void> _fetchThumbnail(int index) async {
-      final videoPath = _videos[index]['video_path'];
-      final url = 'http://localhost/GIB/lib/GIBAPI/videosmp4.php?video_path=' + videoPath;
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        setState(() {
-          _thumbnails[index] = response.body;
-        });
-      } else {
-        // Handle error
-        print('Failed to fetch thumbnail for video at index $index');
-      }
-    }
-
-
-    Future<void> _deleteVideo(int videoIndex) async {
-      int videoId = _videos[videoIndex]['id'];
-      final url = 'http://localhost/GIB/lib/GIBAPI/deletevideos.php?video_id=$videoId';
-
-      final response = await http.delete(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        print('Video deleted successfully.');
-        setState(() {
-          _videos.removeAt(videoIndex);
-        });
-      } else {
-        print('Failed to delete video.');
-      }
-    }
-
-
-    Future<void> _showDeleteConfirmationDialog(int videoIndex) async {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Delete Video'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text('Are you sure you want to delete this video?'),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('Delete'),
-                onPressed: () {
-                  _deleteVideo(videoIndex);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-
-
-
-
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.green,
-          onPressed: () async {
-            // Check if there is already a video stored
-            if (_videos.isEmpty) {
-              // Allow picking and uploading a video
-              showModalBottomSheet(context: context, builder: (ctx) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.storage),
-                      title: const Text("From Gallery"),
-                      onTap: _pickAndUploadVideo,
-                    )
+            });
+          } else {
+            // Show error message if a video is already stored
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Video Already Stored'),
+                  content: Text('You already have a video stored.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
                   ],
                 );
-              });
-            } else {
-              // Show error message if a video is already stored
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Video Already Stored'),
-                    content: Text('You already have a video stored.'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-          },
-          child: const Icon(Icons.add),
-        ),
-        body: ListView.builder(
-          itemCount: _videos.length,
-          itemBuilder: (context, index) {
-            final videoId = _videos[index]['id'];
-            final video_name = _videos[index]['video_name'];
-            final videoPath = _videos[index]['video_path'];
-            final thumbnail = _thumbnails[index];
-
-            return ListTile(
-              title: Text(video_name),
-              leading: Container(
-                width: 50, // Adjust the width as needed
-                child: thumbnail.isNotEmpty
-                    ? Image.network(thumbnail)
-                    : CircularProgressIndicator(), // Show a loading indicator if thumbnail is being fetched
-              ),              onTap: () {
-                // Navigate to VideoPlayerScreen when the name is clicked
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => VideoPlayerScreen(videoPath: videoPath),
-                  ),
-                );
               },
-              trailing: IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  _showDeleteConfirmationDialog(index);
-                },
+            );
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: ListView.builder(
+        itemCount: _videos.length,
+        itemBuilder: (context, index) {
+          final videoId = _videos[index]['id'];
+          final video_name = _videos[index]['video_name'];
+          final videoPath = _videos[index]['video_path'];
+          final thumbnail = _thumbnails[index];
+
+          return ListTile(
+            title: Text(video_name),
+            leading: Container(
+              width: 50, // Adjust the width as needed
+              child: thumbnail.isNotEmpty
+                  ? Image.network(thumbnail)
+                  : CircularProgressIndicator(), // Show a loading indicator if thumbnail is being fetched
+            ),              onTap: () {
+            // Navigate to VideoPlayerScreen when the name is clicked
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VideoPlayerScreen(videoPath: videoPath),
               ),
             );
           },
-        ),
-      );
-    }
+            trailing: IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                _showDeleteConfirmationDialog(index);
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
+}
+
 
 
 class VideoPlayerScreen extends StatelessWidget {
