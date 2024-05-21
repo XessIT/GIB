@@ -1,25 +1,20 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:http/http.dart' as http;
 import 'honor_slip_history.dart';
 
-class ThankNotes extends StatelessWidget {
-  const ThankNotes({Key? key}) : super(key: key);
 
+class ThankNotes extends StatefulWidget {
+  final String? userType;
+  final String? userId;
+  const ThankNotes({Key? key, required this.userType, required this.userId}) : super(key: key);
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: ThankNotesPage(),
-    );
-  }
+  State<ThankNotes> createState() => _ThankNotesState();
 }
-class ThankNotesPage extends StatefulWidget {
-  const ThankNotesPage({Key? key}) : super(key: key);
-  @override
-  State<ThankNotesPage> createState() => _ThankNotesPageState();
-}
-class _ThankNotesPageState extends State<ThankNotesPage> {
+class _ThankNotesState extends State<ThankNotes> {
   final _formKey = GlobalKey<FormState>();
 
 
@@ -33,7 +28,7 @@ class _ThankNotesPageState extends State<ThankNotesPage> {
           actions: [
             IconButton(
                 onPressed:(){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const HonorHistory())); },
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => HonorHistory(userType: widget.userType, userId: widget.userId))); },
                 icon: const Icon(Icons.more_vert)),
           ],
         ),
@@ -41,7 +36,7 @@ class _ThankNotesPageState extends State<ThankNotesPage> {
           child: Form(
             key: _formKey,
             child: Column(
-              children:  const [
+              children: [
                 TabBar(
                   isScrollable: true,
                   labelColor: Colors.green,
@@ -54,7 +49,7 @@ class _ThankNotesPageState extends State<ThankNotesPage> {
                 Expanded(
                   child: TabBarView(children: <Widget>[
                     Online(),
-                    Direct(),
+                    Direct(userType: widget.userType, userId: widget.userId),
                   ],
                   ),
                 ),
@@ -368,26 +363,19 @@ class _OnlineState extends State<Online> {
 }
 
 class Direct extends StatefulWidget {
-  const Direct({Key? key}) : super(key: key);
+  final String? userId;
+  final String? userType;
+  const Direct({Key? key, required this.userType, required this.userId}) : super(key: key);
 
   @override
   State<Direct> createState() => _DirectState();
 }
 
 class _DirectState extends State<Direct> {
-  @override
-  void initState(){
-    super.initState();
-  }
-  //final _formKey = GlobalKey<FormState>();
-
-  String uid = "";
-  String purpose = "";
-  String mobile = "";
-
 
   final _formKey = GlobalKey<FormState>();
 
+  TextEditingController searchController = TextEditingController();
   TextEditingController tocontroller = TextEditingController();
   TextEditingController companynamecontroller = TextEditingController();
   TextEditingController namecontroller = TextEditingController();
@@ -402,297 +390,446 @@ class _DirectState extends State<Direct> {
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
   @override
+  void initState(){
+    searchResults = List.from(allItems);
+    print("searchResults: $searchResults");
+    fetchRegistrationData();
+    fetchData(widget.userId.toString());
+    super.initState();
+  }
+  List<dynamic> allItems = [];
+  List<dynamic> searchResults = [];
+  Future<void> fetchRegistrationData() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the JSON
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          allItems = data; // Store all registration data
+        });
+      } else {
+        // If the server did not return a 200 OK response, throw an exception
+        throw Exception('Failed to load registration data: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      throw Exception('Error: $error');
+    }
+  }
+  void filterSearchResults(String query) {
+    List<dynamic> searchList = [];
+    if (query.isNotEmpty) {
+      allItems.forEach((item) {
+        // Check each field for a match with the query
+        if (item['first_name'].toLowerCase().contains(query.toLowerCase()) ||
+            item['last_name'].toLowerCase().contains(query.toLowerCase()) ||
+            item['member_id'].toLowerCase().contains(query.toLowerCase()) ||
+            item['mobile'].toLowerCase().contains(query.toLowerCase()) ||
+            item['company_name'].toLowerCase().contains(query.toLowerCase())) {
+          searchList.add(item);
+        }
+      });
+    } else {
+      // If query is empty, show all items
+      searchList = List.from(allItems);
+    }
+    setState(() {
+      searchResults = searchList;
+    });
+  }
+  String? fname = "";
+  String? lname = "";
+  String? mobile = "";
+  String? companyname = "";
+  List dynamicdata=[];
+  Future<void> fetchData(String userId) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        print("response S: ${response.statusCode}");
+        print("response B: ${response.body}");
+        final responseData = json.decode(response.body);
+        if (responseData is List<dynamic>) {
+          setState(() {
+            dynamicdata = responseData.cast<Map<String, dynamic>>();
+            if (dynamicdata.isNotEmpty) {
+              setState(() {
+                fname = dynamicdata[0]["first_name"];
+                lname= dynamicdata[0]['last_name'];
+                mobile=dynamicdata[0]["mobile"];
+                companyname=dynamicdata[0]["company_name"];
+              });
+            }
+          });
+        } else {
+          // Handle invalid response data (not a List)
+          print('Invalid response data format');
+        }
+      } else {
+        // Handle non-200 status code
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
+    }
+  }
+  Future<void> InsertHonorSlip() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/honor_slip.php');
+      final response = await http.post(
+        url,
+        body: jsonEncode({
+          "Toname": tocontroller.text.trim(),
+          "Tomobile": tomobilenocontroller.text.trim(),
+          "Tocompanyname": companynamecontroller.text.trim(),
+          "purpose": purposeController.text.trim(),
+          "business_name": namecontroller.text.trim(),
+          "business_mobile": mobilenocontroller.text.trim(),
+          "amount": amountcontroller.text.trim(),
+          "name": fname,
+          "mobile": mobile,
+          "company": companyname
+        }),
+      );
+      print(url);
+      print("ResponseStatus: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        print("Offers response: ${response.body}");
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during signup: $e");
+      // Handle error as needed
+    }
+  }
+  @override
   Widget build(BuildContext context) {
     return  Scaffold(
+      appBar: AppBar(
+        title: Text("Honor Slip", style: Theme.of(context).textTheme.bodySmall),
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed:(){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HonorHistory(userType: widget.userType, userId: widget.userId))); },
+              icon: const Icon(Icons.more_vert)),
+        ],
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Form(
         key: _formKey,
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20,),
-                Container(
-                  width: 350,
-                  // height: 600,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      border: Border.all(color: Colors.green)
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20,),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TypeAheadFormField(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: searchController,
+                    onChanged: (value) {
+                      filterSearchResults(value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10,),
-                      const   Text('Honor Slip',
-                        style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 20),),
-                      //To TextFormField starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller:tocontroller,
-                          validator: (value) {
-                            if(value!.isEmpty){
-                              return "* Enter the name";
-                            }else{
-                              return null;
-                            }
-                          },
-                          onChanged: (value) {
-                            String capitalizedValue = capitalizeFirstLetter(value);
-                            tocontroller.value = tocontroller.value.copyWith(
-                              text: capitalizedValue,
-                              selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                            );
-                          },
-                          decoration: const InputDecoration(
-                              labelText:'To',
-                              hintText:'To',
-                              suffixIcon: Icon(Icons.search,color: Colors.green,)
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: tomobilenocontroller,
-                          validator: (value){
-                            if(value!.isEmpty){
-                              return '* Enter the mobile Number';
-                            } else if(value.length<10){
-                              return'* Mobile number should be 10 digits';
-                            }
-                            else{
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Mobile Number',
-                            hintText: 'Mobile Number',
-                              suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
-                          ),keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10)
-                          ],
-                        ),
-                      ),
-                      //Company name TextFormField starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller:companynamecontroller,
-                          validator: (value) {
-                            if(value!.isEmpty){
-                              return "* Enter the Company name";
-                            }else{
-                              return null;
-                            }
-                          },
-                          onChanged: (value) {
-                            String capitalizedValue = capitalizeFirstLetter(value);
-                            companynamecontroller.value = companynamecontroller.value.copyWith(
-                              text: capitalizedValue,
-                              selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                            );
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Company Name',
-                            hintText: 'Company Name',
-                              suffixIcon: Icon(Icons.business,color: Colors.green,)
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10, ),
-                      //Referral Details Text Starts
-                      const Padding(
-                        padding: EdgeInsets.only(right: 180),
-                        child: Text('Business Details',
-                          style: TextStyle(
-                            fontSize: 18,),),
-                      ),
-                      //TextFormField Name starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: namecontroller,
-                          validator: (value){
-                            if(value!.isEmpty){
-                              return '* Enter the name';
-                            }
-                            else{
-                              return null;
-                            }
-                          },
-                          onChanged: (value) {
-                            String capitalizedValue = capitalizeFirstLetter(value);
-                            namecontroller.value = namecontroller.value.copyWith(
-                              text: capitalizedValue,
-                              selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                            );
-                          },
-                          decoration: const InputDecoration(
-                            labelText:'Name',
-                            hintText: 'Name',
-                            suffixIcon: Icon(Icons.account_circle,color: Colors.green,)
-                          ),
-                          inputFormatters: [
-                            AlphabetInputFormatter(),
-                            LengthLimitingTextInputFormatter(20)
-                          ],
-                        ),
-                      ),
-                      //TextFormField MobileNo starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: mobilenocontroller,
-                          validator: (value){
-                            if(value!.isEmpty){
-                              return '* Enter the mobile Number';
-                            }else if(value.length<10){
-                              return'* Mobile number should be 10 digits';
-                            }
-                            else{
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'To Mobile Number',
-                            hintText: 'To Mobile Number',
-                              suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
-                          ),keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10)
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller:purposeController,
-                          validator: (value) {
-                            if(value!.isEmpty){
-                              return "* Enter the purpose";
-                            }else{
-                              return null;
-                            }
-                          },
-                          onChanged: (value) {
-                            String capitalizedValue = capitalizeFirstLetter(value);
-                            purposeController.value = purposeController.value.copyWith(
-                              text: capitalizedValue,
-                              selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                            );
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Purpose',
-                            hintText: 'Purpose',
-                              suffixIcon: Icon(Icons.abc,color: Colors.green,)
-                            //suffixIcon: Icon(Icons.search,color: Colors.green,)
-                          ),
-                          inputFormatters: [
-                            AlphabetInputFormatter(),
-                            LengthLimitingTextInputFormatter(30)
-                          ],
-                        ),
-                      ),
-                      //TextFormField Location starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: locationcontroller,
-                          validator: (value){
-                            if(value!.isEmpty){
-                              return "* Enter the Location";
-                            }else{
-                              return null;
-                            }
-                          },
-                          onChanged: (value) {
-                            String capitalizedValue = capitalizeFirstLetter(value);
-                            locationcontroller.value = locationcontroller.value.copyWith(
-                              text: capitalizedValue,
-                              selection: TextSelection.collapsed(offset: capitalizedValue.length),
-                            );
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Location",
-                            hintText: "Location",
-                            suffixIcon: Icon(
-                              Icons.location_on,
-                              color: Colors.green,),
-                          ),
-                        ),
-                      ),
-                      //Amount TextFormField starts
-                      SizedBox(
-                        width: 300,
-                        child: TextFormField(
-                          controller: amountcontroller,
-                          validator: (value) {
-                            if(value!.isEmpty){
-                              return "* Enter the Amount";
-                            }else{
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Amount',
-                            prefixIcon: Icon(
-                              Icons.currency_rupee_rounded,
-                              color: Colors.green,),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                  suggestionsCallback: (pattern) {
+                    return Future.value(searchResults);
+                  },
+                  itemBuilder: (context, dynamic suggestion) {
+                    return ListTile(
+                      title: Text('${suggestion['first_name']} (${suggestion['member_id']})'),
+                      subtitle: Text(suggestion['last_name']),
+                      // You can add other fields as needed
+                    );
+                  },
+                  onSuggestionSelected: (dynamic suggestion) {
+                    // Handle when a suggestion is selected
+                    // Update text fields with suggestion data
+                    setState(() {
+                      tocontroller.text = suggestion['first_name'];
+                      tomobilenocontroller.text = suggestion['mobile'];
+                      companynamecontroller.text = suggestion['company_name'];
+                      // Update other text fields as needed
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 10,),
+              //To TextFormField starts
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller:tocontroller,
+                  validator: (value) {
+                    if(value!.isEmpty){
+                      return "* Enter the name";
+                    }else{
+                      return null;
+                    }
+                  },
+                  onChanged: (value) {
+                    String capitalizedValue = capitalizeFirstLetter(value);
+                    tocontroller.value = tocontroller.value.copyWith(
+                      text: capitalizedValue,
+                      selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                     // labelText:'To',
+                      hintText:'To Name',
+                      suffixIcon: Icon(Icons.search,color: Colors.green,)
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller: tomobilenocontroller,
+                  validator: (value){
+                    if(value!.isEmpty){
+                      return '* Enter the mobile Number';
+                    } else if(value.length<10){
+                      return'* Mobile number should be 10 digits';
+                    }
+                    else{
+                      return null;
+                    }
+                  },
+                  decoration: const InputDecoration(
+                   // labelText: 'Mobile Number',
+                    hintText: 'Mobile Number',
+                      suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
+                  ),keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10)
+                  ],
+                ),
+              ),
+              //Company name TextFormField starts
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller:companynamecontroller,
+                  validator: (value) {
+                    if(value!.isEmpty){
+                      return "* Enter the Company name";
+                    }else{
+                      return null;
+                    }
+                  },
+                  onChanged: (value) {
+                    String capitalizedValue = capitalizeFirstLetter(value);
+                    companynamecontroller.value = companynamecontroller.value.copyWith(
+                      text: capitalizedValue,
+                      selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                    //labelText: 'Company Name',
+                    hintText: 'Company Name',
+                      suffixIcon: Icon(Icons.business,color: Colors.green,)
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10, ),
+              //Referral Details Text Starts
+              const Padding(
+                padding: EdgeInsets.only(right: 180),
+                child: Text('Business Details',
+                  style: TextStyle(
+                    fontSize: 18,),),
+              ),
+              //TextFormField Name starts
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller: namecontroller,
+                  validator: (value){
+                    if(value!.isEmpty){
+                      return '* Enter the name';
+                    }
+                    else{
+                      return null;
+                    }
+                  },
+                  onChanged: (value) {
+                    String capitalizedValue = capitalizeFirstLetter(value);
+                    namecontroller.value = namecontroller.value.copyWith(
+                      text: capitalizedValue,
+                      selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                   // labelText:'Name',
+                    hintText: 'Name',
+                    suffixIcon: Icon(Icons.account_circle,color: Colors.green,)
+                  ),
+                  inputFormatters: [
+                    AlphabetInputFormatter(),
+                    LengthLimitingTextInputFormatter(20)
+                  ],
+                ),
+              ),
+              //TextFormField MobileNo starts
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller: mobilenocontroller,
+                  validator: (value){
+                    if(value!.isEmpty){
+                      return '* Enter the mobile Number';
+                    }else if(value.length<10){
+                      return'* Mobile number should be 10 digits';
+                    }
+                    else{
+                      return null;
+                    }
+                  },
+                  decoration: const InputDecoration(
+                   // labelText: 'Mobile Number',
+                    hintText: 'Mobile Number',
+                      suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
+                  ),keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10)
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller:purposeController,
+                  validator: (value) {
+                    if(value!.isEmpty){
+                      return "* Enter the purpose";
+                    }else{
+                      return null;
+                    }
+                  },
+                  onChanged: (value) {
+                    String capitalizedValue = capitalizeFirstLetter(value);
+                    purposeController.value = purposeController.value.copyWith(
+                      text: capitalizedValue,
+                      selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                   // labelText: 'Purpose',
+                    hintText: 'Purpose',
+                      suffixIcon: Icon(Icons.abc,color: Colors.green,)
+                    //suffixIcon: Icon(Icons.search,color: Colors.green,)
+                  ),
+                  inputFormatters: [
+                    AlphabetInputFormatter(),
+                    LengthLimitingTextInputFormatter(30)
+                  ],
+                ),
+              ),
+              //TextFormField Location starts
+                               /* SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller: locationcontroller,
+                  validator: (value){
+                    if(value!.isEmpty){
+                      return "* Enter the Location";
+                    }else{
+                      return null;
+                    }
+                  },
+                  onChanged: (value) {
+                    String capitalizedValue = capitalizeFirstLetter(value);
+                    locationcontroller.value = locationcontroller.value.copyWith(
+                      text: capitalizedValue,
+                      selection: TextSelection.collapsed(offset: capitalizedValue.length),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                   // labelText: "Location",
+                    hintText: "Location",
+                    suffixIcon: Icon(
+                      Icons.location_on,
+                      color: Colors.green,),
+                  ),
+                ),
+              ),*/
+              //Amount TextFormField starts
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  controller: amountcontroller,
+                  validator: (value) {
+                    if(value!.isEmpty){
+                      return "* Enter the Amount";
+                    }else{
+                      return null;
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Amount',
+                    prefixIcon: Icon(
+                      Icons.currency_rupee_rounded,
+                      color: Colors.green,),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
 
-                        ),
-                      ),
-                      SizedBox(height: 10,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Login button starts
-                          MaterialButton(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                              minWidth: 100,
-                              height: 50,
-                              color: Colors.green[800],
-                              onPressed: (){
-                                if (_formKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(const SnackBar(
-                                      content: Text(
-                                          "Your Honor Successfully submitted")));
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const HonorHistory()));
-                                }
-                              },
-                              child:const Text('Honor',
-                                style: TextStyle(color: Colors.white),)),
-                          // Login button ends
-                          // Sign up button starts
-                          MaterialButton(
-                              minWidth: 100,
-                              height: 50,
-                              color: Colors.orangeAccent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                              onPressed: (){
-                              },
-                              child: const Text('Cancel',
-                                style: TextStyle(color: Colors.white),)),
-                          // Sign up button ends
-                        ],
-                      ),
-                      const SizedBox(height: 5,),
-                      // const Text('I Honor for your Closed Business😊',),
-                      // SizedBox(height: 40,),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                ),
+              ),
+              SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Login button starts
+                  MaterialButton(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                      minWidth: 100,
+                      height: 50,
+                      color: Colors.green[800],
+                      onPressed: (){
+                        if (_formKey.currentState!.validate()) {
+                          InsertHonorSlip();
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                              content: Text(
+                                  "Your Honor Successfully submitted")));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => HonorHistory(userType: widget.userType, userId: widget.userId)));
+                        }
+                      },
+                      child:const Text('Honor',
+                        style: TextStyle(color: Colors.white),)),
+                  // Login button ends
+                  // Sign up button starts
+                  MaterialButton(
+                      minWidth: 100,
+                      height: 50,
+                      color: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
+                      onPressed: (){
+                      },
+                      child: const Text('Cancel',
+                        style: TextStyle(color: Colors.white),)),
+                  // Sign up button ends
+                ],
+              ),
+              const SizedBox(height: 5,)
+            ],
           ),
         ),
       ),
