@@ -79,7 +79,7 @@ class _BloodState extends State<Blood> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Home(
+                  builder: (context) => NavigationBarExe(
                     userType: widget.userType.toString(),
                     userId: widget.userId.toString(),
                   ),
@@ -123,7 +123,7 @@ class _BloodState extends State<Blood> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Home(
+                builder: (context) => NavigationBarExe(
                   userType: widget.userType.toString(),
                   userId: widget.userId.toString(),
                 ),

@@ -94,7 +94,7 @@ class _OffersPageState extends State<OffersPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Home(
+                  builder: (context) => NavigationBarExe(
                     userType: widget.userType.toString(),
                     userId: widget.userId.toString(),
                   ),
@@ -107,7 +107,7 @@ class _OffersPageState extends State<OffersPage> {
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
         ),
-        actions: [widget.userType == 'Executive' ?
+        actions: [widget.userType != 'Non-Executive' && widget.userType != 'Guest' ?
           IconButton(onPressed: (){
             Navigator.push(context,
               MaterialPageRoute(builder:
@@ -147,7 +147,7 @@ class _OffersPageState extends State<OffersPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Home(
+                builder: (context) => NavigationBarExe(
                   userType: widget.userType.toString(),
                   userId: widget.userId.toString(),
                 ),
@@ -155,7 +155,9 @@ class _OffersPageState extends State<OffersPage> {
             );
           }
         },
-        child: GridView.builder(
+        child:
+            data.isEmpty ? Center(child: Text('No Offers')) :
+        GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 3.0,

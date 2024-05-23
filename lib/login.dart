@@ -116,9 +116,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
             case "Executive":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Homepage(
+                MaterialPageRoute(builder: (context) => NavigationBarExe(
                   userType: userType,
-                  userID: userId,
+                  userId: userId,
                 )),
               );
               break;
