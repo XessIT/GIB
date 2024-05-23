@@ -23,9 +23,9 @@ void main() {
           /// headline for medium  green
 
           textTheme: GoogleFonts.aBeeZeeTextTheme().copyWith(
-            headlineSmall: TextStyle(fontSize: 16.0,color: Colors.green),
+            headlineSmall: const TextStyle(fontSize: 16.0,color: Colors.green),
             headlineMedium: const TextStyle(fontSize: 16.0,color: Colors.green,fontWeight: FontWeight.bold),
-            headlineLarge:  TextStyle(fontSize: 16.0,color: Colors.blue),
+            headlineLarge:  const TextStyle(fontSize: 16.0,color: Colors.blue),
 
 
             bodySmall: const TextStyle(fontSize: 14, color: Colors.black),
@@ -87,7 +87,7 @@ void main() {
                       userID: id,
                     );
                   case "Non-Executive":
-                    return NonExecutiveHomeNav(
+                    return NavigationBarNon(
                       userType: userType ,
                       userId: id,
                     ); // Pass firstName to Homepage

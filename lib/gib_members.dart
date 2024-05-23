@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Non_exe_pages/non_exe_home.dart';
 import 'gib_members_filter.dart';
+import 'guest_home.dart';
 import 'home.dart';
 
 
@@ -193,11 +194,33 @@ class _MembersState extends State<Members> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading:IconButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => NonExecutiveHomeNav(userType: widget.userType, userId: widget.userId,)));
-            },
-            icon: const Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () {
+            if (widget.userType == "Non-Executive") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarNon(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+            else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
         ),

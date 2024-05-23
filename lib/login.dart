@@ -125,7 +125,7 @@ class _LoginSubClassState extends State<LoginSubClass> {
             case "Non-Executive":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NonExecutiveHomeNav(
+                MaterialPageRoute(builder: (context) => NavigationBarNon(
                   userType: userType,
                   userId:userId,
                 )),
