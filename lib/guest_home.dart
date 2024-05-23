@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gipapp/wave.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,9 +17,6 @@ import 'guest_profile.dart';
 import 'login.dart';
 import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:iconly/iconly.dart';
-
-
-
 
 class GuestHome extends StatefulWidget {
   final String? userType;
@@ -34,41 +33,56 @@ class GuestHome extends StatefulWidget {
 }
 
 class _GuestHomeState extends State<GuestHome> {
-
   int _currentIndex = 0;
 
   late List<Widget> _pages;
   @override
   void initState() {
     _pages = [
-      GuestHomePage(userId: widget.userId, userType: widget.userType,),
+      GuestHomePage(
+        userId: widget.userId,
+        userType: widget.userType,
+      ),
 
-      BloodGroup(userId: widget.userId, userType: widget.userType!,),
-      GuestProfile(userID: widget.userId),
+      BloodGroup(
+        userId: widget.userId,
+        userType: widget.userType!,
+      ),
+      GuestProfile(
+        userID: widget.userId,
+        userType: widget.userType,
+      ),
       // Add more pages as needed
     ];
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-
-
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black45,),
+            icon: Icon(
+              Icons.home,
+              color: Colors.black45,
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services, color: Colors.black45,),
+            icon: Icon(
+              Icons.medical_services,
+              color: Colors.black45,
+            ),
             label: 'Doctor',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bloodtype, color: Colors.black45,),
+            icon: Icon(
+              Icons.bloodtype,
+              color: Colors.black45,
+            ),
             label: 'Blood Group',
           ),
           BottomNavigationBarItem(
@@ -82,7 +96,8 @@ class _GuestHomeState extends State<GuestHome> {
 
           // Add more BottomNavigationBarItems as needed
         ],
-        type: BottomNavigationBarType.fixed, // Set type to fixed for text labels
+        type:
+            BottomNavigationBarType.fixed, // Set type to fixed for text labels
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.black45,
         iconSize: 30,
@@ -96,24 +111,18 @@ class _GuestHomeState extends State<GuestHome> {
         unselectedLabelStyle: TextStyle(color: Colors.white),
         selectedIconTheme: IconThemeData(color: Colors.green),
       ),
-
-
     );
   }
 }
 
-
 class GuestHomePage extends StatefulWidget {
-
   final String? userType;
   final String? userId;
 
-
-  GuestHomePage({Key? key,
-
+  GuestHomePage({
+    Key? key,
     required this.userId,
-    required this. userType,
-
+    required this.userType,
   }) : super(key: key);
 
   @override
@@ -122,17 +131,15 @@ class GuestHomePage extends StatefulWidget {
 
 class _GuestHomePageState extends State<GuestHomePage> {
   Uint8List? _imageBytes;
-  List<Map<String,dynamic>>userdata=[];
+  List<Map<String, dynamic>> userdata = [];
   String imageUrl = "";
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
-
   Future<void> fetchData(String? userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse(
+          'http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
-
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -141,7 +148,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
             userdata = responseData.cast<Map<String, dynamic>>();
             if (userdata.isNotEmpty) {
               setState(() {
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+                imageUrl =
+                    'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
 
                 _imageBytes = base64Decode(userdata[0]['profile_image']);
               });
@@ -162,13 +170,13 @@ class _GuestHomePageState extends State<GuestHomePage> {
     }
   }
 
-
   ///offers fetch
-  List<Map<String, dynamic>> data=[];
+  List<Map<String, dynamic>> data = [];
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      final url = Uri.parse(
+          'http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -211,7 +219,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
       print('Error making HTTP request: $e');
       throw e; // rethrow the error if needed
     }
-
   }
 
   Future<Uint8List?> getImageBytes(String imageUrl) async {
@@ -235,9 +242,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     super.initState();
     fetchData(widget.userId);
     getData();
-
-
-
   }
 
   //  final CalendarController _calendarController =  CalendarController();
@@ -245,164 +249,207 @@ class _GuestHomePageState extends State<GuestHomePage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-   // offersfetchData();
     fetchData(widget.userId);
 
     return Scaffold(
       key: _scaffoldKey,
-
-      drawer:  SafeArea(
-          child: NavDrawer(
-
-            userType:widget.userType.toString(),
-            userId:widget.userId.toString(),
-          )
+      drawer: SafeArea(
+        child: NavDrawer(
+          userType: widget.userType.toString(),
+          userId: widget.userId.toString(),
+        ),
       ),
-      body: Center(
-        child: Container(
-          child: Stack(
-            fit: StackFit.expand,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            children: [
-              Column(
-                children: [
-                  ClipPath(
-                    clipper: CurveClipper(),
-                    child: Container(
-                      height: 100,
-                      width: MediaQuery.of(context).size.width,
-                      //width: 400,
-                      color: Colors.green,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 20),
-                            child: Text('GIB',style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(right: 20),
-                            child: IconButton(
-                              icon: Icon(Icons.menu,color: Colors.white,),
-                              onPressed: () {
-                                print('press nav drawer');
-                                _scaffoldKey.currentState!.openDrawer();
-                              },
-                            ),
-
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 80,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Card(
-                            elevation: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(1),
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          await AwesomeDialog(
+            context: context,
+            dialogType: DialogType.warning,
+            title: 'Exit',
+            desc: 'Do you want to Exit?',
+            width: 400,
+            btnOk: ElevatedButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+              ),
+              child: const Text(
+                'Yes',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            btnCancel: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+              ),
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ).show();
+          // Do not return any value
+        },
+        child: Center(
+          child: Container(
+            child: Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              children: [
+                Column(
+                  children: [
+                    ClipPath(
+                      clipper: CurveClipper(),
+                      child: Container(
+                        height: 100,
+                        width: MediaQuery.of(context).size.width,
+                        color: Colors.green,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 20),
                               child: Text(
-                                'Offers+',
-                                style: GoogleFonts.aBeeZee(
-                                  fontSize: 20,
-                                  color: Colors.green,
+                                'GIB',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                          )                      ],
+                            Padding(
+                              padding: EdgeInsets.only(right: 20),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  print('press nav drawer');
+                                  _scaffoldKey.currentState!.openDrawer();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-
-                      SizedBox(height: 30),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
-                        child: ListView.builder(
-                            itemCount: data.length,
-                            itemBuilder: (context, i) {
-                              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
-                              String dateString = data[i]['validity']; // This will print the properly encoded URL
-                              DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                    ),
+                    SizedBox(height: 80),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Card(
+                              elevation: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(1),
+                                child: Text(
+                                  'Offers+',
+                                  style: GoogleFonts.aBeeZee(
+                                    fontSize: 20,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 30),
+                        // Wrap Column in SingleChildScrollView
+                        SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(data.length, (i) {
+                              String imageUrl =
+                                  'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+                              String dateString = data[i]['validity'];
+                              DateTime dateTime =
+                                  DateFormat('yyyy-MM-dd').parse(dateString);
                               return Center(
                                 child: Card(
                                   child: Column(
                                     children: [
-                                      //MAIN ROW STARTS
+                                      // MAIN ROW STARTS
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children:  [
-                                          //CIRCLEAVATAR STARTS
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          // CIRCLEAVATAR STARTS
                                           CircleAvatar(
                                             radius: 40,
                                             backgroundColor: Colors.cyan,
-                                            backgroundImage: NetworkImage(imageUrl),
-                                            //IMAGE STARTS CIRCLEAVATAR
-                                            //  Image.network('${data[i]['offer_image']}').image,
+                                            backgroundImage:
+                                                NetworkImage(imageUrl),
                                             child: Stack(
                                               children: [
                                                 Align(
-                                                  alignment: Alignment.bottomLeft,
-                                                  //STARTS CIRCLE AVATAR OFFER
+                                                  alignment:
+                                                      Alignment.bottomLeft,
                                                   child: CircleAvatar(
-                                                      radius: 20,
-                                                      backgroundColor: Colors.green[900],
-                                                      child: Text('${data[i]['discount']}%',
-                                                          style: Theme.of(context).textTheme.titleLarge)),
+                                                    radius: 20,
+                                                    backgroundColor:
+                                                        Colors.green[900],
+                                                    child: Text(
+                                                      '${data[i]['discount']}%',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleLarge,
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          //END CIRCLEAVATAR
-
+                                          // END CIRCLEAVATAR
                                           Column(
                                             children: [
-                                              //START TEXTS
-                                              Text('${data[i]['company_name']}',
-                                                //Text style starts
+                                              // START TEXTS
+                                              Text(
+                                                '${data[i]['company_name']}',
                                                 style: const TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 15),),
-                                              const SizedBox(height: 10,),
-                                              //start texts
-                                              Text('${data[i]['offer_type']} - ${data[i]['name']}',
-                                                //Text style starts
-                                                style: const TextStyle(fontSize: 11,
-                                                    fontWeight: FontWeight.bold
-                                                ),),
-                                              //Text starts
-                                              Text(DateFormat('dd-MM-yyyy').format(dateTime)),
+                                                  color: Colors.green,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                '${data[i]['offer_type']} - ${data[i]['name']}',
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(DateFormat('dd-MM-yyyy')
+                                                  .format(dateTime)),
                                             ],
                                           ),
-                                          //IconButton starts
-
-                                          //IconButton starts
-
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
                               );
-                            }
+                            }),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              Positioned(
-                top: 80,
-                left: 20,
-                right: 20,
-                child: Card(
-                  child: SizedBox(
-                     // width: w,
+                      ],
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: 80,
+                  left: 20,
+                  right: 20,
+                  child: Card(
+                    child: SizedBox(
                       height: 80,
                       child: Row(
                         children: [
@@ -411,26 +458,26 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             child: Container(
                               height: 300,
                               decoration: BoxDecoration(
-                                shape: BoxShape.circle, // This makes the container circular
-                                // Optionally, you can add other decorations like border or background color here
+                                shape: BoxShape.circle,
                               ),
                               child: ClipOval(
                                 child: Image.network(
                                   imageUrl,
-                                  fit: BoxFit.cover, // You might want to use cover to fill the circle completely
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left:8.0),
+                            padding: const EdgeInsets.only(left: 8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 10,),
-
+                                const SizedBox(height: 10),
                                 Text(
-                               userdata.isNotEmpty?   userdata[0]["first_name"]:"",
+                                  userdata.isNotEmpty
+                                      ? userdata[0]["first_name"]
+                                      : "",
                                   style: GoogleFonts.aBeeZee(
                                     fontSize: 20,
                                     color: Colors.indigo,
@@ -440,28 +487,14 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Text('memberid!',
-                                    //   style: GoogleFonts.aBeeZee(
-                                    //     fontSize: 10,
-                                    //     color: Colors.indigo,
-                                    //     fontWeight: FontWeight.bold,
-                                    //   ),),
-                                    //  Text('${widget.userType}',
-                                    Text('Guest',
+                                    Text(
+                                      'Guest',
                                       style: GoogleFonts.aBeeZee(
                                         fontSize: 10,
                                         color: Colors.indigo,
                                         fontWeight: FontWeight.bold,
-                                      ),),
-
-                                   /* Text( DateFormat()
-                                    // displaying formatted date
-                                        .format(DateTime.now()),
-                                      style: GoogleFonts.aBeeZee(
-                                        fontSize: 10,
-                                        color: Colors.indigo,
-                                        fontWeight: FontWeight.bold,
-                                      ),),*/
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -470,17 +503,16 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         ],
                       ),
                     ),
+                  ),
                 ),
-              ),
-
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
 
 class CurveClipper extends CustomClipper<Path> {
   @override
@@ -489,7 +521,8 @@ class CurveClipper extends CustomClipper<Path> {
     path.lineTo(0, size.height - 50);
     path.quadraticBezierTo(0, size.height, 50, size.height);
     path.lineTo(size.width - 50, size.height);
-    path.quadraticBezierTo(size.width, size.height, size.width, size.height - 50);
+    path.quadraticBezierTo(
+        size.width, size.height, size.width, size.height - 50);
     path.lineTo(size.width, 0);
     path.close();
     return path;
@@ -619,16 +652,14 @@ class _MyBlinkingButton2State extends State<MyBlinkingButton2>
 }
 
 class NavDrawer extends StatefulWidget {
-
   String userType;
   String userId;
 
-   NavDrawer({Key? key,
-
-     required this.userType,
-     required this.userId,
-
-   }) : super(key: key);
+  NavDrawer({
+    Key? key,
+    required this.userType,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<NavDrawer> createState() => _NavDrawerState();
@@ -639,137 +670,218 @@ class _NavDrawerState extends State<NavDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
         child: ListView(
-          children: [
-            //home
-            ListTile(
-              tileColor: Colors.green[800],
-              leading: IconButton(
-                icon: const Icon(Icons.house,color: Colors.white,size: 30.0,),
-                onPressed: (){
-                  Navigator.of(context).pop();
-                }, ),
-              title: const Text('Home',
-                style: TextStyle(fontSize: 20.0,color: Colors.white),),
-              onTap: () => {
-                /* Navigator.push(
+      children: [
+        //home
+        ListTile(
+          tileColor: Colors.green[800],
+          leading: IconButton(
+            icon: const Icon(
+              Icons.house,
+              color: Colors.white,
+              size: 30.0,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: const Text(
+            'Home',
+            style: TextStyle(fontSize: 20.0, color: Colors.white),
+          ),
+          onTap: () => {
+            /* Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) =>  const Profile()),
                 )*/
-              },
+          },
+        ),
+        //Profile
+        ListTile(
+          leading: const Icon(
+            Icons.account_circle_sharp,
+            color: Colors.green,
+          ),
+          title: Text('Profile', style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () => {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GuestProfile(
+                        // userType:  widget.userType,
+                        userID: widget.userId,
+                        userType: widget.userType,
+                      )),
             ),
-            //Profile
-            ListTile(
-              leading: const Icon(Icons.account_circle_sharp,color: Colors.green,),
-              title: Text('Profile',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>   GuestProfile(
+          },
+        ),
 
-                     // userType:  widget.userType,
-                     userID: widget.userId,
-                  )),
-                ),
+        //GiB members
+        ListTile(
+          leading: const Icon(
+            Icons.supervisor_account,
+            color: Colors.green,
+          ),
+          title:
+              Text('Business', style: Theme.of(context).textTheme.bodyMedium),
+          // onTap: () => {
+          //              Navigator.push(
+          //            context,
+          //          MaterialPageRoute(builder: (context) =>  const bootomnav()),
+          //       )
+          // },
+        ),
+        const Divider(
+          color: Colors.grey,
+        ),
+        ListTile(
+          leading: const Icon(
+            Icons.add_circle,
+            color: Colors.red,
+          ),
+          title: Text('Doctors', style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () => {
+            //     Navigator.push(
+            //     context,
+            //     MaterialPageRoute(builder: (context) =>  const GibDoctors()),
+            //   )
+          },
+        ),
+        ListTile(
+          leading: const Icon(
+            Icons.bloodtype,
+            color: Colors.red,
+          ),
+          title: Text('Blood Group',
+              style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () => {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BloodGroup(
+                        userType: widget.userType,
+                        userId: widget.userId,
+                      )),
+            )
+          },
+        ),
+        const Divider(
+          color: Colors.grey,
+        ),
+        ListTile(
+          leading: const Icon(
+            Icons.info,
+            color: Colors.green,
+          ),
+          title:
+              Text('About GiB', style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () => {
+            //          Navigator.push(
+            //       context,
+            //     MaterialPageRoute(builder: (context) =>  const AboutGib()),
+            //    )
+          },
+        ),
+        ListTile(
+          leading: const Icon(
+            Icons.fingerprint,
+            color: Colors.green,
+          ),
+          title: Text('Change M-Pin',
+              style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () => {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      Change(userType: widget.userType, userID: widget.userId)),
+            )
+          },
+        ),
+        ListTile(
+          leading: const Icon(
+            Icons.logout,
+            color: Colors.green,
+          ),
+          title: Text('Logout', style: Theme.of(context).textTheme.bodyMedium),
+          onTap: () async {
+            // Show an alert dialog to confirm logout
+            bool confirmLogout = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Confirm Logout"),
+                  content: Text("Are you sure you want to logout?",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Colors.black)),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pop(false); // Return false if "No" is selected
+                      },
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      child: Text("No",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.white)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pop(true); // Return true if "Yes" is selected
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green),
+                      child: Text("Yes",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.white)),
+                    ),
+                  ],
+                );
+              },
+            );
 
-              },
-            ),
+            if (confirmLogout == true) {
+              // Clear the authentication status when logging out
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('isLoggedIn', false);
 
-            //GiB members
-            ListTile(
-              leading: const Icon(Icons.supervisor_account,color: Colors.green,),
-              title: Text('Business',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              // onTap: () => {
-              //              Navigator.push(
-              //            context,
-              //          MaterialPageRoute(builder: (context) =>  const bootomnav()),
-              //       )
-              // },
-            ),
-            const Divider(color: Colors.grey,),
-            ListTile(
-              leading: const Icon(Icons.add_circle,color: Colors.red,),
-              title: Text('Doctors',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //     Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) =>  const GibDoctors()),
-                //   )
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.bloodtype,color: Colors.red,),
-              title: Text('Blood Group',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                      Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>   BloodGroup(userType: widget.userType, userId: widget.userId,)),
-                  )
-              },
-            ),
-            const Divider(color: Colors.grey,),
-            ListTile(
-              leading: const Icon(Icons.info,color: Colors.green,),
-              title: Text('About GiB',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                //          Navigator.push(
-                //       context,
-                //     MaterialPageRoute(builder: (context) =>  const AboutGib()),
-                //    )
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.fingerprint,color: Colors.green,),
-              title: Text('Change M-Pin',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                    Navigator.push(
-                  context,
-                   MaterialPageRoute(builder: (context) =>   Change(userType: widget.userType, userID: widget.userId)),
-                  )
-              },
-            ),
-            ListTile(
-              leading: IconButton(
-                icon: Icon(Icons.logout),
-                onPressed: () async {
-                  // Clear the authentication status when logging out
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('isLoggedIn', false);
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
-              ),
-            ),
-          ],
-        )
-    );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            }
+          },
+        ),
+      ],
+    ));
   }
 
-  signout(){
+  signout() {
     //FirebaseAuth.instance.signOut();
   }
 }
-
 
 class BlinkWidget extends StatefulWidget {
   final List<Widget> children;
   final int interval;
 
-  const BlinkWidget({required this.children, this.interval = 500, required Key key}) : super(key: key);
+  const BlinkWidget(
+      {required this.children, this.interval = 500, required Key key})
+      : super(key: key);
 
   @override
   _BlinkWidgetState createState() => _BlinkWidgetState();
 }
 
-class _BlinkWidgetState extends State<BlinkWidget> with SingleTickerProviderStateMixin {
+class _BlinkWidgetState extends State<BlinkWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   int _currentWidget = 0;
 
@@ -778,14 +890,12 @@ class _BlinkWidgetState extends State<BlinkWidget> with SingleTickerProviderStat
     super.initState();
 
     _controller = AnimationController(
-        duration: Duration(milliseconds: widget.interval),
-        vsync: this
-    );
+        duration: Duration(milliseconds: widget.interval), vsync: this);
 
     _controller.addStatusListener((status) {
-      if(status == AnimationStatus.completed) {
+      if (status == AnimationStatus.completed) {
         setState(() {
-          if(++_currentWidget == widget.children.length) {
+          if (++_currentWidget == widget.children.length) {
             _currentWidget = 0;
           }
         });
@@ -810,7 +920,3 @@ class _BlinkWidgetState extends State<BlinkWidget> with SingleTickerProviderStat
     );
   }
 }
-
-
-
-
