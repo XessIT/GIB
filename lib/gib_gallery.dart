@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gipapp/video_player.dart';
 
+import 'Non_exe_pages/non_exe_home.dart';
 import 'gib_gallery_view.dart';
 import 'home.dart';
 import 'home1.dart';
@@ -19,29 +20,35 @@ class GibGallery extends StatelessWidget {
           centerTitle: true,
           leading:IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: '',)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  NavigationBarNon(userType: '', userId: '',)));
               },
               icon: const Icon(Icons.arrow_back)),
         ),
-        body: Column(
-          children:  const [
-            TabBar(
-                isScrollable: true,
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(text: 'Image',),
-                  Tab(text: 'Video',),
-                ]),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  ViewImages(),
-                  Video(),
-                ],
+        body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop)  {
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>  NavigationBarNon(userType: '', userId: '',)));
+          },
+          child: const Column(
+            children:  [
+              TabBar(
+                  isScrollable: true,
+                  labelColor: Colors.green,
+                  unselectedLabelColor: Colors.black,
+                  tabs: [
+                    Tab(text: 'Image',),
+                    Tab(text: 'Video',),
+                  ]),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    ViewImages(),
+                    Video(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'Non_exe_pages/non_exe_home.dart';
 import 'home.dart';
 import 'home1.dart';
 
@@ -31,34 +32,56 @@ class _AttendancePageState extends State<AttendancePage> {
           centerTitle: true,
           leading:IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: '',)));
-              },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                      userType: '',
+                      userId: '',
+                    ),
+                  ),
+                );              },
               icon: const Icon(Icons.arrow_back)),
         ),
-        body:Column(
-            children: const [
-
-              //TABBAR STARTS
-              TabBar(
-                isScrollable: true,
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(text: ('Network Meeting'),),
-                  Tab(text: ('Team Meeting') ,),
-                  Tab(text:('Training Program'),
+        body:PopScope(
+          canPop: false,
+            onPopInvoked: (didPop)  {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarNon(
+                    userType: '',
+                    userId: '',
                   ),
-                ],
-              )  ,
-              //TABBAR VIEW STARTS
-              Expanded(
-                child: TabBarView(children: [
-                  NetworkAttendance(),
-                  TeamMeetingPage(),
-                  TrainingProgram(),
-                ]),
-              )
-            ]),
+                ),
+              );
+            },
+
+          child: Column(
+              children: const [
+
+                //TABBAR STARTS
+                TabBar(
+                  isScrollable: true,
+                  labelColor: Colors.green,
+                  unselectedLabelColor: Colors.black,
+                  tabs: [
+                    Tab(text: ('Network Meeting'),),
+                    Tab(text: ('Team Meeting') ,),
+                    Tab(text:('Training Program'),
+                    ),
+                  ],
+                )  ,
+                //TABBAR VIEW STARTS
+                Expanded(
+                  child: TabBarView(children: [
+                    NetworkAttendance(),
+                    TeamMeetingPage(),
+                    TrainingProgram(),
+                  ]),
+                )
+              ]),
+        ),
       ),
     );
   }

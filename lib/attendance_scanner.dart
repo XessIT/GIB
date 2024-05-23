@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
+import 'Non_exe_pages/non_exe_home.dart';
 import 'home.dart';
 
 class AttendanceScanner extends StatelessWidget {
@@ -15,12 +16,17 @@ class AttendanceScanner extends StatelessWidget {
         title: const Text('Attendance Scanner'),
         leading: IconButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: '',)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>  NavigationBarNon(userType: '', userId: '',)));
           },
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: const AttendanceScannerPage(),
+      body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop)  {
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>  NavigationBarNon(userType: '', userId: '',)));
+          },
+          child: const AttendanceScannerPage()),
     );
   }
 }

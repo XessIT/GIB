@@ -11,9 +11,12 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Non_exe_pages/settings_non_executive.dart';
+import 'Offer/offer.dart';
 import 'blood_group.dart';
 import 'change_mpin.dart';
 import 'guest_profile.dart';
+import 'guest_settings.dart';
 import 'login.dart';
 import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:iconly/iconly.dart';
@@ -39,19 +42,11 @@ class _GuestHomeState extends State<GuestHome> {
   @override
   void initState() {
     _pages = [
-      GuestHomePage(
-        userId: widget.userId,
-        userType: widget.userType,
-      ),
-
-      BloodGroup(
-        userId: widget.userId,
-        userType: widget.userType!,
-      ),
-      GuestProfile(
-        userID: widget.userId,
-        userType: widget.userType,
-      ),
+      GuestHomePage(userId: widget.userId, userType: widget.userType),
+      OffersPage(userId: widget.userId, userType: widget.userType),
+      //GuestProfile(userID: widget.userId, userType: widget.userType),
+      // BloodGroup(userType: widget.userType, userId: widget.userId),
+      GuestSettings(userId: widget.userId, userType: widget.userType),
       // Add more pages as needed
     ];
     super.initState();
@@ -62,44 +57,64 @@ class _GuestHomeState extends State<GuestHome> {
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        items: [
+        // backgroundColor: Colors.white,
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.home,
-              color: Colors.black45,
+              Icons.home_outlined,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
             ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.medical_services,
-              color: Colors.black45,
+              Icons.local_offer,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
             ),
-            label: 'Doctor',
+            label: 'Offers',
           ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(
+          //     Icons.person_2_rounded,
+          //     color: Theme.of(context).brightness == Brightness.light
+          //         ? Colors.black45
+          //         : Colors.white,
+          //   ),
+          //   label: 'Profile',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(
+          //     Icons.water_drop_rounded,
+          //     color: Theme.of(context).brightness == Brightness.light
+          //         ? Colors.black45
+          //         : Colors.white,
+          //   ),
+          //   label: 'Blood Group',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.bloodtype,
-              color: Colors.black45,
+              Icons.settings,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
             ),
-            label: 'Blood Group',
+            label: 'Settings',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.accessibility_new, color: Colors.black45),
-            label: 'About',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle, color: Colors.black45),
-            label: 'Profile',
-          ),
-
-          // Add more BottomNavigationBarItems as needed
         ],
         type:
             BottomNavigationBarType.fixed, // Set type to fixed for text labels
+        currentIndex: _currentIndex,
+        // selectedItemColor: Theme.of(context).brightness == Brightness.light
+        //     ? Colors.black45
+        //     : Colors.white,
         selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black45,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.light
+            ? Colors.black45
+            : Colors.white,
         iconSize: 30,
         onTap: (index) {
           setState(() {
@@ -109,7 +124,8 @@ class _GuestHomeState extends State<GuestHome> {
         elevation: 5,
         selectedLabelStyle: TextStyle(color: Colors.white),
         unselectedLabelStyle: TextStyle(color: Colors.white),
-        selectedIconTheme: IconThemeData(color: Colors.green),
+        selectedIconTheme:
+            IconThemeData(color: Colors.green), // Set selected icon color
       ),
     );
   }
@@ -253,12 +269,12 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: SafeArea(
-        child: NavDrawer(
-          userType: widget.userType.toString(),
-          userId: widget.userId.toString(),
-        ),
-      ),
+      // drawer: SafeArea(
+      //   child: NavDrawer(
+      //     userType: widget.userType.toString(),
+      //     userId: widget.userId.toString(),
+      //   ),
+      // ),
       body: PopScope(
         canPop: false,
         onPopInvoked: (didPop) async {
@@ -301,148 +317,210 @@ class _GuestHomePageState extends State<GuestHomePage> {
               fit: StackFit.expand,
               clipBehavior: Clip.antiAliasWithSaveLayer,
               children: [
-                Column(
-                  children: [
-                    ClipPath(
-                      clipper: CurveClipper(),
-                      child: Container(
-                        height: 100,
-                        width: MediaQuery.of(context).size.width,
-                        color: Colors.green,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                'GIB',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 20),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.menu,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  print('press nav drawer');
-                                  _scaffoldKey.currentState!.openDrawer();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 80),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Card(
-                              elevation: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(1),
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ClipPath(
+                        clipper: CurveClipper(),
+                        child: Container(
+                          height: 100,
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.green,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 20),
                                 child: Text(
-                                  'Offers+',
-                                  style: GoogleFonts.aBeeZee(
-                                    fontSize: 20,
-                                    color: Colors.green,
+                                  'GIB',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                            )
-                          ],
+                              // Padding(
+                              //   padding: EdgeInsets.only(right: 20),
+                              //   child: IconButton(
+                              //     icon: Icon(
+                              //       Icons.menu,
+                              //       color: Colors.white,
+                              //     ),
+                              //     onPressed: () {
+                              //       print('press nav drawer');
+                              //       _scaffoldKey.currentState!.openDrawer();
+                              //     },
+                              //   ),
+                              // ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 30),
-                        // Wrap Column in SingleChildScrollView
-                        SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(data.length, (i) {
+                      ),
+                      SizedBox(height: 80),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Offers',
+                          style: GoogleFonts.aBeeZee(
+                            fontSize: 16,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height *
+                            0.6, // Adjust the height as needed
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (context, i) {
                               String imageUrl =
                                   'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
-                              String dateString = data[i]['validity'];
+
+                              String dateString = data[i][
+                                  'validity']; // This will print the properly encoded URL
                               DateTime dateTime =
                                   DateFormat('yyyy-MM-dd').parse(dateString);
                               return Center(
                                 child: Card(
-                                  child: Column(
-                                    children: [
-                                      // MAIN ROW STARTS
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          // CIRCLEAVATAR STARTS
-                                          CircleAvatar(
-                                            radius: 40,
-                                            backgroundColor: Colors.cyan,
-                                            backgroundImage:
-                                                NetworkImage(imageUrl),
-                                            child: Stack(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        // MAIN ROW STARTS
+                                        Stack(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               children: [
-                                                Align(
-                                                  alignment:
-                                                      Alignment.bottomLeft,
+                                                // CIRCLEAVATAR STARTS
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
                                                   child: CircleAvatar(
-                                                    radius: 20,
+                                                    radius: 30.0,
                                                     backgroundColor:
-                                                        Colors.green[900],
-                                                    child: Text(
-                                                      '${data[i]['discount']}%',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleLarge,
-                                                    ),
+                                                        Colors.cyan,
+                                                    backgroundImage:
+                                                        NetworkImage(imageUrl),
                                                   ),
+                                                ),
+                                                SizedBox(width: 20),
+                                                // END CIRCLEAVATAR
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start, // Align texts to the start
+                                                  children: [
+                                                    // START TEXTS
+                                                    Text(
+                                                      '${data[i]['company_name']}',
+                                                      // Text style starts
+                                                      style: const TextStyle(
+                                                        color: Colors.green,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                    // start texts
+                                                    Text(
+                                                      '${data[i]['offer_type']} - ${data[i]['name']}',
+                                                      // Text style starts
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "Mobile - ${data[i]['mobile']}",
+                                                      // New date format
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                    // Text starts
+                                                    Text(
+                                                      "Validity - ${DateFormat('d MMMM yyyy').format(dateTime)}",
+                                                      // New date format
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          // END CIRCLEAVATAR
-                                          Column(
-                                            children: [
-                                              // START TEXTS
-                                              Text(
-                                                '${data[i]['company_name']}',
-                                                style: const TextStyle(
-                                                  color: Colors.green,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Text(
-                                                '${data[i]['offer_type']} - ${data[i]['name']}',
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(DateFormat('dd-MM-yyyy')
-                                                  .format(dateTime)),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            // Banner in the top right side
+                                            data[i]['discount']
+                                                    .toString()
+                                                    .isEmpty
+                                                ? Container()
+                                                : Positioned(
+                                                    top: 8,
+                                                    right:
+                                                        8, // Adjust position if needed
+                                                    child: Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        color: Colors
+                                                            .red, // Change the color here
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10.0),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10.0),
+                                                        ),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 6.0,
+                                                              vertical: 2.0),
+                                                      child: Row(
+                                                        children: [
+                                                          /*Text(
+                                                    'Offers', // Label for the banner
+                                                    style: TextStyle(
+                                                      color: Colors.white, // Change the text color here
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12.0, // Adjust font size as needed
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 4.0),*/ // Space between the label and the discount
+                                                          Text(
+                                                            '${data[i]['discount']}% off', // Text for your banner
+                                                            style:
+                                                                const TextStyle(
+                                                              color: Colors
+                                                                  .white, // Change the text color here
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontStyle: FontStyle
+                                                                  .italic, // Add any additional styles here
+                                                              fontSize:
+                                                                  12.0, // Adjust font size as needed
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
                             }),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 Positioned(
                   top: 80,
@@ -454,20 +532,19 @@ class _GuestHomePageState extends State<GuestHomePage> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 300,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipOval(
-                                child: Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
+                              padding: const EdgeInsets.all(8.0),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.cyan,
+                                radius:
+                                    30.0, // This will give you a 60.0 diameter circle
+                                backgroundImage: imageUrl.isNotEmpty
+                                    ? NetworkImage(imageUrl)
+                                    : null,
+                                child: imageUrl.isEmpty
+                                    ? const Icon(Icons.person,
+                                        size: 30.0, color: Colors.white)
+                                    : null,
+                              )),
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Column(
@@ -707,9 +784,8 @@ class _NavDrawerState extends State<NavDrawer> {
               context,
               MaterialPageRoute(
                   builder: (context) => GuestProfile(
-                        // userType:  widget.userType,
-                        userID: widget.userId,
                         userType: widget.userType,
+                        userID: widget.userId,
                       )),
             ),
           },
@@ -798,56 +874,9 @@ class _NavDrawerState extends State<NavDrawer> {
           },
         ),
         ListTile(
-          leading: const Icon(
-            Icons.logout,
-            color: Colors.green,
-          ),
-          title: Text('Logout', style: Theme.of(context).textTheme.bodyMedium),
-          onTap: () async {
-            // Show an alert dialog to confirm logout
-            bool confirmLogout = await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Confirm Logout"),
-                  content: Text("Are you sure you want to logout?",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: Colors.black)),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(false); // Return false if "No" is selected
-                      },
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: Text("No",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: Colors.white)),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(true); // Return true if "Yes" is selected
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
-                      child: Text("Yes",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: Colors.white)),
-                    ),
-                  ],
-                );
-              },
-            );
-
-            if (confirmLogout == true) {
+          leading: IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
               // Clear the authentication status when logging out
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.setBool('isLoggedIn', false);
@@ -856,8 +885,8 @@ class _NavDrawerState extends State<NavDrawer> {
                 context,
                 MaterialPageRoute(builder: (context) => Login()),
               );
-            }
-          },
+            },
+          ),
         ),
       ],
     ));

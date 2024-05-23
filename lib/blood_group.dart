@@ -8,7 +8,7 @@ import 'home.dart';
 import 'home1.dart';
 
 class BloodGroup extends StatelessWidget {
-  final String userType;
+  final String? userType;
   final String? userId;
   const BloodGroup({Key? key, required this.userType, required this.userId})
       : super(key: key);
@@ -17,7 +17,7 @@ class BloodGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // Main calling function. This function coding will appear below
-      body: Blood(userType: userType, userId: userId),
+      body: Blood(userType: userType.toString(), userId: userId),
     );
   }
 }
@@ -38,6 +38,9 @@ class _BloodState extends State<Blood> {
     var w = MediaQuery.of(context).size.height;
 
     return Scaffold(
+
+        // Appbar starts
+
         // Appbar starts
         appBar: AppBar(
           // Appbar title
