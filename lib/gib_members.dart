@@ -3,7 +3,9 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'Non_exe_pages/non_exe_home.dart';
 import 'gib_members_filter.dart';
+import 'guest_home.dart';
 import 'home.dart';
 
 class GibMembers extends StatelessWidget {
@@ -209,11 +211,44 @@ class _MembersState extends State<Members> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading:IconButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage(userType: widget.userType, userID: widget.userId,)));
-            },
-            icon: const Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () {
+            if (widget.userType == "Non-Executive") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarNon(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+            else if (widget.userType == "Guest") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GuestHome(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+            else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
         ),
@@ -350,133 +385,171 @@ class _MembersState extends State<Members> {
           ),
 */
 
-        body: SingleChildScrollView(
-          child: Container(height: 1000,width: 500,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                   children: [
-                     IconButton(onPressed: (){
-                       Navigator.push(context, MaterialPageRoute(builder: (context)=>GIBmembersFilter(userType:widget.userType,userId:widget.userId)));
-                     }, icon: Icon(Icons.filter_alt,color: Colors.green.shade900,))
-                   ],
+        body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop)  {
+            if (widget.userType == "Non-Executive") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarNon(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
                 ),
-                Container(
-                  height: 500,
-                  child: ListView.builder(
-                           itemCount: data.length,
-                           itemBuilder: (context, i) {
-                             String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
-                              if (data[i]['first_name']
-                                   .toString()
-                                   .toLowerCase().startsWith(name.toLowerCase()) ||
-                                   data[i]['company_name']
-                                       .toString()
-                                       .toLowerCase().startsWith(name.toLowerCase())) {
-                                 return
-                                   SingleChildScrollView(
-                                     child: Center(
-                                       child: InkWell(
-                                         onTap: () {
-                                         },
-                                         child: Card(
+              );
+            }
+            else if (widget.userType == "Guest") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GuestHome(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+            else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+          },
+          child: SingleChildScrollView(
+            child: Container(height: 1000,width: 500,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       IconButton(onPressed: (){
+                         Navigator.push(context, MaterialPageRoute(builder: (context)=>GIBmembersFilter(userType:widget.userType,userId:widget.userId)));
+                       }, icon: Icon(Icons.filter_alt,color: Colors.green.shade900,))
+                     ],
+                  ),
+                  Container(
+                    height: 500,
+                    child: ListView.builder(
+                             itemCount: data.length,
+                             itemBuilder: (context, i) {
+                               String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
+                                if (data[i]['first_name']
+                                     .toString()
+                                     .toLowerCase().startsWith(name.toLowerCase()) ||
+                                     data[i]['company_name']
+                                         .toString()
+                                         .toLowerCase().startsWith(name.toLowerCase())) {
+                                   return
+                                     SingleChildScrollView(
+                                       child: Center(
+                                         child: InkWell(
+                                           onTap: () {
+                                           },
+                                           child: Card(
 
-                                          /* width: 350,
-                                           height: 80,
-                                           padding: const EdgeInsets.all(5.0),
-                                           decoration: const BoxDecoration(
-                                             border: Border(
-                                               bottom: BorderSide(
-                                                   color: Colors.green, width: 1),
+                                            /* width: 350,
+                                             height: 80,
+                                             padding: const EdgeInsets.all(5.0),
+                                             decoration: const BoxDecoration(
+                                               border: Border(
+                                                 bottom: BorderSide(
+                                                     color: Colors.green, width: 1),
+                                               ),
+                                               // borderRadius: BorderRadius.circular(10.0)
+                                             ),*/
+                                             child: ListTile(
+                                               leading: CircleAvatar(
+                                                 radius: 40, // adjust the radius as per your requirement
+                                                 backgroundImage: NetworkImage(imageUrl),
+                                               ),
+                                               title: Text('${data[i]['first_name']}'),
+                                               subtitle: Text(
+                                                   '${data[i]['company_name']}'),
+                                               trailing: IconButton(
+                                                   onPressed: () async {
+                                                     final call = Uri.parse(
+                                                         "tel://${data[i]['mobile']}");
+                                                     if (await canLaunchUrl(call)) {
+                                                       launchUrl(call);
+                                                     } else {
+                                                       throw 'Could not launch $call';
+                                                     }
+                                                   },
+                                                   icon: Icon(
+                                                     Icons.call, color: Colors.green[800],)),
                                              ),
-                                             // borderRadius: BorderRadius.circular(10.0)
-                                           ),*/
-                                           child: ListTile(
-                                             leading: CircleAvatar(
-                                               radius: 40, // adjust the radius as per your requirement
-                                               backgroundImage: NetworkImage(imageUrl),
-                                             ),
-                                             title: Text('${data[i]['first_name']}'),
-                                             subtitle: Text(
-                                                 '${data[i]['company_name']}'),
-                                             trailing: IconButton(
-                                                 onPressed: () async {
-                                                   final call = Uri.parse(
-                                                       "tel://${data[i]['mobile']}");
-                                                   if (await canLaunchUrl(call)) {
-                                                     launchUrl(call);
-                                                   } else {
-                                                     throw 'Could not launch $call';
-                                                   }
-                                                 },
-                                                 icon: Icon(
-                                                   Icons.call, color: Colors.green[800],)),
                                            ),
                                          ),
                                        ),
-                                     ),
-                                   );
-                               }
-                             return Container();
-                           }
-                            ),
-                ),
-                Container(
-                  height: 500,
-                  child: ListView.builder(
-                      itemCount: districtAndChapterData.length,
-                      itemBuilder: (context, i) {
-                        if (districtAndChapterData[i]['first_name']
-                            .toString()
-                            .toLowerCase().startsWith(name.toLowerCase()) ||
-                            districtAndChapterData[i]['company_name']
-                                .toString()
-                                .toLowerCase().startsWith(name.toLowerCase())) {
-                          return
-                            Center(
-                              child: InkWell(
-                                onTap: () {
-                                },
-                                child: Container(
-                                  width: 350,
-                                  height: 80,
-                                  padding: const EdgeInsets.all(5.0),
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.green, width: 1),
+                                     );
+                                 }
+                               return Container();
+                             }
+                              ),
+                  ),
+                  Container(
+                    height: 500,
+                    child: ListView.builder(
+                        itemCount: districtAndChapterData.length,
+                        itemBuilder: (context, i) {
+                          if (districtAndChapterData[i]['first_name']
+                              .toString()
+                              .toLowerCase().startsWith(name.toLowerCase()) ||
+                              districtAndChapterData[i]['company_name']
+                                  .toString()
+                                  .toLowerCase().startsWith(name.toLowerCase())) {
+                            return
+                              Center(
+                                child: InkWell(
+                                  onTap: () {
+                                  },
+                                  child: Container(
+                                    width: 350,
+                                    height: 80,
+                                    padding: const EdgeInsets.all(5.0),
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                            color: Colors.green, width: 1),
+                                      ),
+                                      // borderRadius: BorderRadius.circular(10.0)
                                     ),
-                                    // borderRadius: BorderRadius.circular(10.0)
-                                  ),
-                                  child: ListTile(
-                                    leading: SizedBox(
-                                      height: 80.0,
-                                      width: 80.0,),
-                                    title: Text('${districtAndChapterData[i]['first_name']}'),
-                                    subtitle: Text(
-                                        '${districtAndChapterData[i]['company_name']}'),
-                                    trailing: IconButton(
-                                        onPressed: () async {
-                                          final call = Uri.parse(
-                                              "tel://${districtAndChapterData[i]['mobile']}");
-                                          if (await canLaunchUrl(call)) {
-                                            launchUrl(call);
-                                          } else {
-                                            throw 'Could not launch $call';
-                                          }
-                                        },
-                                        icon: const Icon(
-                                          Icons.call, color: Colors.green,)),
+                                    child: ListTile(
+                                      leading: SizedBox(
+                                        height: 80.0,
+                                        width: 80.0,),
+                                      title: Text('${districtAndChapterData[i]['first_name']}'),
+                                      subtitle: Text(
+                                          '${districtAndChapterData[i]['company_name']}'),
+                                      trailing: IconButton(
+                                          onPressed: () async {
+                                            final call = Uri.parse(
+                                                "tel://${districtAndChapterData[i]['mobile']}");
+                                            if (await canLaunchUrl(call)) {
+                                              launchUrl(call);
+                                            } else {
+                                              throw 'Could not launch $call';
+                                            }
+                                          },
+                                          icon: const Icon(
+                                            Icons.call, color: Colors.green,)),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
+                              );
+                          }
+                          return Container();
                         }
-                        return Container();
-                      }
-                  ),),
-              ],
+                    ),),
+                ],
+              ),
             ),
           ),
         )
