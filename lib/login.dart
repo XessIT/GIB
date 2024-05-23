@@ -110,9 +110,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Homepage(
+                    builder: (context) => NavigationBarExe(
                           userType: userType,
-                          userID: userId,
+                          userId: userId,
                         )),
               );
               break;

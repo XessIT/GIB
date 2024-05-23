@@ -7,7 +7,11 @@ import 'home.dart';
 import 'home1.dart';
 
 class GibGallery extends StatelessWidget {
-  const GibGallery({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  const GibGallery({super.key,
+    required this.userType,
+    required this. userID,});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,7 @@ class GibGallery extends StatelessWidget {
           onPopInvoked: (didPop)  {
             Navigator.push(context, MaterialPageRoute(builder: (context) =>  NavigationBarNon(userType: '', userId: '',)));
           },
-          child: const Column(
+          child:  Column(
             children:  [
               TabBar(
                   isScrollable: true,
@@ -42,8 +46,8 @@ class GibGallery extends StatelessWidget {
               Expanded(
                 child: TabBarView(
                   children: [
-                    ViewImages(),
-                    Video(),
+                    ViewImages(userType: userType.toString(), userID: userID,),
+                    Video(userType: userType.toString(), userID: userID,),
                   ],
                 ),
               ),
@@ -56,7 +60,11 @@ class GibGallery extends StatelessWidget {
 }
 
 class ViewImages extends StatefulWidget {
-  const ViewImages({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  const ViewImages({super.key,
+    required this.userType,
+    required this. userID,}) ;
 
   @override
   State<ViewImages> createState() => _ViewImagesState();
@@ -81,7 +89,7 @@ class _ViewImagesState extends State<ViewImages> {
                       Map thisitem = [index] as Map;
                       return Column(
                         children: [
-                          const SizedBox(height: 30,),
+                           SizedBox(height: 30,),
                           InkWell(
                             onTap: () {
                               Navigator.push(context, MaterialPageRoute(
@@ -113,7 +121,7 @@ class _ViewImagesState extends State<ViewImages> {
                                             onPressed: () {
                                             //  _delete(thisitem['id'], thisitem['Image']);
                                               Navigator.push(context, MaterialPageRoute(
-                                                  builder: (context) => const GibGallery()));
+                                                  builder: (context) =>  GibGallery(userType: widget.userType.toString(), userID: widget.userID.toString(),)));
                                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                                   content: Text("You have Successfully Deleted a Image")));
                                             },
@@ -141,7 +149,11 @@ class _ViewImagesState extends State<ViewImages> {
 }
 
 class Video extends StatefulWidget {
-  const Video({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  const Video({super.key,
+    required this.userType,
+    required this. userID,});
 
   @override
   State<Video> createState() => _VideoState();
@@ -213,7 +225,7 @@ class _VideoState extends State<Video> {
                                               Navigator.push(
                                                   context, MaterialPageRoute(
                                                   builder: (
-                                                      context) => const GibGallery()));
+                                                      context) =>  GibGallery(userType:widget.userType.toString(), userID:widget.userID.toString(),)));
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(const SnackBar(
                                                   content: Text(

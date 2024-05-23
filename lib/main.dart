@@ -8,6 +8,7 @@ import 'home.dart';
 import 'login.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
       MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -82,9 +83,9 @@ void main() {
               if (isLoggedIn) {
                 switch (userType) {
                   case "Executive":
-                    return Homepage(
+                    return NavigationBarExe(
                       userType: userType ,
-                      userID: id,
+                      userId: id,
                     );
                   case "Non-Executive":
                     return NavigationBarNon(

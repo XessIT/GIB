@@ -86,6 +86,9 @@ class _BloodState extends State<Blood> {
         // Appbar ends
 
         // Main content starts here
+        // Appbar ends
+
+        // Main content starts here
         body: PopScope(
           canPop: false,
           onPopInvoked: (didPop) {
@@ -93,7 +96,7 @@ class _BloodState extends State<Blood> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => NonExecutiveHomeNav(
+                  builder: (context) => NavigationBarNon(
                     userType: widget.userType.toString(),
                     userId: widget.userId.toString(),
                   ),
@@ -113,7 +116,7 @@ class _BloodState extends State<Blood> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Home(
+                  builder: (context) => NavigationBarExe(
                     userType: widget.userType.toString(),
                     userId: widget.userId.toString(),
                   ),
@@ -132,28 +135,21 @@ class _BloodState extends State<Blood> {
                       width: 350,
                       height: 650,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        //border: Border.all(color: Colors.green, width: 1),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black
-                                .withOpacity(0.1), // rgba(0, 0, 0, 0.1)
-                            offset: Offset(0,
-                                4), // 0px horizontal offset, 4px vertical offset
-                            blurRadius: 6, // 6px blur radius
-                            spreadRadius: -1, // -1px spread radius
-                          ),
-                          BoxShadow(
-                            color: Colors.black
-                                .withOpacity(0.06), // rgba(0, 0, 0, 0.06)
-                            offset: Offset(0,
-                                2), // 0px horizontal offset, 2px vertical offset
-                            blurRadius: 4, // 4px blur radius
-                            spreadRadius: -1, // -1px spread radius
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+
+                          /// dark  colors: [Color(0xFFD81B60), Color(0xFFEF5350)], // Pink to Red gradient
+                          colors: [
+                            Colors.pink.shade100, // Light Pink
+                            Color(0xFFFFAB91), // Light Orange
+                            //  Color(0xFFF06292), // Light Pink
+                            Colors.pink.shade100, // Light Pink
+
+                            Color(0xFFFFAB91),
+                          ], // Pink to Light Pink to Red gradient
+                        ), // Optional: Add rounded corners
                       ),
                       child: Column(
                         children: [
@@ -174,16 +170,47 @@ class _BloodState extends State<Blood> {
                                       );
                                     },
                                     icon: Icon(
-                                      Icons.water_drop_rounded,
-                                      color: Colors.red,
+                                      Icons.water_drop_outlined,
+                                      color: Colors.white,
                                       size: 50,
+                                    ),
+                                  ),
+                                  Text(
+                                    "A+",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const BloodList(
+                                                    bloods: 'A+',
+                                                  )),
+                                        );
+                                      },
+                                      icon: Icon(
+                                        Icons.water_drop_rounded,
+                                        color: Colors.red,
+                                        size: 50,
+                                      ),
                                     ),
                                   ),
                                   Text(
                                     "A+",
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
-                                  )
+                                  ),
                                 ],
                               ),
                               Column(

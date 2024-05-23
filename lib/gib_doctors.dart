@@ -105,7 +105,7 @@ List<Map<String,dynamic>> getDoctor=[];
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Home(
+                    builder: (context) => NavigationBarExe(
                       userType: widget.userType.toString(),
                       userId: widget.userId.toString(),
                     ),
@@ -157,7 +157,7 @@ List<Map<String,dynamic>> getDoctor=[];
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Home(
+                builder: (context) => NavigationBarExe(
                   userType: widget.userType.toString(),
                   userId: widget.userId.toString(),
                 ),

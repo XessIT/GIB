@@ -62,16 +62,9 @@ class _NonExecutiveHomeNavState extends State<NonExecutiveHomeNav> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-
-
-
-
-
     );
   }
 }
-
-
 
 class NonExecutiveHome extends StatefulWidget {
 
@@ -367,8 +360,6 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-
-
                   data.isEmpty ? SizedBox.shrink() :
                  // SizedBox(height: 180),
                   Padding(
@@ -655,15 +646,6 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                                             padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
                                             child: Row(
                                               children: [
-                                                /*Text(
-                                                  'Offers', // Label for the banner
-                                                  style: TextStyle(
-                                                    color: Colors.white, // Change the text color here
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12.0, // Adjust font size as needed
-                                                  ),
-                                                ),
-                                                SizedBox(width: 4.0),*/ // Space between the label and the discount
                                                 Text(
                                                   '${data1[i]['discount']}% off', // Text for your banner
                                                   style: TextStyle(
@@ -754,7 +736,6 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-
                             Text(
                               userdata.isNotEmpty ? userdata[0]["first_name"] : "",
                               style: GoogleFonts.aBeeZee(
@@ -815,8 +796,8 @@ class _NavigationBarNonState extends State<NavigationBarNon> {
     _pages = [
       NonExecutiveHomeNav(userId: widget.userId, userType: widget.userType),
       OffersPage(userId: widget.userId, userType: widget.userType),
-      Attendance(),
-      AttendanceScanner(),
+       AttendancePage(userID: widget.userId, userType: widget.userType.toString()),
+      AttendanceScannerPage(userID: widget.userId, userType: widget.userType.toString()),
       SettingsPageNon(userId: widget.userId, userType: widget.userType),
     ];
     super.initState();
