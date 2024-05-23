@@ -170,7 +170,8 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
         print("Message: ${responseData['message']}");
         Navigator.push(context, MaterialPageRoute(builder: (context) => Profile(userID: widget.id, userType: '',)));
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Profile Successfully Updated")));
+            content: Text("Profile Successfully Updated"))
+        );
       } else {
         print("Error: ${response.statusCode}");
       }
@@ -242,8 +243,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child:
-        Text('Business Edit Profile'),),
+        title:  Text('Business Edit Profile',style: Theme.of(context).textTheme.displayLarge,),
         centerTitle: true,
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
@@ -338,7 +338,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         );
                       },
                       decoration:  const InputDecoration(
-                        labelText:'Company Name',
+                      //  labelText:'Company Name',
                         hintText: "Company Name",
                         suffixIcon: Icon(Icons.business,color: Colors.green,)
                       ),
@@ -369,7 +369,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         );
                       },
                       decoration: const InputDecoration(
-                        labelText: "Business Keywords",
+                        //labelText: "Business Keywords",
                         hintText: "Business Keywords",
                         suffixIcon: Icon(Icons.business,color: Colors.green,)
                         // hintText: '',
@@ -394,7 +394,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                           return null;}
                       },
                       decoration:  const InputDecoration(
-                        labelText:'Mobile Number',
+                       // labelText:'Mobile Number',
                         hintText: "Mobile Number",
                         suffixIcon: Icon(Icons.phone_android,color: Colors.green,)
                       ),
@@ -419,7 +419,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         return null;
                       },
                       decoration:  const InputDecoration(
-                        labelText: 'Email Address',
+                       // labelText: 'Email Address',
                         hintText: 'Email Address',
                         suffixIcon: Icon(Icons.mail,color: Colors.green,),
 
@@ -451,7 +451,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         );
                       },
                       decoration: const InputDecoration(
-                        labelText: 'Company address',
+                       // labelText: 'Company address',
                         hintText: 'Company address',
                         suffixIcon: Icon(Icons.business,color: Colors.green,),
                       ),),
@@ -473,7 +473,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         return null;
                       },
                       decoration:  const InputDecoration(
-                        labelText: 'Website',
+                        //labelText: 'Website',
                         hintText: 'Website',
                         suffixIcon: Icon(Icons.web,color: Colors.green,)
                       ),),
@@ -493,8 +493,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                         return null;
                       },
                       decoration: const InputDecoration(
-                        labelText: 'Year of established',
-                        hintText: "YYYY",
+                        hintText: 'Year of established (YYYY)',
                         suffixIcon: Icon(Icons.calendar_month,color: Colors.green,),
                       ),
                       keyboardType: TextInputType.number,
@@ -505,7 +504,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                   ),
                   const SizedBox(height: 30,),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Save button starts
                       MaterialButton(
@@ -517,26 +516,12 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
                             if (_formKey.currentState!.validate()) {
                               selectedImage == null ? Edit() : Update();
                             }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        "You have Successfully Updated")));
+
                           },
                           child: const Text('SAVE',
                             style: TextStyle(color: Colors.white),)),
                       // Save button ends
-
                       // Cancel button starts
-                      MaterialButton(
-                          minWidth: 130,
-                          height: 50,
-                          color: Colors.orangeAccent,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel',
-                            style: TextStyle(color: Colors.white),)),
                       // Cancel button ends
                     ],
                   ),
