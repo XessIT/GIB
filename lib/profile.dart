@@ -68,18 +68,29 @@ class _ViewState extends State<View> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NonExecutiveHome(
+                    builder: (context) => NavigationBarNon(
                       userType: widget.userType.toString(),
-                      userID: widget.userID.toString(),
+                      userId: widget.userID.toString(),
                     ),
                   ),
                 );
               }
-              if (widget.userType == "Executive") {
+              else if (widget.userType == "Guest") {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Home(
+                    builder: (context) => GuestHome(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
                       userType: widget.userType.toString(),
                       userId: widget.userID.toString(),
                     ),
@@ -90,37 +101,75 @@ class _ViewState extends State<View> {
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-          body: Column(
-          children:  [
-            const TabBar(
-                isScrollable: true,
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(text: 'Personal',),
-                  Tab(text: 'Business',),
-
-                 // Tab(text: 'Reward',)
-                ]),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  Personal(
-                    userType:widget.userType,
-                    userID:widget.userID,
-
+          body: PopScope(
+            canPop: false,
+            onPopInvoked: (didPop)  {
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
                   ),
-                  BusinessTabPage(
-                    userType:widget.userType,
-                    userID:widget.userID,
+                );
+              }
+              else if (widget.userType == "Guest") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GuestHome(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
                   ),
-
-                 // Reward(),
-                ],
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
+            },
+            child: Column(
+            children:  [
+              const TabBar(
+                  isScrollable: true,
+                  labelColor: Colors.green,
+                  unselectedLabelColor: Colors.black,
+                  tabs: [
+                    Tab(text: 'Personal',),
+                    Tab(text: 'Business',),
+            
+                   // Tab(text: 'Reward',)
+                  ]),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    Personal(
+                      userType:widget.userType,
+                      userID:widget.userID,
+            
+                    ),
+                    BusinessTabPage(
+                      userType:widget.userType,
+                      userID:widget.userID,
+                    ),
+            
+                   // Reward(),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+                    ),
+          ),
       ),
     );
   }
