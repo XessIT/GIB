@@ -86,7 +86,8 @@ class _ReferralPageState extends State<ReferralPage> {
             "referrer_name": fname,
             "referrer_mobile": mobile,
             "referrer_company": companyname,
-            "status": status
+            "status": status,
+            "user_id": widget.userId
           }),
         );
         print(url);

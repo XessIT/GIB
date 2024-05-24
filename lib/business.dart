@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'business_slip.dart';
 import 'g2g_slip.dart';
 import 'honor_slip.dart';
+import 'package:http/http.dart' as http;
 
 //import 'package:gib/guest_slip.dart';
 
@@ -25,8 +27,7 @@ class _BusinessPageState extends State<BusinessPage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-
-          title: (Text('MY BUSINESS', style: Theme.of(context).textTheme.bodySmall)
+          title: (Text('MY BUSINESS', style: Theme.of(context).textTheme.displayLarge,)
           ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -34,6 +35,8 @@ class _BusinessPageState extends State<BusinessPage> {
               Navigator.pop(context);
             },
           ),
+          iconTheme:  const IconThemeData(
+            color: Colors.white,),
 
         ),
 
@@ -48,17 +51,17 @@ class _BusinessPageState extends State<BusinessPage> {
                   unselectedLabelColor: Colors.black,
                   tabs: [
                     Tab(text: ('GiB Total Transaction'),),
-                    Tab(text: ('My Transaction') ,),
-                    Tab(text:('My Total Transaction'),
+                    Tab(text: ('My Transaction')
+                  //  Tab(text:('My Total Transaction'),
                     ),
                   ],
-                )  ,
+                ),
                 //TABBAR VIEW STARTS
                 Expanded(
                   child: TabBarView(children: <Widget>[
                     GibTransaction(userId: widget.userId, userType: widget.userType),
                     MyTransaction(userId: widget.userId, userType: widget.userType),
-                    MyTotalTransaction(),
+                   // MyTotalTransaction(userId: widget.userId, userType: widget.userType),
                   ],
                   ),
                 )
@@ -92,12 +95,171 @@ class _GibTransactionState extends State<GibTransaction> {
   String? name="";
   String? mobile="";
 
+  String? totalRows = "0";
+
+  Future<void> getBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=BusinessTotalYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          totalRows = responseData['totalRows'];
+          print("my id :${widget.userId}");
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String accountingYear = '0';
+
+  Future<void> getaccountBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=BusinessCurrentYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          accountingYear = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? g2gtotalRows = "0";
+
+  Future<void> g2ggetBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=g2gBusinessTotalYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          g2gtotalRows = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String g2gaccountingYear = '0';
+
+  Future<void> g2ggetaccountBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=g2gBusinessCurrentYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          g2gaccountingYear = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? visitortotalRows = "0";
+
+  Future<void> visitorgetBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=visitorBusinessTotalYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          visitortotalRows = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String visitoraccountingYear = '0';
+
+  Future<void> visitorgetaccountBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=visitorBusinessCurrentYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          visitoraccountingYear = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? honortotalRows = "0";
+
+  Future<void> honorBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=honorBusinessTotalYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          honortotalRows = responseData['totalAmount'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String honoraccountingYear = '0';
+
+  Future<void> honorgetaccountBusinessCount() async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=honorBusinessCurrentYear');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          honoraccountingYear = responseData['totalAmount'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 
   @override
   void initState() {
+    getBusinessCount();
+    g2ggetBusinessCount();
+    getaccountBusinessCount();
+    g2ggetaccountBusinessCount();
+    visitorgetBusinessCount();
+    visitorgetaccountBusinessCount();
+    honorBusinessCount();
+    honorgetaccountBusinessCount();
     // TODO: implement initState
     super.initState();
-
   }
 
 
@@ -136,10 +298,15 @@ class _GibTransactionState extends State<GibTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text(
+                                    'Business Year : $accountingYear',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
                                   SizedBox(height: 10,),
-                                  SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text(
+                                    "Upto Date : $totalRows", // Display the row count here
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
                                 ],
                               ),
                               Column(
@@ -150,12 +317,10 @@ class _GibTransactionState extends State<GibTransaction> {
                                     backgroundImage: AssetImage('assets/letter-b.png'),
                                   ),
                                 ],
-
                               ),
                             ],
                           ),
                         ),
-
                       ),
                       // Text "Business"
                       Padding(
@@ -171,7 +336,7 @@ class _GibTransactionState extends State<GibTransaction> {
                     ],
                   ),
                 ),
-              ), /// Bussiness year
+              ), /// Business year
               SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -190,7 +355,6 @@ class _GibTransactionState extends State<GibTransaction> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                           ),
-
                         ),
                         child: Padding(
                           padding:  EdgeInsets.all(16.0),
@@ -200,10 +364,10 @@ class _GibTransactionState extends State<GibTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  Text("Business Year : $g2gaccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  Text("Upto Date : $g2gtotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
                                 ],
                               ),
                               Column(
@@ -217,7 +381,6 @@ class _GibTransactionState extends State<GibTransaction> {
                           ),
                         ),
                                 ],
-
                               ),
                             ],
                           ),
@@ -265,10 +428,10 @@ class _GibTransactionState extends State<GibTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year : $visitoraccountingYear ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Upto Date : $visitortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                 ],
                               ),
                               Column(
@@ -327,10 +490,10 @@ class _GibTransactionState extends State<GibTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year : ₹ $honoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Upto Date : ₹ $honortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                 ],
                               ),
                               Column(
@@ -381,7 +544,8 @@ class _GibTransactionState extends State<GibTransaction> {
 class MyTransaction extends StatefulWidget {
   final String? userId;
   final String? userType;
-  const MyTransaction({Key? key, required this.userId, required this.userType}) : super(key: key);
+  const MyTransaction({
+    Key? key, required this.userId, required this.userType}) : super(key: key);
 
   @override
   State<MyTransaction> createState() => _MyTransactionState();
@@ -392,11 +556,205 @@ class _MyTransactionState extends State<MyTransaction> {
   String? name="";
   String? mobile="";
 
+  String? totalRows = "0";
 
+  Future<void> MygetBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            totalRows = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+          print("totalRows: $totalRows");
+          print(widget.userId);
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String accountingYear = '0';
+  Future<void> getaccountBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessCurrentYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            accountingYear = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? g2gtotalRows = "0";
+
+  Future<void> MygsgBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=Myg2gTotalYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            g2gtotalRows = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+          print("totalRows: $totalRows");
+          print(widget.userId);
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String g2gaccountingYear = '0';
+  Future<void> g2gaccountBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=Myg2gCurrentYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            g2gaccountingYear = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? visitortotalRows = "0";
+
+  Future<void> MyvisitorBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyvisitorTotalYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            visitortotalRows = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+          print("totalRows: $visitortotalRows");
+          print(widget.userId);
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String visitoraccountingYear = '0';
+  Future<void> visitoraccountBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyvisitorCurrentYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            visitoraccountingYear = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String? honortotalRows = "0";
+
+  Future<void> MyhonorBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyhonorTotalYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            honortotalRows = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+          print("totalRows: $visitortotalRows");
+          print(widget.userId);
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  String honoraccountingYear = '0';
+  Future<void> honoraccountBusinessCount() async {
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyhonorCurrentYear&user_id=${widget.userId}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          setState(() {
+            honoraccountingYear = responseData['totalRows'];
+          });
+        } else {
+          print('Error: ${response.statusCode}');
+        }
+      } else {
+        print('Error: userId is null or empty');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
   @override
   void initState() {
-    // TODO: implement initState
+    // TODO: implement initStat
     super.initState();
+    MygetBusinessCount();
+    getaccountBusinessCount();
+    MygsgBusinessCount();
+    g2gaccountBusinessCount();
+    MyvisitorBusinessCount();
+    visitoraccountBusinessCount();
+    MyhonorBusinessCount();
+    honoraccountBusinessCount();
   }
 
   @override
@@ -434,10 +792,10 @@ class _MyTransactionState extends State<MyTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year : $accountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Upto Date : $totalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                 ],
                               ),
                               Column(
@@ -474,14 +832,14 @@ class _MyTransactionState extends State<MyTransaction> {
                                 context,
                                 MaterialPageRoute(builder: (context) => ReferralPage(userType: widget.userType, userId: widget.userId,)),
                               );
-                            }, icon: Icon(Icons.chevron_right,color: Colors.black,),),
+                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ), /// Bussiness year
+              ), /// Business year
               SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -510,10 +868,10 @@ class _MyTransactionState extends State<MyTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  Text("Business Year : $g2gaccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  Text("Upto Date : $g2gtotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
                                 ],
                               ),
                               Column(
@@ -552,14 +910,14 @@ class _MyTransactionState extends State<MyTransaction> {
                                 context,
                                 MaterialPageRoute(builder: (context) =>    GtoG(userType: widget.userType, userId: widget.userId,)),
                               );
-                            }, icon: Icon(Icons.chevron_right,color: Colors.black,),),
+                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),  ///G2G
+              ),///G2G
               SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -587,10 +945,10 @@ class _MyTransactionState extends State<MyTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year : ₹ $honoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
-                                  Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Upto Date  : ₹ $honortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                 ],
                               ),
                               Column(
@@ -626,14 +984,77 @@ class _MyTransactionState extends State<MyTransaction> {
                                 context,
                                 MaterialPageRoute(builder: (context) => Direct(userId: widget.userId, userType: widget.userType)),
                               );
-                            }, icon: Icon(Icons.chevron_right,color: Colors.black,),),
+                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ), /// guest
+              ), /// Honor
+              SizedBox(height: 20,),
+              Padding(
+                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                child: Card(
+                  elevation: 5,
+                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      // Network Image
+                      Container(
+                        height: 110,
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF6096B4), Color(0xFF93BFCF)], // Gradient colors
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: Padding(
+                          padding:  EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Business Year : $visitoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  SizedBox(height: 10,),
+                                  SizedBox(height: 10,),
+                                  Text("Upto Date : $visitortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: AssetImage('assets/letter-g.png'),
+                                  ),
+                                ],
+
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Text "Business"
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'Guest',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),///guest
+
             ]
           ),
         ),
@@ -647,7 +1068,10 @@ class _MyTransactionState extends State<MyTransaction> {
 
 
 class MyTotalTransaction extends StatefulWidget {
-  const MyTotalTransaction({Key? key}) : super(key: key);
+  final String? userId;
+  final String? userType;
+  const MyTotalTransaction({
+    Key? key, required this.userId, required this.userType}) : super(key: key);
 
   @override
   State<MyTotalTransaction> createState() => _MyTotalTransactionState();
@@ -657,8 +1081,30 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
   String? mobile="";
   String? name="";
 
+  String? id ="";
+  String? totalRows = "0";
+
+  Future<void> getBusinessCount(String id) async {
+    try {
+      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&id=$id');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          totalRows = responseData['totalRows'];
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
   @override
   void initState() {
+    id = widget.userId;
+    getBusinessCount(id!);
     // TODO: implement initState
   }
   @override
@@ -696,7 +1142,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year : $totalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
                                   Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
@@ -731,7 +1177,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                     ],
                   ),
                 ),
-              ), /// Bussiness year
+              ), /// Business year
               SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -760,7 +1206,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  Text("Business Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
                                   Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
@@ -824,7 +1270,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
                                   Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
@@ -871,7 +1317,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                       Container(
                         height: 110,
                         decoration: BoxDecoration(
-                            gradient: LinearGradient(
+                            gradient: const LinearGradient(
                               colors: [Color(0xFFADD8E6), Color(0xFF98FB98)], // Gradient colors (Light blue and light green)
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -886,7 +1332,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bussiness Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  Text("Business Year", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
                                   SizedBox(height: 10,),
                                   SizedBox(height: 10,),
                                   Text("Upto Date", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
