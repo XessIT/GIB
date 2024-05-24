@@ -118,6 +118,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    $password = mysqli_real_escape_string($conn, $data->password);
    $email = mysqli_real_escape_string($conn, $data->email);
    $member_type = mysqli_real_escape_string($conn, $data->member_type);
+   $gender = mysqli_real_escape_string($conn, $data->gender);
    $first_name = mysqli_real_escape_string($conn, $data->first_name);
    $last_name = mysqli_real_escape_string($conn, $data->last_name);
    $company_name = mysqli_real_escape_string($conn, $data->company_name);
@@ -149,12 +150,16 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    $website = mysqli_real_escape_string($conn, $data->website);
    $b_year = mysqli_real_escape_string($conn, $data->b_year);
    $referrer_id = mysqli_real_escape_string($conn, $data->referrer_id);
+   $hospital_name = mysqli_real_escape_string($conn, $data->hospital_name);
+   $hospital_address = mysqli_real_escape_string($conn, $data->hospital_address);
+   $specialist = mysqli_real_escape_string($conn, $data->specialist);
     $path = "upload/$imagename";
        $query = "INSERT INTO `registration`(
        `mobile`,
        `password`,
        `email`,
        `member_type`,
+       `gender`,
        `profile_image`,
        `first_name`,
        `last_name`,
@@ -186,13 +191,17 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        `past_experience`,
        `website`,
        `b_year`,
-       `referrer_id`
+       `referrer_id`,
+       `hospital_name`,
+       `hospital_address`,
+       `specialist`
        )
        VALUES (
        '$mobile',
        '$password',
        '$email',
        '$member_type',
+       '$gender',
        '$path',
        '$first_name',
        '$last_name',
@@ -224,7 +233,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        '$past_experience',
        '$website',
        '$b_year',
-       '$referrer_id'
+       '$referrer_id',
+       '$hospital_name',
+       '$hospital_address',
+       '$specialist'
        )";
        file_put_contents($path, base64_decode($imagedata));
        $arr = [];
