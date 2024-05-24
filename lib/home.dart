@@ -4,13 +4,17 @@ import 'dart:typed_data';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gipapp/about_view.dart';
 import 'package:gipapp/profile.dart';
+import 'package:gipapp/settings_page_executive.dart';
 import 'package:gipapp/year_meeting_details.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Non_exe_pages/non_exe_home.dart';
+import 'Non_exe_pages/settings_non_executive.dart';
 import 'Offer/offer.dart';
 import 'add_member.dart';
 import 'attendance.dart';
@@ -455,440 +459,487 @@ String? memberType ="Executive";
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
       key: _scaffoldKey,
-
-      drawer:  SafeArea(
-          child: NavDrawer(userType: widget.userType.toString(), userId: widget.userId,
-          )),
-
       floatingActionButton: FloatingActionButton(onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context)=>const MeetingUpdateDate()));
       },child: const Icon(Icons.calendar_month_outlined),),
-      body: Form(
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 180),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      elevation: 0,
-                      child: Container(
+      body: WillPopScope(
+        onWillPop: () async {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.warning,
+            title: 'Exit',
+            desc: 'Do you want to Exit?',
+            width: 400,
+            btnOk: ElevatedButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                MaterialStateProperty.all<Color>(Colors.green),
+              ),
+              child: const Text(
+                'Yes',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            btnCancel: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+              ),
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ).show();
+          return false;
+        },
+        child: Form(
+          child: Stack(
+            fit: StackFit.expand,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    data.isEmpty ? SizedBox.shrink() :
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 0,
+                        child: Container(
 
-                        child: Text(
-                          'Upcoming Meetings',
-                          style:Theme.of(context).textTheme.headlineMedium,
+                          child: Text(
+                            'Upcoming Meetings',
+                            style:Theme.of(context).textTheme.headlineMedium,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    child: CarouselSlider(
-                      items: data.map((meeting) {
-                        String meetingDate = meeting['meeting_date'];
-                        String meetingPlace = meeting['place'];
-                        String meetingType = meeting['meeting_type'];
-                        String id = meeting['id'];
-                        ///                           DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container( // Wrap Card with Container
-                              width: MediaQuery.of(context).size.width, // Set width to full width of the screen
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ClayContainer(
-                                  height: 60,
-                                  width: 100,
-                                  curveType: CurveType.concave,
+                    Container(
+                      child: CarouselSlider(
+                        items: data.map((meeting) {
+                          String meetingDate = meeting['meeting_date'];
+                          String meetingPlace = meeting['place'];
+                          String meetingType = meeting['meeting_type'];
+                          String id = meeting['id'];
+                          ///                           DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return Container( // Wrap Card with Container
+                                width: MediaQuery.of(context).size.width, // Set width to full width of the screen
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ClayContainer(
+                                    height: 60,
+                                    width: 100,
+                                    curveType: CurveType.concave,
 
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text('${meeting['meeting_type']}',
-                                                style:Theme.of(context).textTheme.headlineSmall,
-                                            ),
-                                            SizedBox(width: 20,),
-                                            IconButton(
-                                                onPressed: () {
-                                                  print('press icon');
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (ctx) =>
-                                                      // Dialog box for register meeting and add guest
-                                                      AlertDialog(
-                                                        backgroundColor: Colors.grey[800],
-                                                        title:  Text(
-                                                          'Meeting',
-                                                          style:Theme.of(context).textTheme.displaySmall,
-                                                        ),
-                                                        content:  Text(
-                                                          "Do You Want to Register the Meeting?",
-                                                          style:Theme.of(context).textTheme.displaySmall,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text('${meeting['meeting_type']}',
+                                                  style:Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                              SizedBox(width: 20,),
+                                              IconButton(
+                                                  onPressed: () {
+                                                    print('press icon');
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (ctx) =>
+                                                        // Dialog box for register meeting and add guest
+                                                        AlertDialog(
+                                                          backgroundColor: Colors.grey[800],
+                                                          title:  Text(
+                                                            'Meeting',
+                                                            style:Theme.of(context).textTheme.displaySmall,
+                                                          ),
+                                                          content:  Text(
+                                                            "Do You Want to Register the Meeting?",
+                                                            style:Theme.of(context).textTheme.displaySmall,
 
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                              onPressed: () {
-                                                                GlobalKey<FormState> tempKey =GlobalKey<FormState>();
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  GlobalKey<FormState> tempKey =GlobalKey<FormState>();
 
-                                                                //store purpose..
-                                                                registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
-                                                                showDialog(
-                                                                    context: context,
-                                                                    builder: (ctx) =>
-                                                                        Form(
-                                                                          key:tempKey,
-                                                                          child: AlertDialog(
-                                                                            backgroundColor: Colors.grey[800],
-                                                                            title:  Text('Do you wish to add Guest?',
-                                                                              style:Theme.of(context).textTheme.displaySmall,
+                                                                  //store purpose..
+                                                                  registerDateStoreDatabase(id, meetingType, meetingDate, meetingPlace);
+                                                                  showDialog(
+                                                                      context: context,
+                                                                      builder: (ctx) =>
+                                                                          Form(
+                                                                            key:tempKey,
+                                                                            child: AlertDialog(
+                                                                              backgroundColor: Colors.grey[800],
+                                                                              title:  Text('Do you wish to add Guest?',
+                                                                                style:Theme.of(context).textTheme.displaySmall,
 
-                                                                            ),
-                                                                            content: TextFormField(
-                                                                              controller: guestcount,
-                                                                              validator: (value){
-                                                                                if(value!.isEmpty){
-                                                                                  return "* Enter a Guest Count";
-                                                                                }
-                                                                                return null;
-                                                                              },
-                                                                              decoration:  InputDecoration(
-                                                                                labelText: "Guest Count",
-                                                                                labelStyle:Theme.of(context).textTheme.displaySmall,
-
-                                                                                hintText: "Ex:5",
                                                                               ),
-                                                                            ),
+                                                                              content: TextFormField(
+                                                                                controller: guestcount,
+                                                                                validator: (value){
+                                                                                  if(value!.isEmpty){
+                                                                                    return "* Enter a Guest Count";
+                                                                                  }
+                                                                                  return null;
+                                                                                },
+                                                                                decoration:  InputDecoration(
+                                                                                  labelText: "Guest Count",
+                                                                                  labelStyle:Theme.of(context).textTheme.displaySmall,
 
-                                                                            actions: [
-                                                                              TextButton(
-                                                                                  onPressed: () {
-                                                                                    if(tempKey.currentState!.validate()) {
-                                                                                      Navigator.push(
-                                                                                          context,
-                                                                                          MaterialPageRoute(
-                                                                                              builder: (
-                                                                                                  context) =>
-                                                                                                  VisitorsSlip
-                                                                                                    (
-                                                                                                      userId:widget.userId,
-                                                                                                      meetingId:id,
-                                                                                                      guestcount: guestcount.text.trim(),
-                                                                                                      userType:widget.userType,
-                                                                                                      meeting_date:meetingDate,
-                                                                                                      user_mobile:fetchMobile.toString()
-                                                                                                  )));
-                                                                                      print("UserID:-${widget.userId}${widget.userType}");
-                                                                                    } },
-                                                                                  child:  Text('Yes',style:Theme.of(context).textTheme.displaySmall,
-
-                                                                                  )
+                                                                                  hintText: "Ex:5",
+                                                                                ),
                                                                               ),
-                                                                              TextButton(
-                                                                                  onPressed: () {
-                                                                                  },
-                                                                                  child:  Text('No', style:Theme.of(context).textTheme.displaySmall,
-                                                                                  ))
-                                                                            ],
-                                                                          ),
-                                                                        )
-                                                                );
-                                                              },
-                                                              child:  Text('OK',    style:Theme.of(context).textTheme.displaySmall,
-                                                              )),
-                                                          TextButton(
-                                                              onPressed: () {
-                                                                Navigator.pop(context);
-                                                              },
-                                                              child:  Text('Cancel', style:Theme.of(context).textTheme.displaySmall,))
-                                                        ],
-                                                      )
-                                                  );
-                                                },
-                                                icon: const Icon(
-                                                  Icons.person_add_alt_1_rounded,
-                                                  color: Colors.green,
 
-                                                ))
-                                          ],
+                                                                              actions: [
+                                                                                TextButton(
+                                                                                    onPressed: () {
+                                                                                      if(tempKey.currentState!.validate()) {
+                                                                                        Navigator.push(
+                                                                                            context,
+                                                                                            MaterialPageRoute(
+                                                                                                builder: (
+                                                                                                    context) =>
+                                                                                                    VisitorsSlip
+                                                                                                      (
+                                                                                                        userId:widget.userId,
+                                                                                                        meetingId:id,
+                                                                                                        guestcount: guestcount.text.trim(),
+                                                                                                        userType:widget.userType,
+                                                                                                        meeting_date:meetingDate,
+                                                                                                        user_mobile:fetchMobile.toString()
+                                                                                                    )));
+                                                                                        print("UserID:-${widget.userId}${widget.userType}");
+                                                                                      } },
+                                                                                    child:  Text('Yes',style:Theme.of(context).textTheme.displaySmall,
+
+                                                                                    )
+                                                                                ),
+                                                                                TextButton(
+                                                                                    onPressed: () {
+                                                                                    },
+                                                                                    child:  Text('No', style:Theme.of(context).textTheme.displaySmall,
+                                                                                    ))
+                                                                              ],
+                                                                            ),
+                                                                          )
+                                                                  );
+                                                                },
+                                                                child:  Text('OK',    style:Theme.of(context).textTheme.displaySmall,
+                                                                )),
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(context);
+                                                                },
+                                                                child:  Text('Cancel', style:Theme.of(context).textTheme.displaySmall,))
+                                                          ],
+                                                        )
+                                                    );
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.person_add_alt_1_rounded,
+                                                    color: Colors.green,
+
+                                                  ))
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height:5,),
+                                        SizedBox(height:5,),
 
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                                          children: [
-                                            Text('${meeting['meeting_date']}',
-                                              style:Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                            Text('${meeting['meeting_name']}',
-                                              style:Theme.of(context).textTheme.bodySmall,
-                                            ),
-                                          ],
+                                            children: [
+                                              Text('${meeting['meeting_date']}',
+                                                style:Theme.of(context).textTheme.bodySmall,
+                                                  ),
+                                              Text('${meeting['meeting_name']}',
+                                                style:Theme.of(context).textTheme.bodySmall,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
 
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              '${_formatTimeString(meeting['from_time'])} to ${_formatTimeString(meeting['to_time'])}',
-                                              style:Theme.of(context).textTheme.bodySmall,
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '${_formatTimeString(meeting['from_time'])} to ${_formatTimeString(meeting['to_time'])}',
+                                                style:Theme.of(context).textTheme.bodySmall,
 
-                                            ),
-                                       // Space between icon and text
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  WidgetSpan(
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(right: 5.0), // Adjust the spacing as needed
-                                                      child: Icon(Icons.location_on, color: Colors.green),
+                                              ),
+                                         // Space between icon and text
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    WidgetSpan(
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(right: 5.0), // Adjust the spacing as needed
+                                                        child: Icon(Icons.location_on, color: Colors.green),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: meeting['place'],
-                                                    style: Theme.of(context).textTheme.bodySmall,
-                                                  ),
-                                                ],
+                                                    TextSpan(
+                                                      text: meeting['place'],
+                                                      style: Theme.of(context).textTheme.bodySmall,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+
+                                            ],
+                                          ),
+                                        ),
+
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                        options: CarouselOptions(
+                          height: 170.0,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                          aspectRatio: 16 / 9,
+                          autoPlayCurve: Curves.fastOutSlowIn,
+                          enableInfiniteScroll: false,
+                          autoPlayAnimationDuration: Duration(milliseconds: 800),
+                          viewportFraction: 1,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Offers',
+                        style: GoogleFonts.aBeeZee(
+                          fontSize: 16,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),/// offer
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+                      child: ListView.builder(
+                          itemCount: data1.length,
+                          itemBuilder: (context, i) {
+                            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data1[i]["offer_image"]}';
+                            String dateString = data1[i]['validity']; // This will print the properly encoded URL
+                            DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+                            return Center(
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                  Stack(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children:  [
+                                        //CIRCLEAVATAR STARTS
+                                        CircleAvatar(
+                                          radius: 30.0,
+                                          backgroundColor: Colors.cyan,
+                                          backgroundImage: NetworkImage(imageUrl),
+                                          //IMAGE STARTS CIRCLEAVATAR
+                                          //  Image.network('${data[i]['offer_image']}').image,
+                                        ),
+                                        //END CIRCLEAVATAR
+                                        SizedBox(width: 20),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start, // Align texts to the start
+                                          children: [
+                                            // START TEXTS
+                                            Text(
+                                              '${data1[i]['company_name']}',
+                                              // Text style starts
+                                              style: const TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 15,
                                               ),
                                             ),
-
-
+                                            // start texts
+                                            Text(
+                                              '${data1[i]['offer_type']} - ${data1[i]['name']}',
+                                              // Text style starts
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text("Mobile - ${data1[i]['mobile']}",
+                                              // New date format
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            // Text starts
+                                            Text("Validity - ${DateFormat('d MMMM yyyy').format(dateTime)}",
+                                              // New date format
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    data1[i]['discount'].toString().isEmpty ? Container() :
+                                    Positioned(
+                                      top: 8,
+                                      right: 8, // Adjust position if needed
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.red, // Change the color here
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10.0),
+                                            bottomRight: Radius.circular(10.0),
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                                        child: Row(
+                                          children: [
+                                            /*Text(
+                                                    'Offers', // Label for the banner
+                                                    style: TextStyle(
+                                                      color: Colors.white, // Change the text color here
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12.0, // Adjust font size as needed
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 4.0),*/ // Space between the label and the discount
+                                            Text(
+                                              '${data1[i]['discount']}% off', // Text for your banner
+                                              style: TextStyle(
+                                                color: Colors.white, // Change the text color here
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FontStyle.italic, // Add any additional styles here
+                                                fontSize: 12.0, // Adjust font size as needed
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-
+                                    ),
+                                    ],
+                                  ),
                                     ],
                                   ),
                                 ),
                               ),
                             );
-                          },
-                        );
-                      }).toList(),
-                      options: CarouselOptions(
-                        height: 170.0,
-                        enlargeCenterPage: true,
-                        autoPlay: true,
-                        aspectRatio: 16 / 9,
-                        autoPlayCurve: Curves.fastOutSlowIn,
-                        enableInfiniteScroll: false,
-                        autoPlayAnimationDuration: Duration(milliseconds: 800),
-                        viewportFraction: 1,
+                          }
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-              AnimatedContainer(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFf0f0f0),
-                    borderRadius: BorderRadius.circular(10),
+                  ],
                 ),
-                duration: Duration(seconds: 1),
-                curve: Curves.fastOutSlowIn,
               ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      elevation: 0,
-                      child: Container(
-
-                        child: Text(
-                          'Offer',
-                          style:Theme.of(context).textTheme.headlineMedium,
-                        ),
-                      ),
-                    ),
-                  ), /// offer
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
-                    child: ListView.builder(
-                        itemCount: data1.length,
-                        itemBuilder: (context, i) {
-                          String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data1[i]["offer_image"]}';
-                          String dateString = data1[i]['validity']; // This will print the properly encoded URL
-                          DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-                          return Center(
-                            child: Card(
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 5,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children:  [
-                                      //CIRCLEAVATAR STARTS
-                                      CircleAvatar(
-                                        radius: 40,
-                                        backgroundColor: Colors.cyan,
-                                        backgroundImage: NetworkImage(imageUrl),
-                                        //IMAGE STARTS CIRCLEAVATAR
-                                        //  Image.network('${data[i]['offer_image']}').image,
-                                        child: Stack(
-                                          children: [
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              //STARTS CIRCLE AVATAR OFFER
-                                              child: CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundColor: Colors.green,
-                                                  child: Text('${data1[i]['discount']}%',
-                                                      style: Theme.of(context).textTheme.displaySmall
-                                                  )
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      //END CIRCLEAVATAR
-
-                                      Column(
-                                        children: [
-                                          //START TEXTS
-                                          Text('${data1[i]['company_name']}',
-                                            //Text style starts
-                                              style: Theme.of(context).textTheme.headlineMedium
-
-                                          ),
-                                           SizedBox(height: 5,),
-                                          //start texts
-                                          Text('${data1[i]['offer_type']} - ${data1[i]['name']}',
-                                            //Text style starts
-                                              style: Theme.of(context).textTheme.bodySmall
-                                          ),
-                                          //Text starts
-                                          Text(DateFormat('dd-MM-yyyy').format(dateTime),
-                                              style: Theme.of(context).textTheme.bodySmall
-                                          ),
-                                          SizedBox(height: 15,),
-
-                                        ],
-                                      ),
-
-                                    ],
-                                  ),
-                                  SizedBox(height: 5,),
-
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right:0,
-              child:ClipPath(
-                clipper: CurveClipper(),
-                child: Container(
-                  height: 100,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.green,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 20),
-                        child: Text(
-                          'GIB',
-                          style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 20),
-                        child: IconButton(
-                          icon: Icon(Icons.menu, color: Colors.white),
-                          onPressed: () {
-                            print('press nav drawer');
-                            _scaffoldKey.currentState!.openDrawer();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ), ),
-            Positioned(
-              top: 80,
-              left: 20,
-              right: 20,
-              child: Card(
-                child: SizedBox(
-                  height: 80,
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          height: 300,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                            ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right:0,
+                child:ClipPath(
+                  clipper: CurveClipper(),
+                  child: Container(
+                    height: 100,
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.green,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Text(
+                            'GIB',
+                            style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            Text(
-                              userdata.isNotEmpty ? userdata[0]["first_name"] : "",
-                              style: GoogleFonts.aBeeZee(
-                                fontSize: 20,
-                                color: Colors.indigo,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Executive Member',
-                                  style: GoogleFonts.aBeeZee(
-                                    fontSize: 10,
-                                    color: Colors.indigo,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        /*Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: IconButton(
+                            icon: Icon(Icons.menu, color: Colors.white),
+                            onPressed: () {
+                              print('press nav drawer');
+                              _scaffoldKey.currentState!.openDrawer();
+                            },
+                          ),
+                        ),*/
+                      ],
+                    ),
+                  ),
+                ), ),
+              Positioned(
+                top: 80,
+                left: 1,
+                right: 1,
+                child: Card(
+                  child: SizedBox(
+                    height: 80,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            radius: 28.0, // Adjust the radius to achieve the desired size
+                            backgroundImage: NetworkImage(imageUrl),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 10),
+                              Text(
+                                userdata.isNotEmpty ? userdata[0]["first_name"] : "",
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 20,
+                                  color: Colors.indigo,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              Text(
+                                'Executive Member',
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 10,
+                                  color: Colors.indigo,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -897,345 +948,125 @@ String? memberType ="Executive";
 
 }
 
-class NavDrawer extends StatefulWidget {
 
-  final String userType;
+class NavigationBarExe extends StatefulWidget {
   final String? userId;
+  final String? userType;
 
-  NavDrawer({
+  NavigationBarExe({
     Key? key,
-
-    required this.userType,
     required this.userId,
-
+    required this.userType,
   }) : super(key: key);
 
   @override
-  State<NavDrawer> createState() => _NavDrawerState();
+  _NavigationBarExeState createState() => _NavigationBarExeState();
 }
+class _NavigationBarExeState extends State<NavigationBarExe> {
+  int _currentIndex = 0;
 
-class _NavDrawerState extends State<NavDrawer> {
+  late List<Widget> _pages;
   @override
-  Widget build(BuildContext context) {
-    //print('lastName in NavDrawer: ${widget.lastName}');
-
-    return Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              tileColor: Colors.green[800],
-              leading: IconButton(
-                icon: const Icon(Icons.house,color: Colors.white,size: 30.0,),
-                onPressed: (){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>   Home(userType: '', userId: '',)));
-                }, ),
-              title: const Text('Home',
-                style: TextStyle(fontSize: 20.0,color: Colors.white),),
-              onTap: () => {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) =>   RowCounter()),
-                // )
-              },
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.snowshoeing,color: Colors.white,),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>  Activity(userId: widget.userId, userType: widget.userType,)),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.notifications,color: Colors.white,),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>  const NotificationScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle_sharp,color: Colors.green,),
-              title: Text('Profile',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>   Profile(
-                    userType: widget.userType,
-                    userID: widget.userId,
-                  )),
-                ),
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.oil_barrel,color: Colors.green,),
-              title: Text('Business',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BusinessPage(userType: widget.userType, userId: widget.userId,)),
-                )
-              },
-            ),
-
-            const Divider(color: Colors.grey,),
-
-            ListTile(
-              leading: const Icon(Icons.account_tree,color: Colors.green,),
-              title: Text('Meeting',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const MeetingUpcoming()),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.oil_barrel,color: Colors.green,),
-              title: Text('Attendance',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const Attendance()),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.qr_code,color: Colors.green,),
-              title: Text('Attendance Scanner',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>   AttendanceScanner()),
-                )
-              },
-            ),
-
-            const Divider(color: Colors.grey,),
-
-            ListTile(
-              leading: const Icon(Icons.photo,color: Colors.green,),
-              title: Text('My Gallery',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  MyGallery(userId: widget.userId)),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.photo,color: Colors.green,),
-              title: Text('GiB Gallery',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const GibGallery()),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.emoji_events,color: Colors.green,),
-              title: Text('GiB Achievements',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const GibAchievements()),
-                )
-              },
-            ),
-
-
-            const Divider(color: Colors.grey,),
-
-            ListTile(
-              leading: const Icon(Icons.supervisor_account,color: Colors.green,),
-              title: Text('GiB Members',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GibMembers(
-                    userType: widget.userType,
-                    userId: widget.userId,
-                  )),
-                )
-              },
-            ), /// gib members
-
-            ListTile(
-              leading: const Icon(Icons.person_add,color: Colors.green,),
-              title: Text('Add Member',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                     MaterialPageRoute(builder: (context) =>   AddMember(userId:widget.userId,userType:widget.userType)),
-               //   MaterialPageRoute(builder: (context) =>    AddMemberView(userID:widget.userId,userType:widget.userType,)),
-                )
-              },
-            ),  ///
-
-            ListTile(
-              leading: const Icon(Icons.local_offer,color: Colors.green,),
-              title: Text('Offers',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                 Navigator.push(
-                   context,
-                   MaterialPageRoute(builder: (context) =>  OffersPage(
-                     userId: widget.userId,
-                     userType: widget.userType,
-                   )),
-                 )
-              },
-            ),  /// offers
-
-            const Divider(color: Colors.grey,),
-
-            ListTile(
-              leading: const Icon(Icons.add_circle,color: Colors.red,),
-              title: Text('GiB Doctors',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  const GibDoctors()),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.bloodtype,color: Colors.red,),
-              title: Text('Blood Group',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BloodGroup(userId:widget.userId,userType:widget.userType)),
-                )
-              },
-            ),
-
-            const Divider(color: Colors.grey,),
-
-            ListTile(
-              leading: const Icon(Icons.info,color: Colors.green,),
-              title: Text('About GiB',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  AboutTab(userId:widget.userId,userType:widget.userType))
-                )
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.fingerprint,color: Colors.green,),
-              title: Text('Change M-Pin',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>   ChangeMPin(  userType:  widget.userType,
-                    userID:widget.userId,)),
-                )
-              },
-            ),
-
-            ListTile(
-              leading: Icon(
-                Icons.logout,
-                color: Colors.red,
-              ),
-              title: Text(
-                'Log Out',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              onTap: () {
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.noHeader,
-                  width: 350,
-                  body: StatefulBuilder(
-                    builder: (context, setState) {
-                      return Container(
-                          padding: EdgeInsets.all(20),
-                          child: Text("Are you sure want to Log out"));
-                    },
-                  ),
-                  btnOk: ElevatedButton(
-                    onPressed: () async {
-                      SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                      await prefs.setBool('isLoggedIn', false);
-
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                      // Handle OK button press
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.green),
-                    ),
-                    child: Text(
-                      'Yes',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  btnCancel: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.red),
-                    ),
-                    child: Text(
-                      'No',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ).show();
-                // Update UI based on item 2
-              },
-            ),
-          ],
-        )
-    );
+  void initState() {
+    _pages = [
+      Home(userId: widget.userId, userType: widget.userType),
+      OffersPage(userId: widget.userId, userType: widget.userType),
+       AttendancePage(userID: widget.userId, userType: widget.userType.toString()),
+      AttendanceScannerPage(userID: widget.userId, userType: widget.userType.toString()),
+      SettingsPageExecutive(userId: widget.userId, userType: widget.userType),
+    ];
+    super.initState();
   }
 
-  signOut() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) =>  const Login()),
-    );  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        // backgroundColor: Colors.white,
+        items:  <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home_outlined,
+              color: Theme.of(context)
+                  .brightness ==
+                  Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.local_offer,
+              color: Theme.of(context)
+                  .brightness ==
+                  Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
+            ),
+            label: 'Offers',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.supervisor_account,
+              color: Theme.of(context)
+                  .brightness ==
+                  Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
+            ),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.qr_code_scanner,
+              color: Theme.of(context)
+                  .brightness ==
+                  Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
+            ),
+            label: 'Att Scan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.settings,
+              color: Theme.of(context)
+                  .brightness ==
+                  Brightness.light
+                  ? Colors.black45
+                  : Colors.white,
+            ),
+            label: 'Settings',
+          ),
+        ],
+        type:
+        BottomNavigationBarType.fixed, // Set type to fixed for text labels
+        currentIndex: _currentIndex,
+        // selectedItemColor: Theme.of(context).brightness == Brightness.light
+        //     ? Colors.black45
+        //     : Colors.white,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.light
+            ? Colors.black45
+            : Colors.white,
+        iconSize: 30,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        elevation: 5,
+        selectedLabelStyle: TextStyle(color: Colors.white),
+        unselectedLabelStyle: TextStyle(color: Colors.white),
+        selectedIconTheme:
+        IconThemeData(color: Colors.green), // Set selected icon color
+      ),
+    );
+  }
 }
+
 
 
 

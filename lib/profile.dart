@@ -90,7 +90,7 @@ class _ViewState extends State<View> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Home(
+                    builder: (context) => NavigationBarExe(
                       userType: widget.userType.toString(),
                       userId: widget.userID.toString(),
                     ),
@@ -130,7 +130,7 @@ class _ViewState extends State<View> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Home(
+                    builder: (context) => NavigationBarExe(
                       userType: widget.userType.toString(),
                       userId: widget.userID.toString(),
                     ),

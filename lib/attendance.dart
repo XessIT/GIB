@@ -2,21 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'Non_exe_pages/non_exe_home.dart';
+import 'guest_home.dart';
 import 'home.dart';
 import 'home1.dart';
 
-class Attendance extends StatelessWidget {
-  const Attendance({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body:  AttendancePage(),
-    );
-  }
-}
 class AttendancePage extends StatefulWidget {
-  const AttendancePage({Key? key}) : super(key: key);
+  final String userType;
+  final String? userID;
+  const AttendancePage({super.key,
+    required this.userType,
+    required this. userID,});
 
   @override
   State<AttendancePage> createState() => _AttendancePageState();
@@ -28,33 +23,82 @@ class _AttendancePageState extends State<AttendancePage> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Attendance'),
+          title:  Text('Attendance'),
           centerTitle: true,
           leading:IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NavigationBarNon(
-                      userType: '',
-                      userId: '',
+                if (widget.userType == "Non-Executive") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NavigationBarNon(
+                        userType: widget.userType.toString(),
+                        userId: widget.userID.toString(),
+                      ),
                     ),
-                  ),
-                );              },
+                  );
+                }
+                else if (widget.userType == "Guest") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GuestHome(
+                        userType: widget.userType.toString(),
+                        userId: widget.userID.toString(),
+                      ),
+                    ),
+                  );
+                }
+                else{
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NavigationBarExe(
+                        userType: widget.userType.toString(),
+                        userId: widget.userID.toString(),
+                      ),
+                    ),
+                  );
+                }
+                },
               icon: const Icon(Icons.arrow_back)),
         ),
         body:PopScope(
           canPop: false,
             onPopInvoked: (didPop)  {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NavigationBarNon(
-                    userType: '',
-                    userId: '',
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
                   ),
-                ),
-              );
+                );
+              }
+              else if (widget.userType == "Guest") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GuestHome(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
+                      userType: widget.userType.toString(),
+                      userId: widget.userID.toString(),
+                    ),
+                  ),
+                );
+              }
             },
 
           child: Column(

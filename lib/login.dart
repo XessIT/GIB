@@ -28,10 +28,7 @@ class LoginSubClass extends StatefulWidget {
   State<LoginSubClass> createState() => _LoginSubClassState();
 }
 
-
-
 class _LoginSubClassState extends State<LoginSubClass> {
-
   bool _isObscure = true;
   final _formKey = GlobalKey<FormState>();
   bool valuefirst = false;
@@ -43,11 +40,11 @@ class _LoginSubClassState extends State<LoginSubClass> {
   String verificationIDReceived = "";
   bool otpCodeVisible = false;
 
-
   @override
   void initState() {
     super.initState();
   }
+
   String? firstName;
   String? userType;
   String? lastName;
@@ -77,7 +74,8 @@ class _LoginSubClassState extends State<LoginSubClass> {
   Future<void> signIn() async {
     try {
       var response = await http.get(
-        Uri.parse("http://localhost/GIB/lib/GIBAPI/user.php?mobile=${mobilecontroller.text.trim()}&password=${passwordController.text.trim()}"),
+        Uri.parse(
+            "http://localhost/GIB/lib/GIBAPI/user.php?mobile=${mobilecontroller.text.trim()}&password=${passwordController.text.trim()}"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -86,10 +84,6 @@ class _LoginSubClassState extends State<LoginSubClass> {
       if (response.statusCode == 200) {
         print("Sign In response: ${response.body}");
         var responseData = jsonDecode(response.body);
-        /* final List<dynamic> itemGroups = responseData;
-        setState(() {
-          data = itemGroups.cast<Map<String, dynamic>>();
-        });*/
 
         if (responseData.containsKey("status")) {
           print("Authentication successful");
@@ -110,35 +104,36 @@ class _LoginSubClassState extends State<LoginSubClass> {
             print("USER: $userId");
           });
 
-        //  Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
           // Navigate based on user type
           switch (memberType) {
             case "Executive":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Homepage(
-                  userType: userType,
-                  userID: userId,
-                )),
+                MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
+                          userType: userType,
+                          userId: userId,
+                        )),
               );
               break;
             case "Non-Executive":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NavigationBarNon(
-                  userType: userType,
-                  userId:userId,
-                )),
+                MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                          userType: userType,
+                          userId: userId,
+                        )),
               );
               break;
             case "Guest":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => GuestHome(
-
-                  userType: userType,
-                  userId: userId,
-                 )),
+                MaterialPageRoute(
+                    builder: (context) => GuestHome(
+                          userType: userType,
+                          userId: userId,
+                        )),
               );
               break;
             default:
@@ -148,22 +143,23 @@ class _LoginSubClassState extends State<LoginSubClass> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Successfully Signin")),
           );
-        } else if (responseData.containsKey("error")) {
-          print(responseData["error"]);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseData["error"])),
-          );
         } else {
           print("Unknown response format: $responseData");
         }
       } else {
+        var responseData = jsonDecode(response.body);
         print("Error: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData["error"])),
+        );
       }
     } catch (e) {
       print("Error during sign in: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred during sign in")),
+      );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -171,8 +167,11 @@ class _LoginSubClassState extends State<LoginSubClass> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: const AssetImage("assets/logo.png",),
-              colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.07), BlendMode.dstATop),
+              image: const AssetImage(
+                "assets/logo.png",
+              ),
+              colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.07), BlendMode.dstATop),
               fit: BoxFit.fill),
         ),
         child: SingleChildScrollView(
@@ -181,27 +180,36 @@ class _LoginSubClassState extends State<LoginSubClass> {
               key: _formKey,
               child: Column(
                 children: [
-                  const SizedBox(height: 90,),
+                  const SizedBox(
+                    height: 90,
+                  ),
                   // Logo
                   Image.asset('assets/home.png'),
 
                   // Title
-                  Text('Gounders In Business',
-                    style: Theme.of(context).textTheme.displayLarge,),
+                  Text(
+                    'Gounders In Business',
+                    style: Theme.of(context).textTheme.displayLarge,
+                  ),
 
-
-                  const Text('Since 2015',
-                    style: TextStyle(fontStyle: FontStyle.italic),),
+                  const Text(
+                    'Since 2015',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
 
                   // Mobile number textfield starts
-                  const SizedBox(height: 15,),
+                  const SizedBox(
+                    height: 15,
+                  ),
 
-                  const SizedBox(height: 5,),
+                  const SizedBox(
+                    height: 5,
+                  ),
                   SizedBox(
                     width: 300,
                     child: TextFormField(
                       controller: mobilecontroller,
-                      validator: (value)  {
+                      validator: (value) {
                         if (value!.isEmpty) {
                           return '* Enter your Mobile Number';
                         } else {
@@ -220,7 +228,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
                     ),
                   ),
 
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   SizedBox(
                     width: 300,
                     // child: Visibility(
@@ -242,7 +252,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
                         // hintText: 'Enter your Password',
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isObscure ? Icons.visibility : Icons.visibility_off,
+                            _isObscure
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -259,47 +271,51 @@ class _LoginSubClassState extends State<LoginSubClass> {
                     ),
                   ),
 
-
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   const Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-
-
-
-                      SizedBox(width: 140,),
-
+                      SizedBox(
+                        width: 140,
+                      ),
                     ],
                   ),
 
-                  const SizedBox(height: 15,),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Login button starts
                       MaterialButton(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
                         minWidth: 130,
                         height: 50,
                         color: Colors.green[900],
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             final String mobile = mobilecontroller.text.trim();
-                            final String password = passwordController.text.trim();
+                            final String password =
+                                passwordController.text.trim();
 
                             if (mobile.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Mobile Number is empty")),
+                                const SnackBar(
+                                    content: Text("Mobile Number is empty")),
                               );
                             } else if (password.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Password is empty")),
+                                const SnackBar(
+                                    content: Text("Password is empty")),
                               );
-                            } else if (mobile.isNotEmpty && password.isNotEmpty){
+                            } else if (mobile.isNotEmpty &&
+                                password.isNotEmpty) {
                               await signIn();
-                            }
-                            else {
-
+                            } else {
                               // Your login logic here
 
                               /* Navigator.push(
@@ -308,17 +324,17 @@ class _LoginSubClassState extends State<LoginSubClass> {
                               );*/
                             }
                           }
-
                         },
-                        child: const Text("Login", style: TextStyle(color: Colors.white)),
+                        child: const Text("Login",
+                            style: TextStyle(color: Colors.white)),
                       ),
 
                       // Login button ends
-
-
                     ],
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   /*  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -358,40 +374,63 @@ class _LoginSubClassState extends State<LoginSubClass> {
                   ),*/
 
                   // Forgot M-Pin text button starts
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(140, 0, 0, 0),
                     child: TextButton(
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.push(
-                            context, MaterialPageRoute(builder: (context) =>  PasswordResetPage()),
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PasswordResetPage()),
                           );
                         },
                         child: Text('Forgot M-Pin?',
-                            style: TextStyle(color: Colors.green[900],fontWeight: FontWeight.bold,fontSize: 15))),
+                            style: TextStyle(
+                                color: Colors.green[900],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15))),
                   ),
                   // Forgot M-Pin text button ends
 
-                  const SizedBox(height: 15,),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   //const SizedBox(width: 90,),
-                  const Text('Continue as Guest or Member?',
-                    style: TextStyle(fontSize: 17.0),),
+                  const Text(
+                    'Continue as Guest or Member?',
+                    style: TextStyle(fontSize: 17.0),
+                  ),
                   TextButton(
-                      onPressed: (){
+                      onPressed: () {
                         Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => const Registration()),
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Registration()),
                         );
                       },
                       child: Text('Registration',
-                          style: TextStyle(color: Colors.green[900],fontWeight: FontWeight.bold,fontSize: 17.0))),
+                          style: TextStyle(
+                              color: Colors.green[900],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17.0))),
                   // Register text button starts
-                  const SizedBox(height: 30,),
-                  const Text('Developed By KAN INFOTECH',
-                    style: TextStyle(fontSize: 16,color: Colors.orangeAccent,fontWeight: FontWeight.bold),),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  const Text(
+                    'Developed By KAN INFOTECH',
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.orangeAccent,
+                        fontWeight: FontWeight.bold),
+                  ),
 
-
-                  const SizedBox(height: 5,)
-
+                  const SizedBox(
+                    height: 5,
+                  )
                 ],
               ),
             ),
@@ -414,17 +453,13 @@ class SwitchClass extends State {
   var textValue = 'Switch is OFF';
 
   void toggleSwitch(bool value) {
-
-    if(isSwitched == false)
-    {
+    if (isSwitched == false) {
       setState(() {
         isSwitched = true;
         textValue = 'Switch Button is ON';
       });
       // print('Switch Button is ON');
-    }
-    else
-    {
+    } else {
       setState(() {
         isSwitched = false;
         textValue = 'Switch Button is OFF';
@@ -432,25 +467,23 @@ class SwitchClass extends State {
       // print('Switch Button is OFF');
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children:[
-          SizedBox(
-            width: 30,
-            height: 20,
-            child: Switch(
-              onChanged: toggleSwitch,
-              value: isSwitched,
-              activeColor: Colors.grey,
-              activeTrackColor: Colors.green,
-              inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey[400],
-            ),
-          )
-          // Text('$textValue', style: TextStyle(fontSize: 20),)
-        ]);
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      SizedBox(
+        width: 30,
+        height: 20,
+        child: Switch(
+          onChanged: toggleSwitch,
+          value: isSwitched,
+          activeColor: Colors.grey,
+          activeTrackColor: Colors.green,
+          inactiveThumbColor: Colors.grey,
+          inactiveTrackColor: Colors.grey[400],
+        ),
+      )
+      // Text('$textValue', style: TextStyle(fontSize: 20),)
+    ]);
   }
 }
-

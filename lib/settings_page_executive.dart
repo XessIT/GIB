@@ -15,14 +15,14 @@ import '../gib_gallery.dart';
 import '../gib_members.dart';
 import '../login.dart';
 import '../profile.dart';
-import 'non_exe_home.dart';
+import 'home.dart';
 
 
 
-class SettingsPageNon extends StatelessWidget {
+class SettingsPageExecutive extends StatelessWidget {
   final String? userId;
   final String? userType;
-  const SettingsPageNon({super.key, required this.userId,required this.userType }) ;
+  const SettingsPageExecutive({super.key, required this.userId,required this.userType }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class SettingsPageNon extends StatelessWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBarNon(userType: userType.toString(), userId: userId.toString(),)));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBarExe(userType: userType.toString(), userId: userId.toString(),)));
           },
         ),
 
@@ -66,7 +66,7 @@ class SettingsPageNon extends StatelessWidget {
       body: PopScope(
         canPop: false,
         onPopInvoked: (didPop)  {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBarNon(userType: userType.toString(), userId: userId.toString(),)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBarExe(userType: userType.toString(), userId: userId.toString(),)));
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -96,9 +96,9 @@ class SettingsPageNon extends StatelessWidget {
                   ),
                   SettingsItem(
                     onTap: () {
-                        Navigator.push(
+                      Navigator.push(
                         context,
-                      MaterialPageRoute(builder: (context) =>   AttendancePage( userType: userType.toString(), userID: userId.toString(),)),
+                        MaterialPageRoute(builder: (context) =>   AttendancePage(userType: userType.toString(), userID: userId.toString(),)),
                       );
                     },
                     icons: Icons.fingerprint_outlined,
@@ -112,8 +112,8 @@ class SettingsPageNon extends StatelessWidget {
                   ),
                   SettingsItem(
                     onTap: () {
-                        Navigator.push(context,
-                       MaterialPageRoute(builder: (context) =>   AttendanceScannerPage( userType: userType.toString(), userID: userId.toString(),)),
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (context) =>   AttendanceScannerPage( userType: userType.toString(), userID: userId.toString(),)),
                       );
                     },
                     icons: Icons.scanner_outlined,
@@ -150,10 +150,10 @@ class SettingsPageNon extends StatelessWidget {
                 items: [
                   SettingsItem(
                     onTap: () {
-                         Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>   GibGallery( userType: userType.toString(), userID: userId.toString(),)),
-                          );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>   GibGallery(userType: userType.toString(), userID: userId.toString(),)),
+                      );
                     },
                     icons: CupertinoIcons.photo_on_rectangle,
                     iconStyle: IconStyle(
@@ -267,7 +267,7 @@ class SettingsPageNon extends StatelessWidget {
                   ),
                 ],
               ),
-             /* SettingsGroup(
+              /* SettingsGroup(
                 items: [
                   SettingsItem(
                     onTap: () {
@@ -295,7 +295,7 @@ class SettingsPageNon extends StatelessWidget {
               ),*/
               // You can add a settings title
               SettingsGroup(
-               // settingsGroupTitle: "Account",
+                // settingsGroupTitle: "Account",
                 items: [
                   SettingsItem(
                     onTap: () {

@@ -38,8 +38,9 @@ $website = $_POST['website'];
 $business_keywords = $_POST['business_keywords'];
 $marital_status = $_POST['marital_status'];
 $b_year = $_POST['b_year'];
-/* $member_type =$_POST['member_type'];
-$role =$_POST['role']; */
+$member_type =$_POST['member_type'];
+$gender =$_POST['gender'];
+$role =$_POST['role'];
 
 // Update data in the 'Registration' table
 // $sql = "UPDATE Registration SET
@@ -98,8 +99,9 @@ $sql = "UPDATE registration SET
         marital_status = '$marital_status',
         website = '$website',
         b_year = '$b_year',
-        /* member_type ='$member_type',
-        role ='$role' */
+        member_type ='$member_type',
+        gender ='$gender',
+        role ='$role'
         WHERE id = '$id'";
 
 $result = $con->query($sql);
