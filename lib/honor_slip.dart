@@ -484,6 +484,7 @@ class _DirectState extends State<Direct> {
       final response = await http.post(
         url,
         body: jsonEncode({
+          'user_id':widget.userId,
           "Toname": tocontroller.text.trim(),
           "Tomobile": tomobilenocontroller.text.trim(),
           "Tocompanyname": companynamecontroller.text.trim(),
@@ -512,7 +513,7 @@ class _DirectState extends State<Direct> {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: AppBar(
-        title: Text("Honor Slip", style: Theme.of(context).textTheme.bodySmall),
+        title: Text("Honor Slip", style: Theme.of(context).textTheme.displayLarge),
         centerTitle: true,
         actions: [
           IconButton(
@@ -794,7 +795,7 @@ class _DirectState extends State<Direct> {
               ),
               SizedBox(height: 10,),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Login button starts
                   MaterialButton(
@@ -816,15 +817,7 @@ class _DirectState extends State<Direct> {
                         style: TextStyle(color: Colors.white),)),
                   // Login button ends
                   // Sign up button starts
-                  MaterialButton(
-                      minWidth: 100,
-                      height: 50,
-                      color: Colors.orangeAccent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                      onPressed: (){
-                      },
-                      child: const Text('Cancel',
-                        style: TextStyle(color: Colors.white),)),
+
                   // Sign up button ends
                 ],
               ),

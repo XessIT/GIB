@@ -222,8 +222,7 @@ class _MembersState extends State<Members> {
           icon: const Icon(Icons.arrow_back),
         ),
         iconTheme:  const IconThemeData(
-          color: Colors.white, // Set the color for the drawer icon
-        ),
+          color: Colors.white,),
         title: Column(
           children: [
             Visibility(
@@ -303,7 +302,7 @@ class _MembersState extends State<Members> {
                             decoration: const InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
-                              labelText: "District",
+                              hintText: "District",
                             ),
                           ),
                           suggestionsCallback: (pattern) async {
@@ -338,7 +337,7 @@ class _MembersState extends State<Members> {
                             decoration: const InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
-                              labelText: "Chapter",
+                              hintText: "Chapter",
                             ),
                           ),
                           suggestionsCallback: (pattern) async {

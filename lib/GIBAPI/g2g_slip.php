@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -16,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle the insert/update/delete actions
     $data = json_decode(file_get_contents("php://input"));
     $met_name = mysqli_real_escape_string($conn, $data->met_name);
+    $user_id = mysqli_real_escape_string($conn, $data->user_id);
     $met_company_name = mysqli_real_escape_string($conn, $data->met_company_name);
     $met_number = mysqli_real_escape_string($conn, $data->met_number);
     $date = mysqli_real_escape_string($conn, $data->date);
@@ -38,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
     } else {
         // Insert the record
-        $insertQuery = "INSERT INTO g2g (`met_name`, `met_company_name`, `met_number`, `date`, `from_time`, `to_time`, `location`, `first_name`, `mobile`, `company_name`)
-                        VALUES ('$met_name', '$met_company_name', '$met_number', '$date', '$from_time', '$to_time', '$location', '$first_name', '$mobile', '$company_name')";
+        $insertQuery = "INSERT INTO g2g (`met_name`, `user_id`, `met_company_name`, `met_number`, `date`, `from_time`, `to_time`, `location`, `first_name`, `mobile`, `company_name`)
+                        VALUES ('$met_name', '$user_id', '$met_company_name', '$met_number', '$date', '$from_time', '$to_time', '$location', '$first_name', '$mobile', '$company_name')";
         $insertResult = mysqli_query($conn, $insertQuery);
         if($insertResult) {
             // Record inserted successfully

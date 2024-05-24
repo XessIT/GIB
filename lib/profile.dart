@@ -797,10 +797,6 @@ class _BusinessInfoState extends State<BusinessInfo> {
                 ybe = dynamicdata[0]["b_year"];
                 imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["business_image"]}';
                 imageParameter = dynamicdata[0]["business_image"];
-
-
-
-
               });
             }
           });
@@ -1337,106 +1333,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
 
 
-/*class Reward extends StatefulWidget {
-  const Reward({Key? key}) : super(key: key);
-=======
-
-
-
-
-
-class Reward extends StatefulWidget {
-  const Reward({super.key});
->>>>>>> 4f5114d4d814e06af93be023c7959ff6ebdf055b
-
-  @override
-  State<Reward> createState() => _RewardState();
-}
-class _RewardState extends State<Reward> {
-
-  String? image = "";
-  String documentid="";
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-
-                SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.person_add,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('New Member Introduction'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(60, 0, 0, 0),
-                      child: Text('',),
-                    ),
-                  ],
-                ),
-                Divider(color: Colors.grey,),
-
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.card_giftcard_sharp,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('Team Winning Award'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(95, 0, 0, 0),
-                      child: Text(''),
-                    ),
-                  ],
-                ),
-                Divider(color: Colors.grey,),
-
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.emoji_events,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('Activity Trip Award'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(115, 0, 0, 0),
-                      child: Text(''),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30,),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}*/   /// Reward
+  /// Reward
 
 
 
