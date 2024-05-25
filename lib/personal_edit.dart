@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -240,7 +241,6 @@ class _PersonalEditState extends State<PersonalEdit> {
           'past_experience': pastexpcontroller.text,
           'marital_status': status.toString(),
           'id': widget.currentID,
-
         }),
       );
       print(url);
@@ -252,7 +252,7 @@ class _PersonalEditState extends State<PersonalEdit> {
           MaterialPageRoute(builder: (context) => Profile(userID: widget.currentID, userType: '',)),
         );
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Profile Successfully Updated")));
+            content: Text("You have Successfully Updated")));
       } else {
         print("Error: ${response.statusCode}");
       }
@@ -367,7 +367,7 @@ class _PersonalEditState extends State<PersonalEdit> {
     getDistrict();
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Edit123 Profile')),
+        title:  Text('Edit Profile',style: Theme.of(context).textTheme.displayLarge,),
         centerTitle: true,
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
@@ -383,7 +383,6 @@ class _PersonalEditState extends State<PersonalEdit> {
                 const SizedBox(height: 10,),
                 Text('Personal Information ${widget.currentID.toString()}',
                   style: Theme.of(context).textTheme.displayMedium,),
-
                 const SizedBox(width: 20,),
                 // InkWell(
                 //   child: CircleAvatar(
@@ -412,7 +411,6 @@ class _PersonalEditState extends State<PersonalEdit> {
                 //     );
                 //   },
                 // ),
-
                 InkWell(
                   child: ClipOval(
                     child: Container(
@@ -455,7 +453,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: "First Name",
+                      hintText: "First Name",
+                      suffixIcon: Icon(Icons.account_circle,color: Colors.green,),
                       // hintText: name!,
                     ),),
                 ),
@@ -474,12 +473,14 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: "Last Name",
+
+                      hintText: "Last Name",
+                      suffixIcon: Icon(Icons.account_circle,color: Colors.green,),
                       // hintText: name!,
                     ),),
                 ),
 
-
+                const SizedBox(height: 5,),
                 SizedBox(
                   width: 305,
                   height: 50,
@@ -487,9 +488,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                     textFieldConfiguration: TextFieldConfiguration(
                       controller: districtController,
                       decoration: const InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelText: "District"
+                          suffixIcon: Icon(Icons.business_outlined,color: Colors.green,),
+                          hintText: "District"
                       ),
                     ),
                     suggestionsCallback: (pattern) async {
@@ -518,9 +518,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                   ),
                 ),
                 // Chapter drop down button starts
-
                 // DOB textfield starts here
-                const SizedBox(height: 15,),
+                const SizedBox(height: 5,),
                 SizedBox(
                   width: 305,
                   height: 50,
@@ -528,9 +527,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                     textFieldConfiguration: TextFieldConfiguration(
                       controller: chapterController,
                       decoration: const InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelText: "Chapter"
+                          hintText: "Chapter",
+                        suffixIcon: Icon(Icons.business_outlined,color: Colors.green,),
                       ),
                     ),
                     suggestionsCallback: (pattern) async {
@@ -553,7 +551,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                     },
                   ),
                 ),
-
+                const SizedBox(height: 5,),
                 SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -567,7 +565,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                     decoration:  const InputDecoration(
-                      labelText: "Native",
+                      hintText: "Native",
+                      suffixIcon: Icon(Icons.location_on,color: Colors.green,),
                       // hintText: location!,
                     ),),
                 ),
@@ -584,23 +583,28 @@ class _PersonalEditState extends State<PersonalEdit> {
                       }
                       return null;
                     },
+                    onTap: () async {
+                      DateTime currentDate = DateTime.now();
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                          initialDate: date,
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime(2100)
+                      );
+
+                      if (pickedDate != null) {
+                        setState(() {
+                          _dobdate.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                        });
+                      }
+                    },
+
                     decoration: InputDecoration(
-                      labelText: "DOB",
+                      hintText: "DOB",
                       // hintText:dob!,
-                      suffixIcon: IconButton(onPressed: ()async{
-                        DateTime? pickDate = await showDatePicker(
-                            context: context,
-                            initialDate: date,
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime(2100));
-                        if(pickDate==null) return;{
-                          setState(() {
-                            _dobdate.text =DateFormat('dd/MM/yyyy').format(pickDate);
-                          });
-                        }
-                      }, icon: const Icon(
-                          Icons.calendar_today_outlined),
-                        color: Colors.green,),
+                      suffixIcon:
+                     Icon(
+                          Icons.calendar_today_outlined,color: Colors.green,),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
@@ -616,7 +620,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                     child: TextFormField(
                       controller: _waddate,
                       decoration: InputDecoration(
-                        labelText: "WAD",
+                        hintText: "WAD",
                         // hintText: wad!,
                         suffixIcon: IconButton(onPressed: ()async{
                           DateTime? pickDate = await showDatePicker(
@@ -647,7 +651,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                   child: DropdownButtonFormField<String>(
                     value: koottam.isNotEmpty ? koottam : null,
                     hint: Text("Koottam"),
-                    icon: const Icon(Icons.arrow_drop_down),
+                    focusColor: CupertinoColors.systemGrey6,
+                    icon: const Icon(Icons.arrow_drop_down,),
                     isExpanded: true,
                     items: <String>["Koottam","Adhitreya Kumban", "Aadai", "Aadhirai", "Aavan", "Andai", "Akini", "Anangan", "Andhuvan",
                       "Ariyan", "Alagan", "Bharatan", "Bramman", "Devendran", "Dananjayan", "Danavantan", "Eenjan","ElumathurKadais", "Ennai", "Indran",
@@ -695,7 +700,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                     decoration:  const InputDecoration(
-                      labelText: "Kovil",
+                      hintText: "Kovil",
+                      suffixIcon: const Icon(Icons.temple_hindu,color: Colors.green,),
                       // hintText: kovil!,
                     ),),
                 ),
@@ -704,9 +710,10 @@ class _PersonalEditState extends State<PersonalEdit> {
                   width: 320,
                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 4),
                   child: DropdownButtonFormField<String>(
+                    focusColor: CupertinoColors.systemGrey6,
                     value: blood.isNotEmpty ? blood : null,
                     hint: Text("Blood Group"),
-                    icon: const Icon(Icons.arrow_drop_down),
+                    icon: const Icon(Icons.arrow_drop_down,),
                     isExpanded: true,
                     items: <String>["Blood Group","A+", "A-", "A1+", "A1-", "A2+", "A2-", "A1B+", "A1B-", "A2B+", "A2B-", "AB+", "AB-", "B+", "B-", "O+", "O-", "BBG", "INRA"]
                         .map<DropdownMenuItem<String>>((String Value) {
@@ -747,9 +754,10 @@ class _PersonalEditState extends State<PersonalEdit> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: "Mobile Number",
+
+                      hintText: "Mobile Number",
                       //  hintText: mobile!,
-                      suffixIcon: Icon(Icons.phone_android),
+                      suffixIcon: Icon(Icons.phone_android,color: Colors.green,),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
@@ -765,30 +773,28 @@ class _PersonalEditState extends State<PersonalEdit> {
                     controller: emailcontroller,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your Email Address';
+                        return '* Enter your Email Address';
                       }
                       // Check if the entered email has the right format
                       if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                        return 'Enter a valid Email Address';
+                        return '* Enter a valid Email Address';
                       }
                       // Return null if the entered email is valid
                       return null;
                     },
                     decoration:  const InputDecoration(
-                      labelText: "Email",
+                      hintText: "Email",
+                      suffixIcon: Icon(Icons.email,color: Colors.green,),
                       // hintText: email!,
                     ),),
                 ),
+                const SizedBox(height: 5,),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 190, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
                   child: Text('Marital Status',
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineSmall,),
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
-
-                const SizedBox(height: 20,),
+                const SizedBox(height: 5,),
                 // Radio button starts here
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -849,7 +855,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                             return null;
                           },
                           decoration:  const InputDecoration(
-                            labelText: "Spouse Name",
+                            hintText: "Spouse Name",
+
                             // hintText: spousename!,
                           ),),
                       ),
@@ -885,9 +892,10 @@ class _PersonalEditState extends State<PersonalEdit> {
                             }
                           },
                           decoration: const InputDecoration(
-                            labelText: "WAD",
+
+                           // labelText: "WAD",
                             hintText: "Wedding Aniversery Date",
-                            suffixIcon:Icon(Icons.calendar_today_outlined),
+                            suffixIcon:Icon(Icons.calendar_today_outlined,color: Colors.green,),
                           ),
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
@@ -898,9 +906,10 @@ class _PersonalEditState extends State<PersonalEdit> {
                       SizedBox(
                         width: 300,
                         child: DropdownButtonFormField<String>(
+                          focusColor: CupertinoColors.systemGrey6,
                           value: spouseblood.isNotEmpty ? spouseblood : null,
                           hint: const Text("Blood Group",style: TextStyle(color: Colors.black),),
-                          icon: const Icon(Icons.arrow_drop_down),
+                          icon: const Icon(Icons.arrow_drop_down,),
                           isExpanded: true,
                           items: <String>[
                             "Blood Group",
@@ -957,7 +966,8 @@ class _PersonalEditState extends State<PersonalEdit> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            labelText: "Spouse Native",
+                            hintText: "Spouse Native",
+                            suffixIcon: Icon(Icons.location_on,color: Colors.green,),
                             //  hintText: spousenative!,
                           ),),
                       ),
@@ -1016,37 +1026,38 @@ class _PersonalEditState extends State<PersonalEdit> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            labelText: "Spouse Father Kovil",
+                            hintText: "Spouse Father Kovil",
 
-                            suffixIcon: Icon(Icons.account_circle),
+                            suffixIcon: Icon(Icons.temple_hindu,color: Colors.green,),
                           ),),
                       ),
                       const SizedBox(height: 5,),
                     ],
                   ),
                 ),
-
+                const SizedBox(height: 5,),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
                   child: Text('Education',
-                    style: Theme.of(context).textTheme.headline5,),
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
+                const SizedBox(height: 5,),
                 SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: educationcontroller,
                     validator: (value){
                       if (value!.isEmpty) {
-                        return '* Please enter your qualification';
+                        return '* Enter your qualification';
                       } else if(nameRegExp.hasMatch(value)){
                         return null;
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: "Education",
-                      hintText: "",
-                      suffixIcon: Icon(Icons.cast_for_education_outlined),
+                      hintText: "Education",
+
+                      suffixIcon: Icon(Icons.cast_for_education_outlined,color: Colors.green,),
                     ),),
                 ),
 
@@ -1060,7 +1071,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                         .headlineSmall,),
                 ),*/
 
-                const SizedBox(height: 15,),
+
                /* SizedBox(
                   width: 300,
                   child: DropdownButtonFormField<String>(
@@ -1096,7 +1107,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                   ),
                 ),*/
                 // Company Address textfield starts
-                const SizedBox(height: 15,),
+
                /* SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -1128,7 +1139,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 ),*/
                 // Company Address textfield ends
 
-                const SizedBox(height: 15,),
+
                 /*SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -1160,7 +1171,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 ),*/
 
                 // Website  textfield starts
-                const SizedBox(height: 15,),
+
                 /*SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -1189,7 +1200,7 @@ class _PersonalEditState extends State<PersonalEdit> {
                 // Website textfield ends
 
                 // Year of business established textfield starts
-                const SizedBox(height: 15,),
+
                 /*SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -1239,71 +1250,35 @@ class _PersonalEditState extends State<PersonalEdit> {
 
                   ),
                 ),*/
-
                 const SizedBox(height: 5,),
-
-
-
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 210, 0),
-                  child: Text('Experience',
-                    style: Theme.of(context).textTheme.headline5,),
+                  child: Text('Experienece',
+                    style: Theme.of(context).textTheme.headlineSmall,),
                 ),
+                const SizedBox(height: 5,),
+
                 SizedBox(
                   width: 300,
                   child: TextFormField(
                     controller: pastexpcontroller,
                     validator: (value){
                       if (value!.isEmpty) {
-                        return '* Please enter your past experience';
+                        return '* Enter your past experience';
                       } else if(nameRegExp.hasMatch(value)){
                         return null;
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
-                      labelText: "Past Experience",
-                      hintText: "",
-                      suffixIcon: Icon(Icons.work_history),
+                      hintText: "Past Experience",
+                      suffixIcon: Icon(Icons.work_history,color: Colors.green,),
                     ),),
                 ),
-
-
-                /* SizedBox(
-                  width: 300,
-                  child: TextFormField(
-                    validator: (value){
-                      if (value!.isEmpty) {
-                        return '* Enter Your Occupation';
-                      } else if(nameRegExp.hasMatch(value)){
-                        return null;
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Occupation",
-                    ),),
-                ),
-
-                SizedBox(
-                  width: 300,
-                  child: TextFormField(
-                    validator: (value){
-                      if (value!.isEmpty) {
-                        return '* Enter your service';
-                      } else if(nameRegExp.hasMatch(value)){
-                        return null;
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Service Name",
-                    ),),
-                ),*/
 
                 const SizedBox(height: 30,),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Save button starts
                     MaterialButton(
@@ -1320,25 +1295,11 @@ class _PersonalEditState extends State<PersonalEdit> {
 
                           }
 
-
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text("You have Successfully Updated")));
                         },
                         child: const Text('Save',
                           style: TextStyle(color: Colors.white),)),
                     // Save button ends
-
                     // Cancel button starts
-                    MaterialButton(
-                        minWidth: 130,
-                        height: 50,
-                        color: Colors.orangeAccent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancel',
-                          style: TextStyle(color: Colors.white),)),
                     // Cancel button ends
                   ],
                 ),

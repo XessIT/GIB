@@ -53,6 +53,7 @@ class _GuestState extends State<Guest> {
   String? chooseDistrict;
   RegExp nameRegExp = RegExp(r'^[a-zA-Z\s]+$');
   String membertype = "Member Type";
+  String gender = "Gender";
   String koottam = "Koottam";
   String spousekoottam = "Spouse Father Koottam";
   String businesstype = "Business Type";
@@ -218,7 +219,7 @@ class _GuestState extends State<Guest> {
     return text.substring(0, 1).toUpperCase() + text.substring(1);
   }
 
-  String blockStatus ="Block";
+  String blockStatus ="UnBlock";
   String adminRights ="Waiting";
   Future<void> uploadImage(Uint8List imageBytes) async {
       if(membertype=="Member Type") {
@@ -241,6 +242,7 @@ class _GuestState extends State<Guest> {
         "mobile": mobilecontroller.text.trim(),
         "password": confirmpasswordcontroller.text.trim(),
         "member_type": membertype.toString(),
+        "gender": gender.toString(),
         "first_name": firstnamecontroller.text.trim(),
         "last_name": lastnamecontroller.text.trim(),
         "company_name": companynamecontroller.text.trim(),
@@ -528,7 +530,6 @@ class _GuestState extends State<Guest> {
                           String capitalizedValue = capitalizeFirstLetter(value);
                           firstnamecontroller.value = firstnamecontroller.value.copyWith(
                             text: capitalizedValue,
-                            selection: TextSelection.collapsed(offset: capitalizedValue.length),
                           );
                         },
                         decoration: const InputDecoration(
@@ -878,30 +879,6 @@ class _GuestState extends State<Guest> {
 
                           // District drop down button starts
                           const SizedBox(height: 15,),//DropDown For District
-                          /*
-                          SizedBox(
-                            width: 300,
-                            child: DropdownButtonFormField<dynamic>(
-                              items: district,
-                              onChanged: (districtValue) {
-                                setState(() {
-                                  selectedDistrict = districtValue;
-                                });
-                              },
-                              value: selectedDistrict,
-                              isExpanded: true,
-                              hint: const Text(
-                                "Select District" ,
-                              ),
-                              validator: (value){
-                                if(selectedDistrict == null) return
-                                  '* Select your District';
-                                return null;
-                              }, ,
-
-                            ),
-                          ),
-                    */
 
                           SizedBox(
                             width: 305,
@@ -976,7 +953,33 @@ class _GuestState extends State<Guest> {
                               },
                             ),
                           ),
-
+                          const SizedBox(height: 15,),
+                          SizedBox(
+                            width: 300,
+                            child: DropdownButtonFormField<String>(
+                              value: gender,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              isExpanded: true,
+                              items: <String>["Gender", "Male", "Female", "Other"]
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value));
+                              }
+                              ).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  gender = newValue!;
+                                });
+                              },
+                              validator: (value) {
+                                if (gender == 'Gender') {
+                                  return '* Select your Gender';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
                           const SizedBox(height: 15,),
                           SizedBox(
                             width: 300,

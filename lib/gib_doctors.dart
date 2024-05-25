@@ -4,19 +4,26 @@ import 'package:gipapp/search_doctor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart'as http;
 
+import 'Non_exe_pages/non_exe_home.dart';
+import 'guest_home.dart';
+import 'home.dart';
+
 class GibDoctors extends StatelessWidget {
   const GibDoctors({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Doctors(),
+    return  Scaffold(
+      body: Doctors(userType: '', userId: ''),
     );
   }
 }
 
 class Doctors extends StatefulWidget {
-  const Doctors({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+
+  const Doctors({Key? key, required this.userType, required this.userId});
 
   @override
   State<Doctors> createState() => _DoctorsState();
@@ -67,8 +74,48 @@ List<Map<String,dynamic>> getDoctor=[];
     return Scaffold(
       appBar: AppBar(centerTitle: true,
         title: Text('GiB Doctors', style: Theme.of(context).textTheme.bodySmall),
-        iconTheme: IconThemeData(color: Colors.white),
-        actions: <Widget>[
+          iconTheme:  const IconThemeData(
+            color: Colors.white, // Set the color for the drawer icon
+          ),
+          leading: IconButton(
+            onPressed: () {
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+              else if (widget.userType == "Guest") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GuestHome(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+          actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
@@ -81,57 +128,95 @@ List<Map<String,dynamic>> getDoctor=[];
         ],
       ),
 
-      body: ListView.builder(
-                  itemCount: getDoctor.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> thisitem = getDoctor[index];
-                    return Center(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 20,),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>  DoctorsDetailsPage(itemId:thisitem['id'])));
-                            },
-                            child: Container(
-                              width: 300,
-                              height: 100,
-                              padding: const EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.green, width: 1),
-                                  borderRadius: BorderRadius.circular(10.0)
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween,
-                                children: [
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop)  {
+          if (widget.userType == "Non-Executive") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NavigationBarNon(
+                  userType: widget.userType.toString(),
+                  userId: widget.userId.toString(),
+                ),
+              ),
+            );
+          }
+          else if (widget.userType == "Guest") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GuestHome(
+                  userType: widget.userType.toString(),
+                  userId: widget.userId.toString(),
+                ),
+              ),
+            );
+          }
+          else{
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NavigationBarExe(
+                  userType: widget.userType.toString(),
+                  userId: widget.userId.toString(),
+                ),
+              ),
+            );
+          }
+        },
+        child: ListView.builder(
+                    itemCount: getDoctor.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> thisitem = getDoctor[index];
+                      return Center(
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20,),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) =>  DoctorsDetailsPage(itemId:thisitem['id'])));
+                              },
+                              child: Container(
+                                width: 300,
+                                height: 100,
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.green, width: 1),
+                                    borderRadius: BorderRadius.circular(10.0)
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: [
 
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage("https://localhost/GIB/GIBAPI/upload/${thisitem['profile_image']}image.png"),
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage("https://localhost/GIB/GIBAPI/upload/${thisitem['profile_image']}image.png"),
 
-                                    /* backgroundImage: Image
-                                        .network(thisitem['profile_image'])
-                                        .image,*/
-                                    //  radius: 50,
-                                  ),
-                                  Text('${thisitem["first_name"]}\n'
-                                      '${thisitem["company_name"]}'),
-                                  IconButton(
-                                      onPressed: () {
-                                        launch("tel://'${thisitem['mobile']}'");
-                                      },
-                                      icon: const Icon(
-                                        Icons.call, color: Colors.green,))
-                                ],
+                                      /* backgroundImage: Image
+                                          .network(thisitem['profile_image'])
+                                          .image,*/
+                                      //  radius: 50,
+                                    ),
+                                    Text('${thisitem["first_name"]}\n'
+                                        '${thisitem["company_name"]}'),
+                                    IconButton(
+                                        onPressed: () {
+                                          launch("tel://'${thisitem['mobile']}'");
+                                        },
+                                        icon: const Icon(
+                                          Icons.call, color: Colors.green,))
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-              )
+                          ],
+                        ),
+                      );
+                    }
+                ),
+      )
     );
   }
 }

@@ -70,6 +70,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle the insert/update/delete actions
    $data = json_decode(file_get_contents("php://input"));
    $Toname = mysqli_real_escape_string($conn, $data->Toname);
+   $user_id = mysqli_real_escape_string($conn, $data->user_id);
    $Tomobile = mysqli_real_escape_string($conn, $data->Tomobile);
    $Tocompanyname = mysqli_real_escape_string($conn, $data->Tocompanyname);
    $purpose = mysqli_real_escape_string($conn, $data->purpose);
@@ -80,8 +81,8 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    $company = mysqli_real_escape_string($conn, $data->company);
    $amount = mysqli_real_escape_string($conn, $data->amount);
 
-       $insertUserQuery = "INSERT INTO `honoring_slip`(`Toname`, `Tomobile`, `Tocompanyname`, `purpose`, `businessName`, `businessMobile`, `name`, `mobile`, `company`, `amount`)
-      VALUES ('$Toname','$Tomobile','$Tocompanyname','$purpose', '$business_name', '$business_mobile', '$name', '$mobile', '$company','$amount')";
+       $insertUserQuery = "INSERT INTO `honoring_slip`(`Toname`, `user_id`, `Tomobile`, `Tocompanyname`, `purpose`, `businessName`, `businessMobile`, `name`, `mobile`, `company`, `amount`)
+      VALUES ('$Toname','$user_id','$Tomobile','$Tocompanyname','$purpose', '$business_name', '$business_mobile', '$name', '$mobile', '$company','$amount')";
       $arr = [];
       $insertUserResult = mysqli_query($conn, $insertUserQuery);
       if($insertUserResult) {

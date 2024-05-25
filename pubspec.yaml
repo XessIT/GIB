@@ -60,6 +60,7 @@ dependencies:
   card_swiper: ^3.0.1
   ffmpeg_kit_flutter: ^6.0.3
   clay_containers: ^0.3.4
+  babstrap_settings_screen: ^0.1.6
 
 
 
