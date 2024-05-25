@@ -33,13 +33,9 @@ void main() {
             bodyMedium: const TextStyle(fontSize: 16, color: Colors.black,fontWeight: FontWeight.bold),
             bodyLarge: const TextStyle(fontSize: 18.0, color: Colors.black),
 
-<<<<<<< HEAD
             displayLarge:const TextStyle(fontSize: 18, color: Colors.white),
             displayMedium: const TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold),
-=======
-            displayLarge:TextStyle(fontSize: 18, color: Colors.white),
-            displayMedium: TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold),
->>>>>>> 20b2b10235e4f19956fe6d0d9ac9a9f4466dca9f
+
             displaySmall: const TextStyle(fontSize: 14, color: Colors.white), // Assuming this is for labels
           ),
         ),
