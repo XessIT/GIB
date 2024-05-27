@@ -111,32 +111,6 @@ class _AddOfferPageState extends State<AddOfferPage> {
     super.initState();
   }
 
-  //get image from file code starts here
-
-  String message = "";
-  TextEditingController caption = TextEditingController();
-
-  /*String? imagename;
-  String? imagedata;*/
-  /*Future<void> getImage() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement();
-    input.click();
-    input.onChange.listen((e) {
-      final html.File file = input.files!.first;
-      final reader = html.FileReader();
-      reader.onLoadEnd.listen((e) {
-        setState(() {
-          selectedImage = reader.result as Uint8List?;
-          imagename = file.name;
-          imagedata = base64Encode(selectedImage!);
-          print('Image Name: $imagename');
-          print('Image Data: $imagedata');
-        });
-      });
-      reader.readAsArrayBuffer(file);
-    });
-  }*/
-
   bool showLocalImage = false;
   /* XFile? pickedImage; */
   late String imageName;
@@ -147,13 +121,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
     XFile? pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
     showLocalImage = true;
     if (pickedImage != null) {
-      // Verify that pickedImage is indeed an XFile
-      print('pickedImage type: ${pickedImage.runtimeType}');
-
-      // Read the image file as bytes
       try {
         final imageBytes = await pickedImage!.readAsBytes();
-        // Encode the bytes to base64
         String base64ImageData = base64Encode(imageBytes);
         setState(() {
           selectedImage = imageBytes;

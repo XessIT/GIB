@@ -341,10 +341,10 @@ class _GuestState extends State<Guest> {
       setState(() {
         selectedImage = imageBytes;
         print('Image pick: $selectedImage');
-        /*imagename = pickedImage!.name;
+        imagename = pickedImage!.name;
         print('Image Name: $imagename');
         imagedata = base64Encode(imageBytes);
-        print('Image Data: $imagedata');*/
+        print('Image Data: $imagedata');
       });
     }
   }
