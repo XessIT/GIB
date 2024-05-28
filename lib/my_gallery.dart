@@ -361,8 +361,6 @@ class _VideoState extends State<Video> {
       print('videoBytes: $videoBytes');
       final url = 'http://mybudgetbook.in/GIBAPI/videos.php?userId=${widget.userId}';
 
-      print('url: $url');
-      // Make HTTP request to upload video file to server
 
 
       var request = http.MultipartRequest(
@@ -547,7 +545,8 @@ class _VideoState extends State<Video> {
               child: thumbnail.isNotEmpty
                   ? Image.network(thumbnail)
                   : CircularProgressIndicator(), // Show a loading indicator if thumbnail is being fetched
-            ),              onTap: () {
+            ),
+            onTap: () {
             // Navigate to VideoPlayerScreen when the name is clicked
             Navigator.push(
               context,

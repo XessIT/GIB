@@ -37,11 +37,6 @@ void main() {
             displayMedium: const TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold),
             displaySmall: const TextStyle(fontSize: 14, color: Colors.white), // Assuming this is for labels
           ),
-
-
-
-
-
         ),
 
         home: FutureBuilder<Map<String, dynamic>>(
@@ -108,25 +103,6 @@ void main() {
             }
           },
         ),
-
-
-        ///
-///
-
-/*
-        home: FutureBuilder<bool>(
-        future: isLoggedIn(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data! ? Homepage() : Login();
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-
-      ),
-*/
-
       ));
 }
 
@@ -190,13 +166,6 @@ Future<Map<String, dynamic>> isLoggedIn() async {
 }
 
 
-/*
-Future<bool> isLoggedIn() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isLoggedIn') ?? false;
-
-}
-*/
 
 
 
