@@ -14,6 +14,7 @@ import '../gib_gallery.dart';
 import '../gib_members.dart';
 import '../login.dart';
 import '../profile.dart';
+import 'about_view.dart';
 import 'change_mpin.dart';
 import 'guest_home.dart';
 import 'guest_profile.dart';
@@ -49,7 +50,7 @@ class GuestSettings extends StatelessWidget {
         ),
         title: Text(
           "Settings",
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.displayLarge,
         ),
         leading: IconButton(
           icon: const Icon(
@@ -57,19 +58,23 @@ class GuestSettings extends StatelessWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => GuestHomePage(
+           // Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => GuestHome(
                           userType: userType.toString(),
                           userId: userId.toString(),
                         )));
           },
         ),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
-          return false;
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) => GuestHome(
+                    userType: userType.toString(),
+                    userId: userId.toString(),
+                  )));
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -79,9 +84,7 @@ class GuestSettings extends StatelessWidget {
                 items: [
                   SettingsItem(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
+                      Navigator.push(context, MaterialPageRoute(
                             builder: (context) => GuestProfile(
                                   userType: userType.toString(),
                                   userID: userId.toString(),
@@ -91,16 +94,12 @@ class GuestSettings extends StatelessWidget {
                     icons: CupertinoIcons.profile_circled,
                     iconStyle: IconStyle(),
                     title: 'Profile',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
                   ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
-                  SettingsItem(
+                 /* SettingsItem(
                     // onTap: () {
                     //   Navigator.push(
                     //     context,
@@ -115,21 +114,20 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'Business',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     //subtitle: "Lock Ziar'App to improve your privacy",
-                  ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
+                  ),*/
                   SettingsItem(
-                    // onTap: () {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => const AttendanceScanner()),
-                    //   );
-                    // },
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OffersPage(
+                              userType: userType.toString(),
+                              userId: userId.toString(),
+                            )),
+                      );
+                    },
                     icons: Icons.local_offer,
                     iconStyle: IconStyle(
                       iconsColor: Colors.white,
@@ -137,22 +135,18 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'Offers',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     //subtitle: "Lock Ziar'App to improve your privacy",
                   ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
                   SettingsItem(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => Doctors(
-                                  userType: userType.toString(),
-                                  userId: userId.toString(),
-                                )),
+                              userType: userType.toString(),
+                              userId: userId.toString(),
+                            )),
                       );
                     },
                     icons: Icons.add_circle,
@@ -162,24 +156,20 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.purple,
                     ),
                     title: 'Gib Doctors',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
                   ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
                   SettingsItem(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => BloodGroup(
-                                  userType: userType.toString(),
-                                  userId: userId.toString(),
-                                )),
+                              userType: userType.toString(),
+                              userId: userId.toString(),
+                            )),
                       );
                     },
                     icons: Icons.bloodtype,
@@ -189,22 +179,18 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.red,
                     ),
                     title: 'Blood Group',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
                   ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
                   SettingsItem(
-                    // onTap: () => {
-                    //              Navigator.push(
-                    //            context,
-                    //          MaterialPageRoute(builder: (context) =>  const bootomnav()),
-                    //       )
-                    // },
+                    onTap: () => {
+                                 Navigator.push(
+                               context,
+                             MaterialPageRoute(builder: (context) => AboutTab(userId: userId.toString(),userType: userType.toString(),)),
+                          )
+                    },
                     icons: CupertinoIcons.photo_on_rectangle,
                     iconStyle: IconStyle(
                       iconsColor: Colors.white,
@@ -212,15 +198,11 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'About GIB',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
                   ),
-                ],
-              ),
-              SettingsGroup(
-                items: [
                   SettingsItem(
                     onTap: () => {
                       Navigator.push(
@@ -238,7 +220,7 @@ class GuestSettings extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'Change MPIN',
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -262,7 +244,7 @@ class GuestSettings extends StatelessWidget {
                           builder: (context, setState) {
                             return Container(
                                 padding: EdgeInsets.all(20),
-                                child: Text("Are you sure want to Log out"));
+                                child: Text("Are you sure do you want to Log out?"));
                           },
                         ),
                         btnOk: ElevatedButton(
@@ -301,9 +283,14 @@ class GuestSettings extends StatelessWidget {
                         ),
                       ).show();
                     },
+                    iconStyle: IconStyle(
+                      iconsColor: Colors.white,
+                      withBackground: true,
+                      backgroundColor: Colors.red,
+                    ),
                     icons: Icons.exit_to_app_rounded,
-                    title: "Sign Out",
-                    titleStyle: Theme.of(context).textTheme.bodySmall,
+                    title: "Log Out",
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
                   /* SettingsItem(
                     onTap: () {},

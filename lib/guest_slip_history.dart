@@ -37,7 +37,7 @@ class _SlipHistoryState extends State<SlipHistory> {
   Future<void> visitorsFetch() async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/visiters_slip.php?user_id=${widget
+          'http://mybudgetbook.in/GIBAPI/visiters_slip.php?user_id=${widget
               .userId}');
       final response = await http.get(url);
       print("visitors url:$url");

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'blood_group.dart';
 import 'member_details.dart';
 
 class BloodGroupList extends StatelessWidget {
@@ -70,7 +71,7 @@ class _BloodListState extends State<BloodList> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gib_members.php');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -104,18 +105,29 @@ class _BloodListState extends State<BloodList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Center(child: Text(blood, style: Theme.of(context).textTheme.bodySmall)),
+          title: Center(child: Text(blood, style: Theme.of(context).textTheme.displayLarge)),
           centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.navigate_before),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           iconTheme:  const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
           ),
         ),
-        body: data.isEmpty
+        body: PopScope(
+            canPop: false,
+            onPopInvoked: (didPop) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => BloodGroup(userType: '', userId: '',)));
+            },
+        child: data.isEmpty
             ? Center(child: Text("Data not found", style: TextStyle(color: Colors.black)))
          : ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]['profile_image']}';
             String getMobile = data[i]["mobile"];
             return
               Center(
@@ -166,7 +178,7 @@ class _BloodListState extends State<BloodList> {
 
 
         )
-
+    )
     );
   }
 }

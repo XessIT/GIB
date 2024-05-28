@@ -98,7 +98,7 @@ class _VisitorsSlipPageState extends State<VisitorsSlipPage> {
 
         try {
 
-      String uri = "http://localhost/GIB/lib/GIBAPI/visiters_slip.php";
+      String uri = "http://mybudgetbook.in/GIBAPI/visiters_slip.php";
       var res = await http.post(Uri.parse(uri), body: jsonEncode( {
         "guest_name": guestName.text,
         "company_name": companyName.text,

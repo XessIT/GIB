@@ -32,7 +32,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
   List<Map<String,dynamic>>userdata=[];
   Future<void> fetchData(String? userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -70,7 +70,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
   List<Map<String,dynamic>>offersdata=[];
   Future<void> offersfetchData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=offers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=offers');
       final response = await http.get(url);
       print(url);
 
@@ -101,7 +101,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
   String? registerStatus="Register";
   Future<void> registerDateStoreDatabase(String meetingId,String meetingType, String meetingDate, String meetingPlace) async {
     try {
-      String uri = "http://localhost/GIB/lib/GIBAPI/register_meeting.php";
+      String uri = "http://mybudgetbook.in/GIBAPI/register_meeting.php";
       var res = await http.post(Uri.parse(uri), body: jsonEncode( {
         "meeting_id": meetingId,
         "meeting_type": meetingType,

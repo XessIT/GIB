@@ -74,7 +74,7 @@ class _PendingViewState extends State<PendingView> {
   List dynamicdata=[];
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -113,7 +113,7 @@ class _PendingViewState extends State<PendingView> {
 
   Future<void> fetchDataAdminRightsbase() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
       print("mo: $mobile");
       print("ar: $admin_rights");
       print(url);
@@ -162,7 +162,7 @@ class _PendingViewState extends State<PendingView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return  Center(
                   child: Padding(
@@ -233,7 +233,7 @@ class _ApprovedViewState extends State<ApprovedView> {
   List dynamicdata=[];
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -272,7 +272,7 @@ class _ApprovedViewState extends State<ApprovedView> {
 
   Future<void> fetchDataAdminRightsbase() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
       print("mo: $mobile");
       print("ar: $admin_rights");
       print(url);
@@ -320,7 +320,7 @@ class _ApprovedViewState extends State<ApprovedView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return Center(
                   child: Padding(
@@ -392,7 +392,7 @@ class _RejectedViewState extends State<RejectedView> {
   List dynamicdata=[];
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -431,7 +431,7 @@ class _RejectedViewState extends State<RejectedView> {
 
   Future<void> fetchDataAdminRightsbase() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?referrer_mobile=$mobile && admin_rights=$admin_rights');
       print("mo: $mobile");
       print("ar: $admin_rights");
       print(url);
@@ -479,7 +479,7 @@ class _RejectedViewState extends State<RejectedView> {
         body: ListView.builder(
             itemCount: AdminRightsdata.length,
             itemBuilder: (context, i) {
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${AdminRightsdata[i]['profile_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${AdminRightsdata[i]['profile_image']}';
               if (mobile.isNotEmpty) {
                 return Center(
                   child: Padding(

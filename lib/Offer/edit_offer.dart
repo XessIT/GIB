@@ -55,7 +55,7 @@ class _EditOfferState extends State<EditOffer> {
     );
     type = widget.currenttype;
     image = widget.currentimage!;
-    imageUrl = 'http://localhost/GIB/lib/GIBAPI/$image';
+    imageUrl = 'http://mybudgetbook.in/GIBAPI/$image';
   }
   String? image = "";
   String imageUrl = "";
@@ -119,7 +119,7 @@ class _EditOfferState extends State<EditOffer> {
 
   Future<void> Editoffers() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php');
       final DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(_date.text);
       final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
       // final url = Uri.parse('http://192.168.29.129/API/offers.php');
@@ -152,7 +152,7 @@ class _EditOfferState extends State<EditOffer> {
 
   Future<void> UpdateOffers() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php');
       final DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(_date.text);
       final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
       // final url = Uri.parse('http://192.168.29.129/API/offers.php');
@@ -186,7 +186,7 @@ class _EditOfferState extends State<EditOffer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Offer', style: Theme.of(context).textTheme.bodySmall,),
+        title: Text('Edit Offer', style: Theme.of(context).textTheme.displayLarge,),
         centerTitle: true,
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon

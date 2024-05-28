@@ -31,7 +31,7 @@ class _AboutState extends State<About> {
   List<Map<String, dynamic>> suggesstiondata = [];
   Future<void> getDistrict() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/district.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/district.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

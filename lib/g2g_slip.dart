@@ -74,7 +74,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
@@ -116,11 +116,12 @@ class _GtoGPageState extends State<GtoGPage> {
 
 
   Future<void> postData() async {
-    var url = Uri.parse('http://localhost/GIB/lib/GIBAPI/g2g_slip.php');
+    var url = Uri.parse('http://mybudgetbook.in/GIBAPI/g2g_slip.php');
     final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(metdate.text);
     final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
     final response = await http.post(url, body: jsonEncode({
       'met_name': metwith.text,
+      'user_id':widget.userId,
       'met_company_name': companyname.text,
       'met_number': companymobile.text,
       'date': formattedDate,
@@ -146,7 +147,7 @@ class _GtoGPageState extends State<GtoGPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Error"),
+              title: Text("Alert"),
               content: Text(responseData['message']),
               actions: [
                 TextButton(
@@ -171,7 +172,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
   Future<void> fetchRegistrationData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -232,7 +233,7 @@ class _GtoGPageState extends State<GtoGPage> {
       appBar: AppBar(
         centerTitle: true,
 
-        title: (Text('G2G', style: Theme.of(context).textTheme.bodySmall)
+        title: (Text('G2G',  style: Theme.of(context).textTheme.displayLarge,)
         ),
         actions: [
           IconButton(
@@ -534,14 +535,13 @@ class _GtoGPageState extends State<GtoGPage> {
                                         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, selectedTime.hour, selectedTime.minute),
                                       );
                                       print("Formatted Time: $formattedTime");
-
                                       setState(() {
                                         totime.text = formattedTime;
                                       });
                                     },                                    style: const TextStyle(fontSize: 12,
                                         fontWeight: FontWeight.bold),
                                     decoration: InputDecoration(
-                                      labelText: 'To Time',
+                                      hintText: 'To Time',
                                       suffixIcon: const Icon(
                                             Icons.watch_later_outlined,
                                         color: Colors.green,),
@@ -554,7 +554,6 @@ class _GtoGPageState extends State<GtoGPage> {
                           ]
                       ),
                     ),
-        
                     MaterialButton(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)  ),
                       minWidth: 320,
@@ -565,7 +564,7 @@ class _GtoGPageState extends State<GtoGPage> {
                           postData();
                         }
                       },
-                      child: const Text('Sumbit',
+                      child: const Text('SUBMIT',
                         style: TextStyle(color: Colors.white),),
                     ),
                   ]

@@ -123,7 +123,7 @@ class _GuestState extends State<Guest> {
     try {
       print("Mobile :$mobile");
 
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&mobile=$mobile');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&mobile=$mobile');
       final response = await http.get(url);
       print("id fetch URL :$url" );
 
@@ -168,7 +168,7 @@ class _GuestState extends State<Guest> {
   Future<void> idBaseMobileNoFetched(String memberId) async {
     try {
       print("Mobile :$memberId");
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&member_id=$memberId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&member_id=$memberId');
       final response = await http.get(url);
       print("id fetch URL memberId :$url" );
 
@@ -232,9 +232,9 @@ class _GuestState extends State<Guest> {
         });
       }
     try {
-      String uri = "http://localhost/GIB/lib/GIBAPI/registration.php";
+      String uri = "http://mybudgetbook.in/GIBAPI/registration.php";
       print("registration URL: $uri");
-     // String uri = "http://localhost/GIB/lib/GIBAPI/save_image.php";
+     // String uri = "http://mybudgetbook.in/GIBAPI/save_image.php";
       print("ImageName: $imagename");
       var res = await http.post(Uri.parse(uri),
           body: jsonEncode({
@@ -354,7 +354,7 @@ class _GuestState extends State<Guest> {
   List district = [];
   Future<void> getDistrict() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/district.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/district.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -376,7 +376,7 @@ class _GuestState extends State<Guest> {
   List<Map<String, dynamic>> suggesstiondataitemName = [];
   Future<void> getitemname(String district) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/chapter.php?district=$district'); // Fix URL
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/chapter.php?district=$district'); // Fix URL
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

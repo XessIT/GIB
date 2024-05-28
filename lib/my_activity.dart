@@ -23,8 +23,8 @@ class _ActivityState extends State<Activity> {
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      //http://mybudgetbook.in/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
         print("fetch url:$url");
 
@@ -59,7 +59,7 @@ class _ActivityState extends State<Activity> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=waiting&mobile=$fetchMobile');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=waiting&mobile=$fetchMobile');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
@@ -83,7 +83,7 @@ class _ActivityState extends State<Activity> {
   }
   Future<void> approved(int ID) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/member_approval.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/member_approval.php');
       final response = await http.put(
         url,
         body: jsonEncode({
@@ -105,7 +105,7 @@ class _ActivityState extends State<Activity> {
   }
   Future<void> delete(String id) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?id=$id');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?id=$id');
       final response = await http.delete(url);
       print("Delete Url: $url");
       if (response.statusCode == 200) {
@@ -151,7 +151,7 @@ class _ActivityState extends State<Activity> {
       body: data.isNotEmpty ? ListView.builder(
           itemCount: data.length,
           itemBuilder: (context, i) {
-            String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['profile_image']}';
+            String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]['profile_image']}';
               return
                 Center(
                   child: Padding(

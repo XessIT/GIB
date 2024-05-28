@@ -71,11 +71,13 @@ class _LoginSubClassState extends State<LoginSubClass> {
   String? profile_image;
   String? userId;
   String? company_name;
+  bool isLoading = false;
   Future<void> signIn() async {
+    await Future.delayed(const Duration(seconds: 1));
     try {
       var response = await http.get(
         Uri.parse(
-            "http://localhost/GIB/lib/GIBAPI/user.php?mobile=${mobilecontroller.text.trim()}&password=${passwordController.text.trim()}"),
+            "http://mybudgetbook.in/GIBAPI/user.php?mobile=${mobilecontroller.text.trim()}&password=${passwordController.text.trim()}"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -103,7 +105,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
             userId = userID;
             print("USER: $userId");
           });
-
+          setState(() {
+            isLoading = false;
+          });
           // Navigate based on user type
           switch (memberType) {
             case "Executive":
@@ -290,7 +294,9 @@ class _LoginSubClassState extends State<LoginSubClass> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Login button starts
-                      MaterialButton(
+                      isLoading
+                          ? CircularProgressIndicator()
+                          : MaterialButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5.0)),
                         minWidth: 130,

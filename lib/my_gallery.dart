@@ -32,17 +32,18 @@ class _MyGalleryState extends State<MyGallery> {
       child: Scaffold(
         appBar: AppBar(
           // Appbar title
-          title: const Center(child: Text('My Gallery')),
+          title: Center(child: Text('My Gallery', style: Theme.of(context).textTheme.displayLarge),),
           centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
           leading:IconButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  Home(userType: '', userId: widget.userId,)));
               },
-              icon: const Icon(Icons.arrow_back)),
+              icon: const Icon(Icons.navigate_before)),
         ),
         body: Column(
           children:   [
-            TabBar(
+            const TabBar(
                 isScrollable: true,
                 labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
@@ -70,7 +71,7 @@ class _MyGalleryState extends State<MyGallery> {
 class Gallery extends StatefulWidget {
   final String? userId;
 
-  const Gallery({Key? key, required this.userId}) : super(key: key);
+  const Gallery({super.key, required this.userId});
 
   @override
   State<Gallery> createState() => _GalleryState();
@@ -103,7 +104,7 @@ class _GalleryState extends State<Gallery> {
 
   Future<void> _uploadImage(Uint8List imageBytes) async {
     final url =
-        'http://localhost/GIB/lib/GIBAPI/mygallery.php?userId=${widget.userId}';
+        'http://mybudgetbook.in/GIBAPI/mygallery.php?userId=${widget.userId}';
 
     final response = await http.post(
       Uri.parse(url),
@@ -124,7 +125,7 @@ class _GalleryState extends State<Gallery> {
 
   Future<void> _fetchImages() async {
     final url =
-        'http://localhost/GIB/lib/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
+        'http://mybudgetbook.in/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
 
     final response = await http.get(Uri.parse(url));
 
@@ -136,7 +137,7 @@ class _GalleryState extends State<Gallery> {
 
       for (var data in imageData) {
         final imageUrl =
-            'http://localhost/GIB/lib/GIBAPI/${data['image_path']}';
+            'http://mybudgetbook.in/GIBAPI/${data['image_path']}';
         final imageResponse = await http.get(Uri.parse(imageUrl));
         if (imageResponse.statusCode == 200) {
           Uint8List imageBytes = imageResponse.bodyBytes;
@@ -154,7 +155,7 @@ class _GalleryState extends State<Gallery> {
   Future<void> _deleteImage(int imageIndex) async {
     String imageId = _imageDataList[imageIndex]['id'];
     final url =
-        'http://localhost/GIB/lib/GIBAPI/deleteImage.php?image_id=$imageId';
+        'http://mybudgetbook.in/GIBAPI/deleteImage.php?image_id=$imageId';
     print('url: $url');
 
     final response = await http.delete(Uri.parse(url));
@@ -176,8 +177,8 @@ class _GalleryState extends State<Gallery> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Image'),
-          content: SingleChildScrollView(
+          title: const Text('Delete Image'),
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text('Are you sure you want to delete this image?'),
@@ -358,7 +359,7 @@ class _VideoState extends State<Video> {
       }
 
       print('videoBytes: $videoBytes');
-      final url = 'http://localhost/GIB/lib/GIBAPI/videos.php?userId=${widget.userId}';
+      final url = 'http://mybudgetbook.in/GIBAPI/videos.php?userId=${widget.userId}';
 
       print('url: $url');
       // Make HTTP request to upload video file to server
@@ -397,7 +398,7 @@ class _VideoState extends State<Video> {
   }
 
   Future<void> _fetchVideos() async {
-    final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userId}';
+    final url = 'http://mybudgetbook.in/GIBAPI/fetchvideos.php?userId=${widget.userId}';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -417,7 +418,7 @@ class _VideoState extends State<Video> {
 
   Future<void> _fetchThumbnail(int index) async {
     final videoPath = _videos[index]['video_path'];
-    final url = 'http://localhost/GIB/lib/GIBAPI/videosmp4.php?video_path=' + videoPath;
+    final url = 'http://mybudgetbook.in/GIBAPI/videosmp4.php?video_path=' + videoPath;
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -433,7 +434,7 @@ class _VideoState extends State<Video> {
 
   Future<void> _deleteVideo(int videoIndex) async {
     int videoId = _videos[videoIndex]['id'];
-    final url = 'http://localhost/GIB/lib/GIBAPI/deletevideos.php?video_id=$videoId';
+    final url = 'http://mybudgetbook.in/GIBAPI/deletevideos.php?video_id=$videoId';
 
     final response = await http.delete(Uri.parse(url));
 

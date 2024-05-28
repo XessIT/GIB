@@ -56,7 +56,7 @@ class _ViewState extends State<View> {
         appBar: AppBar(
           title: Text(
             'My Profile',
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.displayLarge,
           ),
           iconTheme: const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
@@ -75,17 +75,6 @@ class _ViewState extends State<View> {
                   ),
                 );
               }
-              else if (widget.userType == "Guest") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GuestHome(
-                      userType: widget.userType.toString(),
-                      userId: widget.userID.toString(),
-                    ),
-                  ),
-                );
-              }
               else{
                 Navigator.push(
                   context,
@@ -98,7 +87,7 @@ class _ViewState extends State<View> {
                 );
               }
             },
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.navigate_before),
           ),
         ),
           body: PopScope(
@@ -109,17 +98,6 @@ class _ViewState extends State<View> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => NavigationBarNon(
-                      userType: widget.userType.toString(),
-                      userId: widget.userID.toString(),
-                    ),
-                  ),
-                );
-              }
-              else if (widget.userType == "Guest") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GuestHome(
                       userType: widget.userType.toString(),
                       userId: widget.userID.toString(),
                     ),
@@ -223,7 +201,7 @@ class _PersonalState extends State<Personal> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
@@ -259,10 +237,11 @@ class _PersonalState extends State<Personal> {
                 spousekovil=dynamicdata[0]["s_father_kovil"];
                 profileImage=dynamicdata[0]["profile_image"];
                 marital_status=dynamicdata[0]["marital_status"];
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["profile_image"]}';
+                imageUrl = 'http://mybudgetbook.in/GIBAPI/${dynamicdata[0]["profile_image"]}';
                 imageParameter = dynamicdata[0]["profile_image"];
               });
               print("Image Parameter: $imageParameter");
+              print("Image Url: $imageUrl");
             }
           });
         } else {
@@ -295,7 +274,7 @@ class _PersonalState extends State<Personal> {
             children: [
               SizedBox(
                 width: double.infinity,
-                height: 300,
+                height: 250,
                 child: Image.network(imageUrl, fit: BoxFit.fill,),
               ),
              Align(
@@ -303,6 +282,7 @@ class _PersonalState extends State<Personal> {
                 child: IconButton(
                   onPressed: () {
                     print("Pas:n$imageParameter");
+                    print("image URL:n$imageUrl");
                     // Ensure that imageUrl is not empty before navigating
                     if (imageUrl.isNotEmpty) {
                       Navigator.push(
@@ -703,10 +683,11 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
 
               //TABBAR STARTS
               child: TabBar(
-                indicator: const BoxDecoration(
+                /*indicator: const BoxDecoration(
                  // color: Colors.green,
-                ),
+                ),*/
                 //TABS STARTS
+                labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
                 tabs: [
                   const Tab(text: ('BusinessInfo')),
@@ -775,7 +756,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -793,12 +774,8 @@ class _BusinessInfoState extends State<BusinessInfo> {
                 email = dynamicdata[0]["email"];
                 website = dynamicdata[0]["website"];
                 ybe = dynamicdata[0]["b_year"];
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["business_image"]}';
+                imageUrl = 'http://mybudgetbook.in/GIBAPI/${dynamicdata[0]["business_image"]}';
                 imageParameter = dynamicdata[0]["business_image"];
-
-
-
-
               });
             }
           });
@@ -870,7 +847,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
                     )));
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(Icons.edit,color: Colors.green,),
                 ),
               ),
               ExpansionTile(
@@ -912,17 +889,22 @@ class _BusinessInfoState extends State<BusinessInfo> {
                     child: Row(
                       // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children:  [
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                          child: Text('Business Keywords'),
+                        Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                              child: Text('Business Keywords'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                              child: Text(businesskeywords!,
+                                textAlign: TextAlign.justify,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,),
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(73, 0, 0, 0),
-                          child: Text(businesskeywords!,
-                            textAlign: TextAlign.justify,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 3,),
-                        )
+
                       ],
                     ),
                   ),
@@ -996,13 +978,26 @@ class _BusinessInfoState extends State<BusinessInfo> {
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text('Website/Brochure'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(73, 0, 0, 5),
-                        child: Text(website!),
+                      Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                            child: Text('Website/Brochure'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 18),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.language,  // Use the appropriate icon, here "language" is used as an example
+                                  color: Colors.green,
+                                ),
+                                SizedBox(width: 5),  // Add some space between the icon and the text
+                                Text(website!),
+                              ],
+                            ),
+                          ),
+                        ],
                       )
                     ],
                   ),
@@ -1049,8 +1044,13 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Gallery",style: TextStyle(color: Colors.white),),
+          title: Text("Gallery",style: Theme.of(context).textTheme.displayLarge),
           centerTitle: true,
+          iconTheme: IconThemeData(color: Colors.white),
+          leading: IconButton(
+            icon: Icon(Icons.navigate_before),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         body: Column(
           children: [
@@ -1069,9 +1069,7 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
 
               //TABBAR STARTS
               child: const TabBar(
-                indicator: BoxDecoration(
-                  color: Colors.green,
-                ),
+                labelColor: Colors.green,
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
                 tabs: [
@@ -1111,7 +1109,7 @@ class _ImageViewState extends State<ImageView> {
 
   Future<void> _fetchImages() async {
     final url =
-        'http://localhost/GIB/lib/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
+        'http://mybudgetbook.in/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
 
     final response = await http.get(Uri.parse(url));
 
@@ -1123,7 +1121,7 @@ class _ImageViewState extends State<ImageView> {
 
       for (var data in imageData) {
         final imageUrl =
-            'http://localhost/GIB/lib/GIBAPI/${data['image_path']}';
+            'http://mybudgetbook.in/GIBAPI/${data['image_path']}';
         final imageResponse = await http.get(Uri.parse(imageUrl));
         if (imageResponse.statusCode == 200) {
           Uint8List imageBytes = imageResponse.bodyBytes;
@@ -1190,7 +1188,7 @@ class _VideoViewState extends State<VideoView> {
   }
 
   Future<void> _fetchVideos() async {
-    final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userID}';
+    final url = 'http://mybudgetbook.in/GIBAPI/fetchvideos.php?userId=${widget.userID}';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -1317,106 +1315,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
 
 
-/*class Reward extends StatefulWidget {
-  const Reward({Key? key}) : super(key: key);
-=======
-
-
-
-
-
-class Reward extends StatefulWidget {
-  const Reward({super.key});
->>>>>>> 4f5114d4d814e06af93be023c7959ff6ebdf055b
-
-  @override
-  State<Reward> createState() => _RewardState();
-}
-class _RewardState extends State<Reward> {
-
-  String? image = "";
-  String documentid="";
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-
-                SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.person_add,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('New Member Introduction'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(60, 0, 0, 0),
-                      child: Text('',),
-                    ),
-                  ],
-                ),
-                Divider(color: Colors.grey,),
-
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.card_giftcard_sharp,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('Team Winning Award'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(95, 0, 0, 0),
-                      child: Text(''),
-                    ),
-                  ],
-                ),
-                Divider(color: Colors.grey,),
-
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Icon(Icons.emoji_events,size: 30,),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                      child: Text('Activity Trip Award'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(115, 0, 0, 0),
-                      child: Text(''),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30,),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}*/   /// Reward
+  /// Reward
 
 
 

@@ -93,8 +93,8 @@ class _PersonalEditoldState extends State<PersonalEditold> {
 
   Future<void> fetchData(String userId) async {
     try {
-      //http://localhost/GIB/lib/GIBAPI/offers.php?table=registration&id=${widget.userId}
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      //http://mybudgetbook.in/GIBAPI/offers.php?table=registration&id=${widget.userId}
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -180,7 +180,7 @@ class _PersonalEditoldState extends State<PersonalEditold> {
 
 
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php');
 
       final response = await http.put(
         url,
@@ -274,7 +274,7 @@ class _PersonalEditoldState extends State<PersonalEditold> {
   List district = [];
   Future<void> getDistrict() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=district');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=district');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -295,7 +295,7 @@ class _PersonalEditoldState extends State<PersonalEditold> {
   List<Map<String, dynamic>> suggesstiondataitemName = [];
   Future<void> getitemname(String district) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&district=$district'); // Fix URL
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&district=$district'); // Fix URL
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

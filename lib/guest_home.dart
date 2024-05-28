@@ -154,7 +154,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
   Future<void> fetchData(String? userId) async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+          'http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -165,7 +165,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
             if (userdata.isNotEmpty) {
               setState(() {
                 imageUrl =
-                    'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+                    'http://mybudgetbook.in/GIBAPI/${userdata[0]["profile_image"]}';
 
                 _imageBytes = base64Decode(userdata[0]['profile_image']);
               });
@@ -192,7 +192,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
     print('Attempting to make HTTP request...');
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+          'http://mybudgetbook.in/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -376,7 +376,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             itemCount: data.length,
                             itemBuilder: (context, i) {
                               String imageUrl =
-                                  'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+                                  'http://mybudgetbook.in/GIBAPI/${data[i]["offer_image"]}';
 
                               String dateString = data[i][
                                   'validity']; // This will print the properly encoded URL

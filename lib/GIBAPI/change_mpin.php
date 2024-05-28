@@ -3,10 +3,10 @@ header("Access-Control-Allow-Origin: *");
  header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
  header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "gib";
+$servername = "207.174.212.202";
+ $username = "kanin7w7_gibErode";
+ $password = "Kanxtl@6868#";
+ $dbname = "kanin7w7_gibErode";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $database);

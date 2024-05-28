@@ -110,7 +110,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
 
   Future<void> registerDateStoreDatabase(String meetingId,String meetingType, String meetingDate, String meetingPlace) async {
     try {
-      String uri = "http://localhost/GIB/lib/GIBAPI/register_meeting.php";
+      String uri = "http://mybudgetbook.in/GIBAPI/register_meeting.php";
       var res = await http.post(Uri.parse(uri), body: jsonEncode( {
         "meeting_id": meetingId,
         "meeting_type": meetingType,
@@ -138,7 +138,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
 
   Future<void> fetchData(String? userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -147,7 +147,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
           setState(() {
             userdata = responseData.cast<Map<String, dynamic>>();
             if (userdata.isNotEmpty) {
-              profileImage = 'http://localhost/GIB/lib/GIBAPI/${userdata[0]["profile_image"]}';
+              profileImage = 'http://mybudgetbook.in/GIBAPI/${userdata[0]["profile_image"]}';
               _imageBytes = base64Decode(userdata[0]['profile_image']);
             }
           });
@@ -166,7 +166,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/non_exe_meeting.php?member_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/non_exe_meeting.php?member_type=$type');
       print('URL: $url');
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -240,7 +240,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
   Future<void> getData1() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -565,7 +565,7 @@ class _NonExecutiveHomeState extends State<NonExecutiveHome> {
                     child: ListView.builder(
                         itemCount: data1.length,
                         itemBuilder: (context, i) {
-                          String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data1[i]["offer_image"]}';
+                          String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data1[i]["offer_image"]}';
 
                           String dateString = data1[i]['validity']; // This will print the properly encoded URL
                           DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
@@ -797,7 +797,7 @@ class _NavigationBarNonState extends State<NavigationBarNon> {
       NonExecutiveHomeNav(userId: widget.userId, userType: widget.userType),
       OffersPage(userId: widget.userId, userType: widget.userType),
        AttendancePage(userID: widget.userId, userType: widget.userType.toString()),
-      AttendanceScannerPage(userID: widget.userId, userType: widget.userType.toString()),
+      GibMembers(userId: widget.userId, userType: widget.userType.toString()),
       SettingsPageNon(userId: widget.userId, userType: widget.userType),
     ];
     super.initState();
@@ -845,14 +845,14 @@ class _NavigationBarNonState extends State<NavigationBarNon> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.qr_code_scanner,
+              Icons.account_circle_outlined,
               color: Theme.of(context)
                   .brightness ==
                   Brightness.light
                   ? Colors.black45
                   : Colors.white,
             ),
-            label: 'Att Scan',
+            label: 'Members',
           ),
           BottomNavigationBarItem(
             icon: Icon(

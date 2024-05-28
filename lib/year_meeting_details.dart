@@ -29,7 +29,7 @@ class _MeetingUpdateDatePageState extends State<MeetingUpdateDatePage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -133,7 +133,7 @@ class _MeetingUpdateDatePageState extends State<MeetingUpdateDatePage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -284,7 +284,7 @@ class _MeetingUpdateDatePageState extends State<MeetingUpdateDatePage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -469,7 +469,7 @@ class _MeetingUpdateDatePageState extends State<MeetingUpdateDatePage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

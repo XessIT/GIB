@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 // Create a new mysqli connection
-$con = new mysqli("localhost", "root", "", "gib");
+$con = new mysqli("207.174.212.202", "kanin7w7_gibErode", "Kanxtl@6868#", "kanin7w7_gibErode");
 
 // Check if the connection is successful
 if ($con->connect_error) {
