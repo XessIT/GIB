@@ -107,7 +107,7 @@ class ViewPhotosPage extends StatefulWidget {
 class _ViewPhotosPageState extends State<ViewPhotosPage> {
   List<Map<String, dynamic>> _imageGroups = [];
   Future<void> _fetchImages() async {
-    final url = Uri.parse('http://localhost/GIB_ADMIN/lib/GIBADMINAPI/gibimagefetch.php');
+    final url = Uri.parse('http://mybudgetbook.in/GIBADMINAPI/gibimagefetch.php');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List<dynamic> imageData = jsonDecode(response.body);
@@ -186,7 +186,7 @@ class _ViewPhotosPageState extends State<ViewPhotosPage> {
                     itemBuilder: (context, imageIndex) {
                       final imagePath = group['imagepaths'][imageIndex];
                       return FutureBuilder(
-                        future: http.get(Uri.parse('http://localhost/GIB_ADMIN/lib/GIBADMINAPI/$imagePath')),
+                        future: http.get(Uri.parse('http://mybudgetbook.in/GIBADMINAPI/$imagePath')),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                             final imageResponse = snapshot.data as http.Response;
@@ -237,7 +237,7 @@ class _ViewVideosPageState extends State<ViewVideosPage> {
   List<Map<String, dynamic>> _groupedVideos = [];
 
   Future<void> _fetchVideos() async {
-    final url = Uri.parse('http://localhost/GIB_ADMIN/lib/GIBADMINAPI/gibvideosfetch.php');
+    final url = Uri.parse('http://mybudgetbook.in/GIBADMINAPI/gibvideosfetch.php');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

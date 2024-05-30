@@ -20,7 +20,7 @@ class AttendanceScannerPage extends StatefulWidget {
 
 class _AttendanceScannerPageState extends State<AttendanceScannerPage> {
   final _formKey = GlobalKey<FormState>();
-  String qrstr ="";
+  String qrstr ="before Scan";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,6 +169,7 @@ class _AttendanceScannerPageState extends State<AttendanceScannerPage> {
                       ),
                     ),
                   ),
+                  Text(qrstr, style: Theme.of(context).textTheme.displayLarge),
                 ],
               ),
             ),
@@ -183,8 +184,8 @@ class _AttendanceScannerPageState extends State<AttendanceScannerPage> {
       FlutterBarcodeScanner.scanBarcode('#2A99CF', 'cancel', true, ScanMode.QR).then((value) {
         setState(() async {
           qrstr = value;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Attend Your Meeting"),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(qrstr),
           ));
         });
       });

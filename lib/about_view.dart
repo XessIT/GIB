@@ -1,32 +1,30 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gipapp/home.dart';
-
-import 'gib_edit_about.dart';
+import 'Non_exe_pages/non_exe_home.dart';
+import 'guest_home.dart';
 
 class AboutTab extends StatelessWidget {
-  final String userId = "";
-  final String userType = "";
+  final String? userId;
+  final String? userType;
 
-  AboutTab({Key? key, required userId, required userType}) : super(key: key);
+  const AboutTab({super.key, required this.userId, required this.userType});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AboutGibView(userId: userId, userType: userType),
+      body: AboutGibView(userId: userId.toString(), userType: userType.toString()),
     );
   }
 }
 
 class AboutGibView extends StatefulWidget {
-  String? userId = "";
-  String? userType = "";
+  final String? userId;
+  final String? userType;
 
-  AboutGibView({Key? key, required this.userId, required this.userType})
-      : super(key: key);
+  const AboutGibView({super.key, required this.userId, required this.userType});
 
   @override
   State<AboutGibView> createState() => _AboutGibViewState();
@@ -40,11 +38,10 @@ class _AboutGibViewState extends State<AboutGibView> {
   Future<void> aboutVision() async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/about.php?table=about_vision');
+          'http://mybudgetbook.in/GIBAPI/about.php?table=about_vision');
       if (kDebugMode) {
         print("Url:$url");
       }
-
       final response = await http.get(url);
       if (kDebugMode) {
         print("Response:$response");
@@ -63,7 +60,7 @@ class _AboutGibViewState extends State<AboutGibView> {
         }
         setState(() {
           aboutVisiondata = itemGroups.cast<Map<String, dynamic>>();
-          print("aboutvision:$aboutVisiondata");
+         // print("aboutvision:$aboutVisiondata");
         });
       } else {
         //print('Error: ${response.statusCode}');
@@ -75,7 +72,7 @@ class _AboutGibViewState extends State<AboutGibView> {
 
   Future<void> aboutGIB() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/about.php?table=about_gib');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/about.php?table=about_gib');
       if (kDebugMode) {
         print("Url:$url");
       }
@@ -98,7 +95,7 @@ class _AboutGibViewState extends State<AboutGibView> {
         }
         setState(() {
           aboutGIBdata = itemGroups.cast<Map<String, dynamic>>();
-          print("aboutgib:$aboutGIBdata");
+         // print("aboutgib:$aboutGIBdata");
         });
       } else {
         //print('Error: ${response.statusCode}');
@@ -111,7 +108,7 @@ class _AboutGibViewState extends State<AboutGibView> {
   Future<void> aboutMission() async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/about.php?table=about_mission');
+          'http://mybudgetbook.in/GIBAPI/about.php?table=about_mission');
       if (kDebugMode) {
         print("aboutMission Url:$url");
       }
@@ -134,7 +131,7 @@ class _AboutGibViewState extends State<AboutGibView> {
         }
         setState(() {
           aboutMissiondata = itemGroups.cast<Map<String, dynamic>>();
-          print("about Mission data:$aboutMissiondata");
+        //  print("about Mission data:$aboutMissiondata");
         });
       } else {
         //print('Error: ${response.statusCode}');
@@ -158,155 +155,212 @@ class _AboutGibViewState extends State<AboutGibView> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title:  Text('About GIB',style: Theme.of(context).textTheme.bodySmall),
+          title:  Text('About GIB',style: Theme.of(context).textTheme.displayLarge),
           centerTitle: true,
-          // actions: [
-          //   IconButton(onPressed: (){
-          //     Navigator.push(context, MaterialPageRoute(builder: (context)=>AboutTabEdit(userId: widget.userId, userType: widget.userType,)));
-          //   }, icon: Icon(Icons.edit))
-          // ],
           iconTheme:  const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
           ),
           leading: IconButton(
             onPressed: () {
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarNon(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+              else if (widget.userType == "Guest") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GuestHome(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarExe(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+        body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (widget.userType == "Non-Executive") {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      Home(userType: widget.userType, userId: widget.userId),
+                  builder: (context) => NavigationBarNon(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
                 ),
               );
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
-        ),
-        body: Column(
-          children: [
-            TabBar(
-                tabAlignment: TabAlignment.center,
-                isScrollable: true,
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(
-                    text: 'GIB',
+            } else if (widget.userType == "Guest") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GuestHome(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
                   ),
-                  Tab(
-                    text: 'Vision',
+                ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarExe(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
                   ),
-                  Tab(
-                    text: 'Mission',
-                  )
-                ]),
-            Container(
-              height: 500,
-              width: 400,
-              child: TabBarView(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Center(
-                          child: Column(
-                            children: [
-                              // Row(
-                              //   crossAxisAlignment:CrossAxisAlignment.end,
-                              //   children: [
-                              //     IconButton(onPressed: (){
-                              //     //  Navigator.push(context, MaterialPageRoute(builder: (context)=>GIBEditAbout()));
-                              //     }, icon: Icon(Icons.edit))
-                              //   ],
-                              // ),
-                              Image.asset('assets/logo.png', width: 300,),
-                              Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Text(
-                                  aboutGIBdata.isNotEmpty &&
-                                      aboutGIBdata[0]["gib_content_1"].isNotEmpty
-                                      ? "${aboutGIBdata[0]["gib_content_1"]}"
-                                      : "Loading...",
-                                  textAlign: TextAlign.justify,
+                ),
+              );
+            }
+          },
+          child: Column(
+            children: [
+              const TabBar(
+                  tabAlignment: TabAlignment.center,
+                  isScrollable: true,
+                  labelColor: Colors.green,
+                  unselectedLabelColor: Colors.black,
+                  tabs: [
+                    Tab(
+                      text: 'GIB',
+                    ),
+                    Tab(
+                      text: 'Vision',
+                    ),
+                    Tab(
+                      text: 'Mission',
+                    )
+                  ]),
+              SizedBox(
+                height: 500,
+                width: 400,
+                child: TabBarView(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Column(
+                              children: [
+                                // Row(
+                                //   crossAxisAlignment:CrossAxisAlignment.end,
+                                //   children: [
+                                //     IconButton(onPressed: (){
+                                //     //  Navigator.push(context, MaterialPageRoute(builder: (context)=>GIBEditAbout()));
+                                //     }, icon: Icon(Icons.edit))
+                                //   ],
+                                // ),
+                                Image.asset('assets/logo.png', width: 300,),
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    aboutGIBdata.isNotEmpty &&
+                                        aboutGIBdata[0]["gib_content_1"].isNotEmpty
+                                        ? "${aboutGIBdata[0]["gib_content_1"]}"
+                                        : "Loading...",
+                                    textAlign: TextAlign.justify,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Text(
-                                  aboutGIBdata.isNotEmpty &&
-                                      aboutGIBdata[0]["gib_content_2"].isNotEmpty
-                                      ? "${aboutGIBdata[0]["gib_content_2"]}"
-                                      : "Loading...",
-                                  textAlign: TextAlign.justify,
+                                const SizedBox(height: 10,),
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    aboutGIBdata.isNotEmpty &&
+                                        aboutGIBdata[0]["gib_content_2"].isNotEmpty
+                                        ? "${aboutGIBdata[0]["gib_content_2"]}"
+                                        : "Loading...",
+                                    textAlign: TextAlign.justify,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Text(
-                                  aboutGIBdata.isNotEmpty &&
-                                      aboutGIBdata[0]["gib_content_3"].isNotEmpty
-                                      ? "${aboutGIBdata[0]["gib_content_3"]}"
-                                      : "Loading...",
-                                  textAlign: TextAlign.justify,
+                                const SizedBox(height: 10,),
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    aboutGIBdata.isNotEmpty &&
+                                        aboutGIBdata[0]["gib_content_3"].isNotEmpty
+                                        ? "${aboutGIBdata[0]["gib_content_3"]}"
+                                        : "Loading...",
+                                    textAlign: TextAlign.justify,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Image.asset('assets/logo.png', width: 300,),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                aboutVisiondata.isNotEmpty
+                                    ? "${aboutVisiondata[0]["vision_content_1"]}"
+                                    : "Loading...",
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Image.asset('assets/logo.png', width: 300,),
-                          Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Text(
-                              aboutVisiondata.isNotEmpty
-                                  ? "${aboutVisiondata[0]["vision_content_1"]}"
-                                  : "Loading...",
-                              textAlign: TextAlign.justify,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                  SingleChildScrollView(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Image.asset('assets/logo.png', width: 300,),
-                          Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Text(
-                              aboutMissiondata.isNotEmpty
-                                  ? "${aboutMissiondata[0]["mission_content_1"]}"
-                                  : "Loading...",
-                              textAlign: TextAlign.justify,
+                    SingleChildScrollView(
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Image.asset('assets/logo.png', width: 300,),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                aboutMissiondata.isNotEmpty
+                                    ? "${aboutMissiondata[0]["mission_content_1"]}"
+                                    : "Loading...",
+                                textAlign: TextAlign.justify,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 10,),
-                          Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Text(
-                              aboutMissiondata.isNotEmpty
-                                  ? "${aboutMissiondata[0]["mission_content_2"]}"
-                                  : "Loading...",
-                              textAlign: TextAlign.justify,
+                            const SizedBox(height: 10,),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                aboutMissiondata.isNotEmpty
+                                    ? "${aboutMissiondata[0]["mission_content_2"]}"
+                                    : "Loading...",
+                                textAlign: TextAlign.justify,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

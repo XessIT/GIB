@@ -75,17 +75,6 @@ class _ViewState extends State<View> {
                   ),
                 );
               }
-              else if (widget.userType == "Guest") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GuestHome(
-                      userType: widget.userType.toString(),
-                      userId: widget.userID.toString(),
-                    ),
-                  ),
-                );
-              }
               else{
                 Navigator.push(
                   context,
@@ -98,7 +87,7 @@ class _ViewState extends State<View> {
                 );
               }
             },
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.navigate_before),
           ),
         ),
           body: PopScope(
@@ -109,17 +98,6 @@ class _ViewState extends State<View> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => NavigationBarNon(
-                      userType: widget.userType.toString(),
-                      userId: widget.userID.toString(),
-                    ),
-                  ),
-                );
-              }
-              else if (widget.userType == "Guest") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GuestHome(
                       userType: widget.userType.toString(),
                       userId: widget.userID.toString(),
                     ),
@@ -223,7 +201,7 @@ class _PersonalState extends State<Personal> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
@@ -259,7 +237,7 @@ class _PersonalState extends State<Personal> {
                 spousekovil=dynamicdata[0]["s_father_kovil"];
                 profileImage=dynamicdata[0]["profile_image"];
                 marital_status=dynamicdata[0]["marital_status"];
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["profile_image"]}';
+                imageUrl = 'http://mybudgetbook.in/GIBAPI/${dynamicdata[0]["profile_image"]}';
                 imageParameter = dynamicdata[0]["profile_image"];
               });
               print("Image Parameter: $imageParameter");
@@ -705,10 +683,11 @@ class _BusinessTabPageState extends State<BusinessTabPage> {
 
               //TABBAR STARTS
               child: TabBar(
-                indicator: const BoxDecoration(
+                /*indicator: const BoxDecoration(
                  // color: Colors.green,
-                ),
+                ),*/
                 //TABS STARTS
+                labelColor: Colors.green,
                 unselectedLabelColor: Colors.black,
                 tabs: [
                   const Tab(text: ('BusinessInfo')),
@@ -777,7 +756,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -795,7 +774,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
                 email = dynamicdata[0]["email"];
                 website = dynamicdata[0]["website"];
                 ybe = dynamicdata[0]["b_year"];
-                imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["business_image"]}';
+                imageUrl = 'http://mybudgetbook.in/GIBAPI/${dynamicdata[0]["business_image"]}';
                 imageParameter = dynamicdata[0]["business_image"];
               });
             }
@@ -1065,8 +1044,13 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Gallery",style: TextStyle(color: Colors.white),),
+          title: Text("Gallery",style: Theme.of(context).textTheme.displayLarge),
           centerTitle: true,
+          iconTheme: IconThemeData(color: Colors.white),
+          leading: IconButton(
+            icon: Icon(Icons.navigate_before),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         body: Column(
           children: [
@@ -1085,9 +1069,7 @@ class _ImageAndVideoState extends State<ImageAndVideo> {
 
               //TABBAR STARTS
               child: const TabBar(
-                indicator: BoxDecoration(
-                  color: Colors.green,
-                ),
+                labelColor: Colors.green,
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
                 tabs: [
@@ -1127,7 +1109,7 @@ class _ImageViewState extends State<ImageView> {
 
   Future<void> _fetchImages() async {
     final url =
-        'http://localhost/GIB/lib/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
+        'http://mybudgetbook.in/GIBAPI/mygalleryfetch.php?userId=${widget.userId}';
 
     final response = await http.get(Uri.parse(url));
 
@@ -1139,7 +1121,7 @@ class _ImageViewState extends State<ImageView> {
 
       for (var data in imageData) {
         final imageUrl =
-            'http://localhost/GIB/lib/GIBAPI/${data['image_path']}';
+            'http://mybudgetbook.in/GIBAPI/${data['image_path']}';
         final imageResponse = await http.get(Uri.parse(imageUrl));
         if (imageResponse.statusCode == 200) {
           Uint8List imageBytes = imageResponse.bodyBytes;
@@ -1206,7 +1188,7 @@ class _VideoViewState extends State<VideoView> {
   }
 
   Future<void> _fetchVideos() async {
-    final url = 'http://localhost/GIB/lib/GIBAPI/fetchvideos.php?userId=${widget.userID}';
+    final url = 'http://mybudgetbook.in/GIBAPI/fetchvideos.php?userId=${widget.userID}';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {

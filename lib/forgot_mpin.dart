@@ -27,7 +27,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&mobile=${mobileController.text}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&mobile=${mobileController.text}');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");

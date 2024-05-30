@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'edit_offer.dart';
 import 'package:http/http.dart' as http;
 
+import 'offer.dart';
+
 class OfferList extends StatelessWidget {
   final String? userId;
   const OfferList({super.key, required this.userId});
@@ -37,41 +39,69 @@ class _OfferListPageState extends State<OfferListPage> {
         //APPBAR STARTS
         appBar: AppBar(
           title: Text('OFFERS',
-              style: Theme.of(context).textTheme.bodySmall),
+              style: Theme.of(context).textTheme.displayLarge),
           centerTitle: true,
           iconTheme:  const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
           ),
+          leading: IconButton(
+            icon: Icon(Icons.navigate_before),
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OffersPage(
+                    userType: "",
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
         //END APPBAR
-        body: Center(
-          child: Column(
-            children:  [
-              const SizedBox(height: 15,),
-              //TABBAR STARTS
-              const TabBar(
-                  isScrollable: true,
-                  labelColor: Colors.green,
-                  unselectedLabelColor: Colors.black,
-                  tabs:[
-                    Tab(text: 'New Offer',),
-                    Tab(text: 'Running',),
-                    Tab(text: 'Completed',),
-                    Tab(text: 'Block')
-                  ] ),
-              //END TABBAR
-              //START TABBAR VIEW
-              const SizedBox(height: 10,),
-              Expanded(
-                child: TabBarView(children: [
-                  AddOfferPage(userId: widget.userId,),
-                  RunningPage(userId: widget.userId),
-                  CompletedPage(userId: widget.userId),
-                  BlockPage(userId: widget.userId),
-                ]),
-              ),
-              //END TABBAR VIEW
-            ],
+        body: PopScope(
+                canPop: false,
+                onPopInvoked: (didPop) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OffersPage(
+                        userType: "",
+                        userId: widget.userId.toString(),
+                      ),
+                    ),
+                  );
+                },
+          child: Center(
+            child: Column(
+              children:  [
+                const SizedBox(height: 15,),
+                //TABBAR STARTS
+                const TabBar(
+                    isScrollable: true,
+                    labelColor: Colors.green,
+                    unselectedLabelColor: Colors.black,
+                    tabs:[
+                      Tab(text: 'New Offer',),
+                      Tab(text: 'Running',),
+                      Tab(text: 'Completed',),
+                      Tab(text: 'Block')
+                    ] ),
+                //END TABBAR
+                //START TABBAR VIEW
+                const SizedBox(height: 10,),
+                Expanded(
+                  child: TabBarView(children: [
+                    AddOfferPage(userId: widget.userId,),
+                    RunningPage(userId: widget.userId),
+                    CompletedPage(userId: widget.userId),
+                    BlockPage(userId: widget.userId),
+                  ]),
+                ),
+                //END TABBAR VIEW
+              ],
+            ),
           ),
         ),
       ),
@@ -156,7 +186,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=registration&id=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=registration&id=${widget.userId}');
       //   print(url);
       final response = await http.get(url);
       // print("ResponseStatus: ${response.statusCode}");
@@ -190,7 +220,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
   Future<void> offers(String datefetch) async {
     try {
       print("_date.text before check request: ${_date.text}");
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php');
       if (datefetch.isNotEmpty) {
         final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(datefetch);
         final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
@@ -464,7 +494,7 @@ class _RunningPageState extends State<RunningPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -526,7 +556,7 @@ class _RunningPageState extends State<RunningPage> {
   }
   Future<void> delete(String ID) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?ID=$ID');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?ID=$ID');
       final response = await http.delete(url);
       print("Delete Url: $url");
       if (response.statusCode == 200) {
@@ -547,7 +577,7 @@ class _RunningPageState extends State<RunningPage> {
   }
   Future<void> blocked(int ID) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php');
       final response = await http.put(
         url,
         body: jsonEncode({
@@ -574,7 +604,7 @@ class _RunningPageState extends State<RunningPage> {
         ListView.builder(
             itemCount: data.length,
             itemBuilder: (context, i) {
-             String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]["offer_image"]}';
+             String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]["offer_image"]}';
               String dateString = data[i]['validity']; // This will print the properly encoded URL
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
               return Center(
@@ -784,7 +814,7 @@ class _CompletedPageState extends State<CompletedPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=UnblockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -833,7 +863,7 @@ class _CompletedPageState extends State<CompletedPage> {
             itemBuilder: (context, i) {
               String dateString = data[i]['validity'];
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]['offer_image']}';
               return Center(
                 child: Card(
                   child: Stack(
@@ -928,7 +958,7 @@ class _BlockPageState extends State<BlockPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=BlockOffers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=BlockOffers');
       print(url);
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -977,7 +1007,7 @@ class _BlockPageState extends State<BlockPage> {
 
   Future<void> unblock(int ID) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php');
       final response = await http.put(
         url,
         body: jsonEncode({
@@ -998,7 +1028,7 @@ class _BlockPageState extends State<BlockPage> {
   }
   Future<void> delete(String ID) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?ID=$ID');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?ID=$ID');
       final response = await http.delete(url);
       print("Delete Url: $url");
       if (response.statusCode == 200) {
@@ -1028,7 +1058,7 @@ class _BlockPageState extends State<BlockPage> {
             itemBuilder: (context, i) {
               String dateString = data[i]['validity'];
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]['offer_image']}';
               return Center(
                 child: Card(
                   child: Column(

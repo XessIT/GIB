@@ -8,17 +8,6 @@ import 'Non_exe_pages/non_exe_home.dart';
 import 'guest_home.dart';
 import 'home.dart';
 
-class GibDoctors extends StatelessWidget {
-  const GibDoctors({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-      body: Doctors(userType: '', userId: ''),
-    );
-  }
-}
-
 class Doctors extends StatefulWidget {
   final String? userType;
   final String? userId;
@@ -39,7 +28,7 @@ List<Map<String,dynamic>> getDoctor=[];
 
       final url =
 
-      Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&member_type=$doctor');
+      Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&member_type=$doctor');
 
         print("Doctor Url:$url");
       final response = await http.get(url);
@@ -73,7 +62,7 @@ List<Map<String,dynamic>> getDoctor=[];
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(centerTitle: true,
-        title: Text('GiB Doctors', style: Theme.of(context).textTheme.bodySmall),
+        title: Text('GiB Doctors', style: Theme.of(context).textTheme.displayLarge),
           iconTheme:  const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
           ),
@@ -113,7 +102,7 @@ List<Map<String,dynamic>> getDoctor=[];
                 );
               }
             },
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.navigate_before),
           ),
           actions: <Widget>[
           IconButton(
@@ -165,7 +154,8 @@ List<Map<String,dynamic>> getDoctor=[];
             );
           }
         },
-        child: ListView.builder(
+        child: getDoctor.isEmpty ? Center(child: Text("No Doctor's", style: Theme.of(context).textTheme.bodyMedium,))
+            : ListView.builder(
                     itemCount: getDoctor.length,
                     itemBuilder: (context, index) {
                       Map<String, dynamic> thisitem = getDoctor[index];
@@ -239,7 +229,7 @@ class _DoctorsDetailsPageState extends State<DoctorsDetailsPage> {
   Future<void> getGibDoctors() async {
     try {
 
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.itemId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.itemId}');
 
       print("Doctor fetch Url:$url");
       final response = await http.get(url);

@@ -32,7 +32,7 @@ String registerStatus="";
 
   Future<void> registerFetch() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/register_meeting.php?user_id=${widget.userId}&meeting_id=${widget.currentid}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/register_meeting.php?user_id=${widget.userId}&meeting_id=${widget.currentid}');
       final response = await http.get(url);
       print("r url:$url");
 

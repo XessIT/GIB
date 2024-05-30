@@ -29,7 +29,7 @@ class _OffersPageState extends State<OffersPage> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/offers.php?table=UnblockOffers');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/offers.php?table=UnblockOffers');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -102,7 +102,7 @@ class _OffersPageState extends State<OffersPage> {
               );
             }
           },
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.navigate_before),
         ),
         iconTheme:  const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
@@ -167,92 +167,84 @@ class _OffersPageState extends State<OffersPage> {
             itemBuilder: (context, i) {
               String dateString = data[i]['validity'];
               DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-              String imageUrl = 'http://localhost/GIB/lib/GIBAPI/${data[i]['offer_image']}';
+              String imageUrl = 'http://mybudgetbook.in/GIBAPI/${data[i]['offer_image']}';
               // final DocumentSnapshot documentSnapshot = streamSnapshot.data!.docs[index];
-              return Stack(
-                children:[
-                  Card(
-                    child: SizedBox(
-                      height: 240,
-                      width: 180,
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topRight,
-                            child:
-                            IconButton(
-                              onPressed: () {
-                                launchUrl(Uri.parse("tel://${data[i]['mobile']}"));
-                              },
-                              icon: Icon(
-                                Icons.call_outlined,
-                                color: Colors.green[900],
-                              ),
+              return Card(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 60,
+                          decoration: const BoxDecoration(
+                            color: Colors.red, // Change the color here
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
                             ),
                           ),
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundImage: NetworkImage(imageUrl),
-                            child: Stack(
-                              children: [
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5,),
-                          Text('${data[i]['company_name']}',
-                            style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold),),
-                          // const SizedBox(height: 15,),
-                          Text('${data[i]['offer_type']} - ${data[i]['name']}',
-                            style: const TextStyle(fontSize: 10,
-                                fontWeight: FontWeight.bold),),
-                          //  const SizedBox(height: 5,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                          child: Row(
                             children: [
-                              const Text('Validity -',
-                                style: TextStyle(fontSize: 10,
-                                    fontWeight: FontWeight.bold),),
-                              Text(DateFormat('dd-MM-yyyy').format(dateTime),
-                                style: const TextStyle(fontSize: 10,
-                                    fontWeight: FontWeight.bold),),
+                              Text(
+                                '${data[i]['discount']}% off', // Text for your banner
+                                style: const TextStyle(
+                                  color: Colors.white, // Change the text color here
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.italic, // Add any additional styles here
+                                  fontSize: 12.0, // Adjust font size as needed
+                                ),
+                              ),
                             ],
                           ),
-                          // Text(DateFormat('dd/MM/yyyy').format(DateTime.now()))
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    left: 8, // Adjust position if needed
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.red, // Change the color here
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          bottomRight: Radius.circular(10.0),
                         ),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            '${data[i]['discount']}% off', // Text for your banner
-                            style: const TextStyle(
-                              color: Colors.white, // Change the text color here
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic, // Add any additional styles here
-                              fontSize: 12.0, // Adjust font size as needed
-                            ),
+                        IconButton(
+                          onPressed: () {
+                            launchUrl(Uri.parse("tel://${data[i]['mobile']}"));
+                          },
+                          icon: Icon(
+                            Icons.call_outlined,
+                            color: Colors.green[900],
                           ),
+                        ),
+                      ],
+                    ),
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundImage: NetworkImage(imageUrl),
+                      child: Stack(
+                        children: [
                         ],
                       ),
                     ),
-                  ),
-
-                ]
+                   // const SizedBox(height: 5,),
+                    Text('${data[i]['company_name']}',
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold),),
+                    Text("Contact: ${data[i]['mobile']}",
+                      style: const TextStyle(fontSize: 10,
+                          fontWeight: FontWeight.bold),),
+                    // const SizedBox(height: 15,),
+                    Text('${data[i]['offer_type']} - ${data[i]['name']}',
+                      style: const TextStyle(fontSize: 10,
+                          fontWeight: FontWeight.bold),),
+                    //  const SizedBox(height: 5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Validity -',
+                          style: TextStyle(fontSize: 10,
+                              fontWeight: FontWeight.bold),),
+                        Text(DateFormat('dd-MM-yyyy').format(dateTime),
+                          style: const TextStyle(fontSize: 10,
+                              fontWeight: FontWeight.bold),),
+                      ],
+                    ),
+                    // Text(DateFormat('dd/MM/yyyy').format(DateTime.now()))
+                  ],
+                ),
               );
             }
         ),

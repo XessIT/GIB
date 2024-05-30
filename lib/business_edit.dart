@@ -48,7 +48,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   String uid = '';
   @override
   void  initState() {
-    image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl}';
+    image = 'http://mybudgetbook.in/GIBAPI/${widget.imageUrl}';
 
     companynamecontroller = TextEditingController(text: widget.currentcompanyname,);
     businesskeywordcontroller = TextEditingController(text: widget.currentbusinesskeywords,);
@@ -76,7 +76,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
 
   Future<void> Edit() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_edit.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_edit.php');
       print('url: $url');
       print('id: ${widget.id}');
       final requestBody = jsonEncode({
@@ -128,7 +128,7 @@ class _BusinessEditPageState extends State<BusinessEditPage> {
   }
   Future<void> Update() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_edit.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_edit.php');
       print('url: $url');
       print('id: ${widget.id}');
       final requestBody = jsonEncode({

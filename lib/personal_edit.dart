@@ -108,7 +108,7 @@ class _PersonalEditState extends State<PersonalEdit> {
   bool depVisible=false;
   @override
   void initState() {
-    image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl}';
+    image = 'http://mybudgetbook.in/GIBAPI/${widget.imageUrl}';
     firstnamecontroller = TextEditingController(text: widget.currentFname);
     lastnamecontroller = TextEditingController(text: widget.currentLname);
     locationcontroller = TextEditingController(text: widget.currentLocation);
@@ -157,7 +157,7 @@ class _PersonalEditState extends State<PersonalEdit> {
       }
     });
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/personal_edit.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/personal_edit.php');
       // final url = Uri.parse('http://192.168.29.129/API/offers.php');
       final response = await http.put(
         url,
@@ -214,7 +214,7 @@ class _PersonalEditState extends State<PersonalEdit> {
       }
     });
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/personal_edit.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/personal_edit.php');
       // final url = Uri.parse('http://192.168.29.129/API/offers.php');
       final response = await http.put(
         url,

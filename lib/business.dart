@@ -52,7 +52,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   tabs: [
                     Tab(text: ('GiB Total Transaction'),),
                     Tab(text: ('My Transaction')
-                  //  Tab(text:('My Total Transaction'),
+                      //  Tab(text:('My Total Transaction'),
                     ),
                   ],
                 ),
@@ -61,7 +61,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   child: TabBarView(children: <Widget>[
                     GibTransaction(userId: widget.userId, userType: widget.userType),
                     MyTransaction(userId: widget.userId, userType: widget.userType),
-                   // MyTotalTransaction(userId: widget.userId, userType: widget.userType),
+                    // MyTotalTransaction(userId: widget.userId, userType: widget.userType),
                   ],
                   ),
                 )
@@ -99,7 +99,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> getBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=BusinessTotalYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=BusinessTotalYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -119,7 +119,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> getaccountBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=BusinessCurrentYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=BusinessCurrentYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -138,7 +138,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> g2ggetBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=g2gBusinessTotalYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=g2gBusinessTotalYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -157,7 +157,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> g2ggetaccountBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=g2gBusinessCurrentYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=g2gBusinessCurrentYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -176,7 +176,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> visitorgetBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=visitorBusinessTotalYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=visitorBusinessTotalYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -195,7 +195,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> visitorgetaccountBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=visitorBusinessCurrentYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=visitorBusinessCurrentYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -214,7 +214,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> honorBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=honorBusinessTotalYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=honorBusinessTotalYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -233,7 +233,7 @@ class _GibTransactionState extends State<GibTransaction> {
 
   Future<void> honorgetaccountBusinessCount() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=honorBusinessCurrentYear');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=honorBusinessCurrentYear');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -283,7 +283,7 @@ class _GibTransactionState extends State<GibTransaction> {
                         height: 110,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10),
                           gradient: LinearGradient(
                             colors: [Colors.blue, Colors.green], // Gradient colors
                             begin: Alignment.topCenter,
@@ -349,7 +349,7 @@ class _GibTransactionState extends State<GibTransaction> {
                       Container(
                         height: 110,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10),
                           gradient: LinearGradient(
                             colors: [Color(0xFFE4E6F1), Color(0xFFCBD6EE)], // Gradient colors
                             begin: Alignment.topCenter,
@@ -375,11 +375,11 @@ class _GibTransactionState extends State<GibTransaction> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30,
-                                  backgroundColor: Colors.green,
-                          child: Text(
-                            'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                                    backgroundColor: Colors.green,
+                                    child: Text(
+                                      'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -561,7 +561,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> MygetBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -585,7 +585,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> getaccountBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessCurrentYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyBusinessCurrentYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -608,7 +608,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> MygsgBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=Myg2gTotalYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=Myg2gTotalYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -632,7 +632,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> g2gaccountBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=Myg2gCurrentYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=Myg2gCurrentYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -655,7 +655,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> MyvisitorBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyvisitorTotalYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyvisitorTotalYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -679,7 +679,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> visitoraccountBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyvisitorCurrentYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyvisitorCurrentYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -702,7 +702,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> MyhonorBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyhonorTotalYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyhonorTotalYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -726,7 +726,7 @@ class _MyTransactionState extends State<MyTransaction> {
   Future<void> honoraccountBusinessCount() async {
     try {
       if (widget.userId != null && widget.userId!.isNotEmpty) {
-        final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyhonorCurrentYear&user_id=${widget.userId}');
+        final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyhonorCurrentYear&user_id=${widget.userId}');
         final response = await http.get(url);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -763,299 +763,299 @@ class _MyTransactionState extends State<MyTransaction> {
       body: Center(
         child: SingleChildScrollView(
           child: Column(
-            children: [
-              SizedBox(height: 20,),
-              Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                child: Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Network Image
-                      Container(
-                        height: 110,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [Colors.blue, Colors.green], // Gradient colors
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        child: Padding(
-                          padding:  EdgeInsets.all(16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Business Year : $accountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                  SizedBox(height: 10,),
-                                  SizedBox(height: 10,),
-                                  Text("Upto Date : $totalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: AssetImage('assets/letter-b.png'),
-                                  ),
-                                ],
-
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      ),
-                      // Text "Business"
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("     "),
-                            Text(
-                              'Business',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+              children: [
+                SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Card(
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        // Network Image
+                        Container(
+                          height: 110,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(
+                              colors: [Colors.blue, Colors.green], // Gradient colors
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                             ),
-                            IconButton(onPressed: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ReferralPage(userType: widget.userType, userId: widget.userId,)),
-                              );
-                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ), /// Business year
-              SizedBox(height: 20,),
-              Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                child: Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Network Image
-                      Container(
-                        height: 110,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFE4E6F1), Color(0xFFCBD6EE)], // Gradient colors
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
                           ),
-
-                        ),
-                        child: Padding(
-                          padding:  EdgeInsets.all(16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Business Year : $g2gaccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
-                                  SizedBox(height: 10,),
-                                  SizedBox(height: 10,),
-                                  Text("Upto Date : $g2gtotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.green,
-                                    child: Text(
-                                      'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                          child: Padding(
+                            padding:  EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Business Year : $accountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                    SizedBox(height: 10,),
+                                    SizedBox(height: 10,),
+                                    Text("Upto Date : $totalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage('assets/letter-b.png'),
                                     ),
-                                  ),
-                                ],
+                                  ],
 
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
+
                         ),
-                      ),
-                      // Text "Business"
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("     "),
-                            Text(
-                              'G2G',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(onPressed: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) =>    GtoG(userType: widget.userType, userId: widget.userId,)),
-                              );
-                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),///G2G
-              SizedBox(height: 20,),
-              Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                child: Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Network Image
-                      Container(
-                        height: 110,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF6096B4), Color(0xFF93BFCF)], // Gradient colors
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                            borderRadius: BorderRadius.circular(10)
-                        ),
-                        child: Padding(
-                          padding:  EdgeInsets.all(16.0),
+                        // Text "Business"
+                        Padding(
+                          padding: EdgeInsets.all(10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Business Year : ₹ $honoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                  SizedBox(height: 10,),
-                                  SizedBox(height: 10,),
-                                  Text("Upto Date  : ₹ $honortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                ],
+                              Text("     "),
+                              Text(
+                                'Business',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: AssetImage('assets/letter-g.png'),
-                                  ),
-                                ],
-
-                              ),
+                              IconButton(onPressed: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ReferralPage(userType: widget.userType, userId: widget.userId,)),
+                                );
+                              }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
                             ],
                           ),
                         ),
-                      ),
-                      // Text "Business"
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("     "),
-                            Text(
-                              'Hounoring',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(onPressed: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Direct(userId: widget.userId, userType: widget.userType)),
-                              );
-                            }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ), /// Honor
-              SizedBox(height: 20,),
-              Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                child: Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Network Image
-                      Container(
-                        height: 110,
-                        decoration: BoxDecoration(
+                ), /// Business year
+                SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Card(
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        // Network Image
+                        Container(
+                          height: 110,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
                             gradient: LinearGradient(
-                              colors: [Color(0xFF6096B4), Color(0xFF93BFCF)], // Gradient colors
+                              colors: [Color(0xFFE4E6F1), Color(0xFFCBD6EE)], // Gradient colors
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             ),
-                            borderRadius: BorderRadius.circular(10)
+
+                          ),
+                          child: Padding(
+                            padding:  EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Business Year : $g2gaccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                    SizedBox(height: 10,),
+                                    SizedBox(height: 10,),
+                                    Text("Upto Date : $g2gtotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.green,
+                                      child: Text(
+                                        'G2G', style: TextStyle(color: Colors.white,fontSize: 30, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        child: Padding(
-                          padding:  EdgeInsets.all(16.0),
+                        // Text "Business"
+                        Padding(
+                          padding: EdgeInsets.all(10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Business Year : $visitoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                  SizedBox(height: 10,),
-                                  SizedBox(height: 10,),
-                                  Text("Upto Date : $visitortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
-                                ],
+                              Text("     "),
+                              Text(
+                                'G2G',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: AssetImage('assets/letter-g.png'),
-                                  ),
-                                ],
-
-                              ),
+                              IconButton(onPressed: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>    GtoG(userType: widget.userType, userId: widget.userId,)),
+                                );
+                              }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
                             ],
                           ),
                         ),
-                      ),
-                      // Text "Business"
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          'Guest',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                      ],
+                    ),
+                  ),
+                ),///G2G
+                SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Card(
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        // Network Image
+                        Container(
+                          height: 110,
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF6096B4), Color(0xFF93BFCF)], // Gradient colors
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                          child: Padding(
+                            padding:  EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Business Year : ₹ $honoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                    SizedBox(height: 10,),
+                                    SizedBox(height: 10,),
+                                    Text("Upto Date  : ₹ $honortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage('assets/letter-g.png'),
+                                    ),
+                                  ],
+
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        // Text "Business"
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("     "),
+                              Text(
+                                'Hounoring',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(onPressed: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => Direct(userId: widget.userId, userType: widget.userType)),
+                                );
+                              }, icon: Icon(Icons.add_circle_outline,color: Colors.black,),),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),///guest
+                ), /// Honor
+                SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Card(
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        // Network Image
+                        Container(
+                          height: 110,
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF6096B4), Color(0xFF93BFCF)], // Gradient colors
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                          child: Padding(
+                            padding:  EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Business Year : $visitoraccountingYear", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                    SizedBox(height: 10,),
+                                    SizedBox(height: 10,),
+                                    Text("Upto Date : $visitortotalRows", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage('assets/letter-g.png'),
+                                    ),
+                                  ],
 
-            ]
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Text "Business"
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'Guest',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),///guest
+
+              ]
           ),
         ),
       ),
@@ -1086,7 +1086,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
 
   Future<void> getBusinessCount(String id) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&id=$id');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gibBusiness.php?table=MyBusinessTotalYear&id=$id');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -1324,7 +1324,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                             ),
                             borderRadius: BorderRadius.circular(10)
                         ),
-                        child: Padding(
+                        child: const Padding(
                           padding:  EdgeInsets.all(16.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1353,7 +1353,7 @@ class _MyTotalTransactionState extends State<MyTotalTransaction> {
                         ),
                       ),
                       // Text "Business"
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.all(10),
                         child: Text(
                           'Honoring',

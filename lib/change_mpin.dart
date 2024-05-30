@@ -61,7 +61,7 @@ class _ChangeState extends State<Change> {
   Future<void> fetchData(String userId) async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/id_base_details_fetch.php?id=$userId');
+          'http://mybudgetbook.in/GIBAPI/id_base_details_fetch.php?id=$userId');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -93,7 +93,7 @@ class _ChangeState extends State<Change> {
 
   Future updatedetails(String password, String id) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/change_mpin.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/change_mpin.php');
 
       final response = await http.post(
         url,
@@ -133,8 +133,7 @@ class _ChangeState extends State<Change> {
       // Appbar starts
       appBar: AppBar(
         // Appbar title
-        title:
-            Text('Change M-Pin', style: Theme.of(context).textTheme.bodySmall),
+        title: Text('Change M-Pin', style: Theme.of(context).textTheme.displayLarge),
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
@@ -143,13 +142,8 @@ class _ChangeState extends State<Change> {
                 MaterialPageRoute(
                   builder: (context) {
                     switch (widget.userType) {
-                      case "Executive":
-                        return Homepage(
-                          userType: widget.userType,
-                          userID: widget.userID,
-                        );
                       case "Non-Executive":
-                        return NonExecutiveHomeNav(
+                        return NavigationBarNon(
                           userType: widget.userType,
                           userId: widget.userID,
                         );
@@ -159,9 +153,10 @@ class _ChangeState extends State<Change> {
                           userId: widget.userID,
                         );
                       default:
-                        print("Unknown member_type: ${widget.userType}");
-                        // You might want to return a default widget here or throw an error
-                        return Container(); // Placeholder, replace with appropriate widget
+                        return NavigationBarExe(
+                          userType: widget.userType,
+                          userId: widget.userID,
+                        ); // Placeholder, replace with appropriate widget
                     }
                   },
                 ),
@@ -182,7 +177,7 @@ class _ChangeState extends State<Change> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NonExecutiveHomeNav(
+                builder: (context) => NavigationBarNon(
                   userType: widget.userType.toString(),
                   userId: widget.userID.toString(),
                 ),
@@ -202,7 +197,7 @@ class _ChangeState extends State<Change> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Home(
+                builder: (context) => NavigationBarExe(
                   userType: widget.userType.toString(),
                   userId: widget.userID.toString(),
                 ),
@@ -367,6 +362,7 @@ class _ChangeState extends State<Change> {
                   ),
                   // Submit button starts here
                   MaterialButton(
+                    minWidth: 300,
                       color: Colors.green,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
@@ -378,7 +374,7 @@ class _ChangeState extends State<Change> {
                         }
                       },
                       child: const Text(
-                        'SUBMIT',
+                        'Submit',
                         style: TextStyle(color: Colors.white),
                       )),
                   const SizedBox(

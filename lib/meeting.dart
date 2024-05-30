@@ -1,19 +1,28 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gipapp/settings_page_executive.dart';
 import 'package:http/http.dart' as http;
 
+import 'Non_exe_pages/non_exe_home.dart';
+import 'Non_exe_pages/settings_non_executive.dart';
+import 'home.dart';
+
 class MeetingUpcoming extends StatelessWidget {
-  const MeetingUpcoming({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const MeetingUpcoming({super.key, required this.userType, required this.userId});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: MeetingUpcomingPage(),
+    return  Scaffold(
+      body: MeetingUpcomingPage(userType: userType.toString(), userId: userId.toString()),
     );
   }
 }
 class MeetingUpcomingPage extends StatefulWidget {
-  const MeetingUpcomingPage({Key? key}) : super(key: key);
+  final String? userType;
+  final String? userId;
+  const MeetingUpcomingPage({super.key, required this.userType, required this.userId});
 
   @override
   State<MeetingUpcomingPage> createState() => _MeetingUpcomingPageState();
@@ -26,38 +35,92 @@ class _MeetingUpcomingPageState extends State<MeetingUpcomingPage> {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title:  Text('Meeting',style: Theme.of(context).textTheme.bodySmall),
+          title:  Text('Meeting',style: Theme.of(context).textTheme.displayLarge),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
+          leading: IconButton(
+            onPressed: () {
+              if (widget.userType == "Non-Executive") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPageNon(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+              else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPageExecutive(
+                      userType: widget.userType.toString(),
+                      userId: widget.userId.toString(),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.navigate_before),
+          ),
         ),
 
-        body: const Column(
-            children: [
-              //TABBAR STARTS
-              TabBar(
-                isScrollable: true,
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(text: ('Network Meeting'),),
-                  Tab(text: ('Team Meeting'),),
-                  Tab(text: ('Training Program'),),
-                  Tab(text: ("GIB Meeting"),),
-                  //  Tab(text: ('API'),)
-                ],
-              ),
-              //TABBAR VIEW STARTS
-              Expanded(
-                child: TabBarView(children: <Widget>[
-                  NetworkMeeting(),
-                  TeamMeeting(),
-                  TrainingProgram(),
-                  GIBMeeting(),
-                  //  MyHomePage(title: '',),
-                ],
+        body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop)  {
+            if (widget.userType == "Non-Executive") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarNon(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
                 ),
-              )
-            ]),
+              );
+            }
+            else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavigationBarExe(
+                    userType: widget.userType.toString(),
+                    userId: widget.userId.toString(),
+                  ),
+                ),
+              );
+            }
+          },
+          child: const Column(
+              children: [
+                //TABBAR STARTS
+                TabBar(
+                  isScrollable: true,
+                  labelColor: Colors.green,
+                  unselectedLabelColor: Colors.black,
+                  tabs: [
+                    Tab(text: ('Network Meeting'),),
+                    Tab(text: ('Team Meeting'),),
+                    Tab(text: ('Training Program'),),
+                    Tab(text: ("GIB Meeting"),),
+                    //  Tab(text: ('API'),)
+                  ],
+                ),
+                //TABBAR VIEW STARTS
+                Expanded(
+                  child: TabBarView(children: <Widget>[
+                    NetworkMeeting(),
+                    TeamMeeting(),
+                    TrainingProgram(),
+                    GIBMeeting(),
+                    //  MyHomePage(title: '',),
+                  ],
+                  ),
+                )
+              ]),
+        ),
       ),
     );
   }
@@ -89,9 +152,7 @@ class NetworkMeeting extends StatelessWidget {
 
               //TABBAR STARTS
               child: const TabBar(
-                indicator: BoxDecoration(
-                  color: Colors.green,
-                ),
+                labelColor: Colors.green,
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
                 tabs: [
@@ -135,7 +196,7 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -173,7 +234,7 @@ class _UpComingNetworkMeetingState extends State<UpComingNetworkMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -303,7 +364,7 @@ class _CompletedNetworkMeetingState extends State<CompletedNetworkMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -423,9 +484,10 @@ class TeamMeeting  extends StatelessWidget {
 
               //TABBAR STARTS
               child:const TabBar(
-                indicator: BoxDecoration(
+                labelColor: Colors.green,
+                /*indicator: BoxDecoration(
                   color: Colors.green,
-                ),
+                ),*/
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
                 tabs: [
@@ -463,7 +525,7 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -500,7 +562,7 @@ class _UpcomingTeamMeetingState extends State<UpcomingTeamMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -643,7 +705,7 @@ class _CompletedTeamMeetingState extends State<CompletedTeamMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -774,9 +836,10 @@ class TrainingProgram extends StatelessWidget {
 
               //TABBAR STARTS
               child: const TabBar(
-                indicator: BoxDecoration(
+                /*indicator: BoxDecoration(
                   color: Colors.green,
-                ),
+                ),*/
+                labelColor: Colors.green,
                 //TABS STARTS
                 unselectedLabelColor: Colors.black,
                 tabs: [
@@ -816,7 +879,7 @@ class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -854,7 +917,7 @@ class _UpComingTrainingProgramState extends State<UpComingTrainingProgram> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -976,7 +1039,7 @@ class _CompletedTrainingProgramState extends State<CompletedTrainingProgram> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -1146,7 +1209,7 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -1188,7 +1251,7 @@ class _UpComingGIBMeetingState extends State<UpComingGIBMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -1303,7 +1366,7 @@ class _CompletedGIBMeetingState extends State<CompletedGIBMeeting> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/meeting.php?meeting_type=$type');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/meeting.php?meeting_type=$type');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

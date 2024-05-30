@@ -401,7 +401,7 @@ class _DirectState extends State<Direct> {
   List<dynamic> searchResults = [];
   Future<void> fetchRegistrationData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -447,7 +447,7 @@ class _DirectState extends State<Direct> {
   List dynamicdata=[];
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
@@ -480,7 +480,7 @@ class _DirectState extends State<Direct> {
   }
   Future<void> InsertHonorSlip() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/honor_slip.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/honor_slip.php');
       final response = await http.post(
         url,
         body: jsonEncode({

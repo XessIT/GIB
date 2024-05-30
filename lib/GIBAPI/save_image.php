@@ -4,11 +4,10 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "gib";
-
+$servername = "207.174.212.202";
+ $username = "kanin7w7_gibErode";
+ $password = "Kanxtl@6868#";
+ $dbname = "kanin7w7_gibErode";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

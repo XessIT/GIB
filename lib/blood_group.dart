@@ -45,7 +45,7 @@ class _BloodState extends State<Blood> {
         appBar: AppBar(
           // Appbar title
           title:
-              Text('Blood Group', style: Theme.of(context).textTheme.bodySmall),
+              Text('Blood Group', style: Theme.of(context).textTheme.displayLarge),
           iconTheme: const IconThemeData(
             color: Colors.white, // Set the color for the drawer icon
           ),
@@ -55,25 +55,25 @@ class _BloodState extends State<Blood> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => NonExecutiveHome(
-                              userType: widget.userType.toString(),
-                              userID: widget.userId.toString(),
-                            )));
-              }
-              if (widget.userType == "Executive") {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Home(
+                        builder: (context) => NavigationBarNon(
                               userType: widget.userType.toString(),
                               userId: widget.userId.toString(),
                             )));
               }
-              if (widget.userType == "Guest") {
+              else if (widget.userType == "Guest") {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => GuestHomePage(
+                        builder: (context) => GuestHome(
+                              userType: widget.userType.toString(),
+                              userId: widget.userId.toString(),
+                            )));
+              }
+              else {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NavigationBarExe(
                               userType: widget.userType.toString(),
                               userId: widget.userId.toString(),
                             )));
@@ -125,7 +125,7 @@ class _BloodState extends State<Blood> {
             }
           },
           child: SingleChildScrollView(
-            child: Container(
+            child: Center(
               child: Column(
                 children: [
                   Padding(
@@ -133,23 +133,18 @@ class _BloodState extends State<Blood> {
                         const EdgeInsets.only(top: 30, right: 20, left: 20),
                     child: Container(
                       width: 350,
-                      height: 650,
+                      height: 610,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-
-                          /// dark  colors: [Color(0xFFD81B60), Color(0xFFEF5350)], // Pink to Red gradient
-                          colors: [
-                            Colors.pink.shade100, // Light Pink
-                            Color(0xFFFFAB91), // Light Orange
-                            //  Color(0xFFF06292), // Light Pink
-                            Colors.pink.shade100, // Light Pink
-
-                            Color(0xFFFFAB91),
-                          ], // Pink to Light Pink to Red gradient
-                        ), // Optional: Add rounded corners
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3), // changes position of shadow
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -158,37 +153,7 @@ class _BloodState extends State<Blood> {
                             children: [
                               Column(
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const BloodList(
-                                                  bloods: 'A+',
-                                                )),
-                                      );
-                                    },
-                                    icon: Icon(
-                                      Icons.water_drop_outlined,
-                                      color: Colors.white,
-                                      size: 50,
-                                    ),
-                                  ),
-                                  Text(
-                                    "A+",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    child: IconButton(
+                                     IconButton(
                                       onPressed: () {
                                         Navigator.push(
                                           context,
@@ -199,13 +164,12 @@ class _BloodState extends State<Blood> {
                                                   )),
                                         );
                                       },
-                                      icon: Icon(
+                                      icon: const Icon(
                                         Icons.water_drop_rounded,
                                         color: Colors.red,
                                         size: 50,
                                       ),
                                     ),
-                                  ),
                                   Text(
                                     "A+",
                                     style:

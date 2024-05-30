@@ -22,7 +22,7 @@ class _GuestProfileState extends State<GuestProfile> {
     print('Attempting to fetch data...');
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/guest_profile.php?id=${widget.userID}');
+          'http://mybudgetbook.in/GIBAPI/guest_profile.php?id=${widget.userID}');
       print('Request URL: $url');
       final response = await http.get(url);
       print("ResponseStatus: ${response.statusCode}");
@@ -68,7 +68,7 @@ class _GuestProfileState extends State<GuestProfile> {
       // Replace backslashes with forward slashes and remove any leading slashes
       imageUrl = imageUrl.replaceAll('\\ ', '/').replaceAll(RegExp('^/'), '');
       // Construct the full image URL with the base URL
-      imageUrl = 'http://localhost/GIB/lib/GIBAPI/$imageUrl';
+      imageUrl = 'http://mybudgetbook.in/GIBAPI/$imageUrl';
       setState(() {
         this.imageUrl = imageUrl;
         print('Image URL: $imageUrl');
@@ -92,11 +92,23 @@ class _GuestProfileState extends State<GuestProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: const Center(
-                child: Text('Profile', style: TextStyle(color: Colors.white))),
+            title: Text('Profile', style: Theme.of(context).textTheme.displayLarge),
             centerTitle: true,
             iconTheme: const IconThemeData(
               color: Colors.white, // Set the color for the drawer icon
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GuestHome(
+                            userId: widget.userID,
+                            userType: widget.userType,
+                          )),
+                );
+              },
             ),
             actions: [
               IconButton(
@@ -124,7 +136,7 @@ class _GuestProfileState extends State<GuestProfile> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => GuestHomePage(
+                  builder: (context) => GuestHome(
                         userId: widget.userID,
                         userType: widget.userType,
                       )),
@@ -133,7 +145,7 @@ class _GuestProfileState extends State<GuestProfile> {
           child: SingleChildScrollView(
               child: Center(
                   child: Column(children: [
-            //imageUrl = 'http://localhost/GIB/lib/GIBAPI/${dynamicdata[0]["profile_image"]}';
+            //imageUrl = 'http://mybudgetbook.in/GIBAPI/${dynamicdata[0]["profile_image"]}';
             Container(
               child: AspectRatio(
                 aspectRatio: 16 /

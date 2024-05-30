@@ -64,7 +64,7 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
     blood = widget.currentBloodGroup!;
     print("widget image: ${widget.imageUrl20}");
     setState(() {
-      image = 'http://localhost/GIB/lib/GIBAPI/${widget.imageUrl20}';
+      image = 'http://mybudgetbook.in/GIBAPI/${widget.imageUrl20}';
     });
     print("image edit: $image");
     super.initState();
@@ -102,7 +102,7 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
   Future<void> Edit() async {
     try {
       final url =
-          Uri.parse('http://localhost/GIB/lib/GIBAPI/guest_profile.php');
+          Uri.parse('http://mybudgetbook.in/GIBAPI/guest_profile.php');
       // final url = Uri.parse('http://192.168.29.129/API/offers.php');
       final response = await http.put(
         url,
@@ -144,7 +144,7 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
   Future<void> updateProfile() async {
     try {
       final url =
-          Uri.parse('http://localhost/GIB/lib/GIBAPI/guest_profile.php');
+          Uri.parse('http://mybudgetbook.in/GIBAPI/guest_profile.php');
 
       // Assuming imageData is a String containing base64-encoded image data
       String base64Image = imageData;
@@ -197,11 +197,23 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Edit Profile', style: TextStyle(color: Colors.white)),
+        title: Text('Edit Profile', style: Theme.of(context).textTheme.displayLarge),
         centerTitle: true,
         iconTheme: const IconThemeData(
           color: Colors.white, // Set the color for the drawer icon
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GuestProfile(
+                    userID: widget.id,
+                    userType: widget.userType,
+                  )),
+            );
+          },
         ),
       ),
       body: PopScope(
@@ -579,52 +591,32 @@ class _GuestProfileEditState extends State<GuestProfileEdit> {
                   const SizedBox(
                     height: 30,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      MaterialButton(
-                          minWidth: 130,
-                          height: 50,
-                          color: Colors.orange,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.white),
-                          )),
-
-                      MaterialButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          minWidth: 130,
-                          height: 50,
-                          color: Colors.green[800],
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              selectedImage == null ? Edit() : updateProfile();
-                            }
-                            /*if(type == null){
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                  content: Text("Please Select the Type")));
-                            }
-                            else if (_formKey.currentState!.validate()) {
-                              Editoffers();
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context)=> OfferList(userId: widget.user_id)),);
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                  content: Text("Successfully Updated a Offer")));
-                            }*/
-                          },
-                          child: const Text(
-                            'Update',
-                            style: TextStyle(color: Colors.white),
-                          )),
-                      // Cancel button ends
-                    ],
-                  ),
+                  MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0)),
+                      minWidth: 300,
+                      height: 50,
+                      color: Colors.green,
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          selectedImage == null ? Edit() : updateProfile();
+                        }
+                        /*if(type == null){
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text("Please Select the Type")));
+                        }
+                        else if (_formKey.currentState!.validate()) {
+                          Editoffers();
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context)=> OfferList(userId: widget.user_id)),);
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text("Successfully Updated a Offer")));
+                        }*/
+                      },
+                      child: const Text(
+                        'Update',
+                        style: TextStyle(color: Colors.white),
+                      )),
                   const SizedBox(height: 20),
                 ],
               ),

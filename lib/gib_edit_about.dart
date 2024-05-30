@@ -45,7 +45,7 @@ class _AboutGibViewtabState extends State<AboutGibViewtab> {
   Future<void> aboutVision() async {
     try {
       final url = Uri.parse(
-          'http://localhost/GIB/lib/GIBAPI/about.php?table=about_vision');
+          'http://mybudgetbook.in/GIBAPI/about.php?table=about_vision');
 
 
       final response = await http.get(url);

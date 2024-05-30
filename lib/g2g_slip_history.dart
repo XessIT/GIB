@@ -51,8 +51,8 @@ class _SlipHistoryState extends State<SlipHistory> {
 
   Future<void> fetchData() async {
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      //http://mybudgetbook.in/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
       print("fetch url:$url");
 
@@ -87,7 +87,7 @@ class _SlipHistoryState extends State<SlipHistory> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/g2g_slip.php?table=g2g');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/g2g_slip.php?table=g2g');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");

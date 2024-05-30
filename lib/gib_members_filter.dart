@@ -30,7 +30,7 @@ TextEditingController  districtController = TextEditingController();
 /*
   Future<void> fetchData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -64,7 +64,7 @@ TextEditingController  districtController = TextEditingController();
   Future<void> getData(String districts,String chapters) async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/gib_members.php?member_type=${widget.userType}&district=$districts&chapter=$chapters&id=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/gib_members.php?member_type=${widget.userType}&district=$districts&chapter=$chapters&id=${widget.userId}');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
@@ -92,7 +92,7 @@ TextEditingController  districtController = TextEditingController();
   List<Map<String, dynamic>> suggesstiondistrictdata = [];
   Future<void> getDistrict() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/district.php');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/district.php');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -113,7 +113,7 @@ TextEditingController  districtController = TextEditingController();
   List<Map<String, dynamic>> suggesstionchapterdata = [];
   Future<void> getchapter(String district) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/chapter.php?district=$district');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/chapter.php?district=$district');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

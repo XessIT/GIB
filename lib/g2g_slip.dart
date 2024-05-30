@@ -74,7 +74,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
   Future<void> fetchData(String userId) async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=$userId');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=$userId');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         print("response S: ${response.statusCode}");
@@ -116,7 +116,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
 
   Future<void> postData() async {
-    var url = Uri.parse('http://localhost/GIB/lib/GIBAPI/g2g_slip.php');
+    var url = Uri.parse('http://mybudgetbook.in/GIBAPI/g2g_slip.php');
     final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(metdate.text);
     final formattedDate = DateFormat('yyyy/MM/dd').format(parsedDate);
     final response = await http.post(url, body: jsonEncode({
@@ -172,7 +172,7 @@ class _GtoGPageState extends State<GtoGPage> {
 
   Future<void> fetchRegistrationData() async {
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/searchbarfetch.php?userId=${widget.userId}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

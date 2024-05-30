@@ -32,13 +32,13 @@ class _BusinessHistoryState extends State<BusinessHistory> {
           title: Text("Business History", style: Theme.of(context).textTheme.bodySmall,),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
-          actions: [
+          /*actions: [
             IconButton(onPressed:(){
               Navigator.push(context, MaterialPageRoute(
                   builder: (context) => RadioListTileExample()));
                   },
                 icon: const Icon(Icons.more_vert)),
-          ],
+          ],*/
         ),
 
         body: Column(
@@ -91,8 +91,8 @@ class _CompletedState extends State<Completed> {
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      //http://mybudgetbook.in/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
       print("fetch url:$url");
 
@@ -128,7 +128,7 @@ class _CompletedState extends State<Completed> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
@@ -153,7 +153,7 @@ class _CompletedState extends State<Completed> {
 
 
   Future<void> updateBusinessSlip(String id, String status, String reason) async {
-    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php');
     print('url123$url');
     final response = await http.put(
       url,
@@ -484,8 +484,8 @@ class _PendingState extends State<Pending> {
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      //http://mybudgetbook.in/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
       print("fetch url:$url");
 
@@ -521,7 +521,7 @@ class _PendingState extends State<Pending> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
@@ -545,7 +545,7 @@ class _PendingState extends State<Pending> {
 
 
   Future<void> updateBusinessSlip(String id, String status, String reason) async {
-    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php');
     print('url123$url');
     final response = await http.put(
       url,
@@ -745,7 +745,7 @@ class _PendingState extends State<Pending> {
                                                       if(selectedStatus == 'Successful') {
                                                           updateBusinessSlip(data[i]['id'], selectedStatus, amountController.text);
                                                           try {
-                                                            final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/honor_slip.php');
+                                                            final url = Uri.parse('http://mybudgetbook.in/GIBAPI/honor_slip.php');
                                                             final response = await http.post(url,
                                                               body: jsonEncode({
                                                                 "Toname": data[i]["referrer_name"],
@@ -875,8 +875,8 @@ class _UnsuccessfulState extends State<Unsuccessful> {
   Future<void> fetchData() async {
     print("with user id ${widget.userId}");
     try {
-      //http://localhost/GIB/lib/GIBAPI/user.php?table=registration&id=$userId
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/registration.php?table=registration&id=${widget.userId}');
+      //http://mybudgetbook.in/GIBAPI/user.php?table=registration&id=$userId
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/registration.php?table=registration&id=${widget.userId}');
       final response = await http.get(url);
       print("fetch url:$url");
 
@@ -912,7 +912,7 @@ class _UnsuccessfulState extends State<Unsuccessful> {
   Future<void> getData() async {
     print('Attempting to make HTTP request...');
     try {
-      final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
+      final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php?table=business_slip&mobile=$fetchMobile&status=$status');
       print("gib members url =$url");
       final response = await http.get(url);
       print("gib members ResponseStatus: ${response.statusCode}");
@@ -937,7 +937,7 @@ class _UnsuccessfulState extends State<Unsuccessful> {
 
 
   Future<void> updateBusinessSlip(String id, String status, String reason) async {
-    final url = Uri.parse('http://localhost/GIB/lib/GIBAPI/business_slip.php');
+    final url = Uri.parse('http://mybudgetbook.in/GIBAPI/business_slip.php');
     print('url123$url');
     final response = await http.put(
       url,

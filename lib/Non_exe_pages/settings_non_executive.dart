@@ -14,6 +14,7 @@ import '../gib_doctors.dart';
 import '../gib_gallery.dart';
 import '../gib_members.dart';
 import '../login.dart';
+import '../meeting.dart';
 import '../profile.dart';
 import 'non_exe_home.dart';
 
@@ -32,25 +33,10 @@ class SettingsPageNon extends StatelessWidget {
           : Colors.black,
       appBar: AppBar(
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Colors.green,
-/*
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.green,
-                  Color(0xFF8155BA),
-                ],
-              )
-*/
-          ),
-        ),
         title:
         Text(
           "Settings",
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.displayLarge,
         ),
         leading: IconButton(
           icon: const Icon(
@@ -90,6 +76,26 @@ class SettingsPageNon extends StatelessWidget {
                     icons: CupertinoIcons.profile_circled,
                     iconStyle: IconStyle(),
                     title: 'Profile',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
+                    // subtitle:'Profile Image, Name, Income',
+                    titleMaxLine: 1,
+                    subtitleMaxLine: 1,
+                  ),
+                  SettingsItem(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MeetingUpcoming(userType: userType.toString(), userId: userId.toString(),)),
+                      );
+                    },
+                    icons: CupertinoIcons.calendar,
+                    iconStyle: IconStyle(
+                      iconsColor: Colors.white,
+                      withBackground: true,
+                      backgroundColor: Colors.purpleAccent,
+                    ),
+                    title: 'Meeting',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -108,6 +114,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.red,
                     ),
                     title: 'Attendance',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     //subtitle: "Lock Ziar'App to improve your privacy",
                   ),
                   SettingsItem(
@@ -123,6 +130,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'Attendance Scanner',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     //subtitle: "Lock Ziar'App to improve your privacy",
                   ),
 /*
@@ -162,6 +170,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                     title: 'Gib Gallery',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -180,6 +189,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.yellow.shade700,
                     ),
                     title: 'Gib Achievements',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -203,6 +213,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.blue,
                     ),
                     title: 'Gib Members',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -221,6 +232,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.orange,
                     ),
                     title: 'Offers',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -243,6 +255,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.purple,
                     ),
                     title: 'Gib Doctors',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -251,7 +264,7 @@ class SettingsPageNon extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>   BloodGroup( userType: userType.toString(), userId: userId.toString(),)),
+                        MaterialPageRoute(builder: (context) =>   Blood( userType: userType.toString(), userId: userId.toString(),)),
                       );
                     },
                     icons: Icons.bloodtype,
@@ -261,6 +274,7 @@ class SettingsPageNon extends StatelessWidget {
                       backgroundColor: Colors.red,
                     ),
                     title: 'Blood Group',
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                     // subtitle:'Profile Image, Name, Income',
                     titleMaxLine: 1,
                     subtitleMaxLine: 1,
@@ -307,7 +321,7 @@ class SettingsPageNon extends StatelessWidget {
                           builder: (context, setState) {
                             return Container(
                                 padding: EdgeInsets.all(20),
-                                child: Text("Are you sure want to Log out"));
+                                child: Text("Are you sure do you want to Log out?"));
                           },
                         ),
                         btnOk: ElevatedButton(
@@ -346,8 +360,14 @@ class SettingsPageNon extends StatelessWidget {
                         ),
                       ).show();
                     },
+                    iconStyle: IconStyle(
+                      iconsColor: Colors.white,
+                      withBackground: true,
+                      backgroundColor: Colors.red,
+                    ),
                     icons: Icons.exit_to_app_rounded,
-                    title: "Sign Out",
+                    title: "Log Out",
+                    titleStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
                   /* SettingsItem(
                     onTap: () {},
